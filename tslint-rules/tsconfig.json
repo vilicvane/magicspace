@@ -1,0 +1,8 @@
+{
+  "extends": "../node_modules/vts/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "bld"
+  },
+  "include": ["src"]
+}

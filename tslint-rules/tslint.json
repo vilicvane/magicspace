@@ -1,0 +1,3 @@
+{
+  "extends": "vts/tslint-prettier"
+}
