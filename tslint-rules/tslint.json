@@ -1,3 +1,9 @@
 {
-  "extends": "vts/tslint-prettier"
+  "extends": "vts/tslint-prettier",
+  "rules": {
+    "import-group": true
+  },
+  "rulesDirectory": [
+    "./ts-rules/importGroup"
+  ]
 }
