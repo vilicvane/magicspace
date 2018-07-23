@@ -4,5 +4,16 @@
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
-  "license": "MIT"
+  "license": "MIT",
+  "peerDependencies": {
+    "tslint": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "tsutils": "^2.28.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.2"
+  },
+  "repo":"Typescript"
 }
