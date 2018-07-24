@@ -1,57 +1,122 @@
-import {AbstractWalker} from 'tslint';
-import * as Lint from 'tslint';
+import {
+  AbstractWalker,
+  IOptions,
+  IRuleMetadata,
+  RuleFailure,
+  Rules,
+} from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
 import * as TS from 'typescript';
 
-// tslint:disable-next-line:no-duplicate-imports
-import {ConfigItem} from '../@lang';
+interface RawOptions {
+  groups: ModuleGroupConfigItem[];
+  ordered?: boolean;
+}
 
+interface ParsedOptions {
+  groups: ModuleGroup[];
+  ordered: boolean;
+}
+
+/** 分组的tester */
 type ModuleGroupTester = (path: string) => boolean;
 
-// let testConfigString = '$node';
+/** 分组的配置项 */
+interface ModuleGroupConfigItem {
+  name: string;
+  test: string;
+}
 
-// name
-// regex: "$node"
-// const tsConfig: TSConfig = require('../package.json');
+/** 模块组（处理后的配置项） */
+interface ModuleGroup {
+  name: string;
+  test: RegExp | ModuleGroupTester;
+}
 
 interface ModuleImportInfo {
   node: TS.Node;
   index: number;
   line: number;
-  // tag: importGroup;
 }
 
-export class Rule extends Lint.Rules.AbstractRule {
-  apply(sourceFile: TS.SourceFile): Lint.RuleFailure[] {
-    // return this.applyWithFunction(sourceFile, walk);
+export class Rule extends Rules.AbstractRule {
+  /** 用户配置项 */
+  private parsedOptions: ParsedOptions | undefined;
+
+  constructor(options: IOptions) {
+    super(options);
+
+    let {groups: groupConfigItems, ordered} = options
+      .ruleArguments[0] as RawOptions;
+
+    this.parsedOptions = {
+      groups: groupConfigItems.map(item => {
+        return {
+          name: item.name,
+          test: this.buildTester(item.test),
+        };
+      }),
+      ordered: !!ordered,
+    };
+  }
+
+  apply(sourceFile: TS.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportGroupWalker(
         sourceFile,
         Rule.metadata.ruleName,
-        this.ruleArguments,
+        this.parsedOptions!,
       ),
     );
   }
 
-  // faiture信息
+  /**
+   * 创建tester
+   * @description 通过对module path的初步解析，创建tester
+   * @param configString 配置的匹配字符串
+   * @return 返回一个tester用于匹配实际路径
+   */
+  private buildTester(configString: string): RegExp | ModuleGroupTester {
+    if (configString.startsWith(ImportGroupWalker.RUNTIME_NPM_MODULE_TAG)) {
+      switch (configString) {
+        case '$node':
+          return (path: string): boolean => require.resolve(path) === path;
+        case '$npm':
+          return (path: string): boolean =>
+            require
+              .resolve(path)
+              .includes(ImportGroupWalker.NPM_MODULE_POSITION);
+        default:
+          return (_: string): boolean => false;
+      }
+    } else {
+      return new RegExp(configString);
+    }
+  }
+
+  static Tag = false;
+
+  /** faiture信息 */
   static readonly SAME_GROUP_FAILURE_STRING = '同组之间不能有空行';
   static readonly DIFF_GROUP_FAILURE_STRING = '异组之间必须有空行';
   static readonly SEQUERENCE_FAILURE_STRING = '顺序错误';
 
-  // 元数据配置
-  static metadata: Lint.IRuleMetadata = {
+  /** 元数据配置 */
+  static metadata: IRuleMetadata = {
     ruleName: 'import-group',
     description: '针对于传入的参数对import的模块进行分组',
     optionsDescription: '',
     options: {
-      type: 'array',
-      items: {type: 'ConfigItem'},
+      type: `{group:'array', order:boolean}`,
     },
     optionExamples: [
-      `{
-        name:"runtime",
-        test:"$node"
-      }`,
+      [
+        true,
+        {
+          groups: [{name: 'runtime', test: '$node'}],
+          order: true,
+        },
+      ],
     ],
     type: 'style',
     hasFix: true,
@@ -59,20 +124,18 @@ export class Rule extends Lint.Rules.AbstractRule {
   };
 }
 
-class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
-  // 分组容器
-  private moduleImportInfosArr: ModuleImportInfo[] = [];
+class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
+  /** 分组容器 */
+  private moduleImportInfos: ModuleImportInfo[] = [];
 
-  // runtime模块或者npm模块的标志符
-  private readonly RUNTIME_NPM_MODULE_TAG = '$';
-  // npm模块的安装位置
-  private readonly NPM_MODULE_POSITION = 'node_modules';
+  visitImportDeclaration(node: TS.ImportDeclaration) {}
 
   walk(sourceFile: TS.SourceFile): void {
-    if (this.options.length === 0) {
+    if (this.options.groups.length === 0) {
       return;
     }
-    this.moduleImportInfosArr = [];
+
+    this.moduleImportInfos = [];
     let expressions = findImports(sourceFile, ImportKind.AllStaticImports);
 
     // 录入 import 语句到分组容器
@@ -83,10 +146,11 @@ class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
         expression.getStart(),
       ).line;
 
-      this.moduleImportInfosArr = this.pushInModuleImportInfosArr(
+      this.moduleImportInfos = this.pushInModuleImportInfosArr(
         expression.parent!,
         text,
         line,
+        this.moduleImportInfos,
       );
     }
 
@@ -105,16 +169,15 @@ class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
   }
 
   /**
-   * 检测规则
-   * @description 遍历容器，不符合顺序的抛出failure
+   * 检测规则, 遍历容器，不符合顺序的抛出failure
    */
   private judgeRule() {
-    // 当前索引
+    /** 当前索引 */
     let currentIndex = 0;
-    // 上一个节点
+    /** 上一个节点 */
     let prev: ModuleImportInfo | undefined;
     // 遍历容器
-    for (let moduleImportInfo of this.moduleImportInfosArr) {
+    for (let moduleImportInfo of this.moduleImportInfos) {
       if (moduleImportInfo.index >= currentIndex) {
         currentIndex = moduleImportInfo.index;
       } else {
@@ -124,7 +187,6 @@ class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
         );
       }
 
-      // 异组之间必须空行
       if (
         prev &&
         prev.index !== moduleImportInfo.index &&
@@ -161,37 +223,15 @@ class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
     node: TS.Node,
     path: string,
     line: number,
+    moduleImportInfos: ModuleImportInfo[],
   ): ModuleImportInfo[] {
-    let tmpArr = this.moduleImportInfosArr.concat([]);
-    for (let index of Object.keys(this.options)) {
-      if (this.matchModulePath(path, this.options[+index].test)) {
+    let tmpArr = moduleImportInfos.concat([]);
+    for (let index of Object.keys(this.options.groups)) {
+      if (this.matchModulePath(path, this.options.groups[Number(index)].test)) {
         tmpArr.push({node, index: +index, line});
       }
     }
     return tmpArr;
-  }
-
-  /**
-   * 创建tester
-   * @description 通过对module path的初步解析，创建tester
-   * @param configString 配置的匹配字符串
-   * @return 返回一个tester用于匹配实际路径
-   */
-  private buildTester(configString: string): RegExp | ModuleGroupTester {
-    if (configString.startsWith(this.RUNTIME_NPM_MODULE_TAG)) {
-      return (path: string): boolean => {
-        switch (configString) {
-          case '$node':
-            return require.resolve(path) === path;
-          case '$npm':
-            return require.resolve(path).includes(this.NPM_MODULE_POSITION);
-          default:
-            return false;
-        }
-      };
-    } else {
-      return new RegExp(configString);
-    }
   }
 
   /**
@@ -200,12 +240,19 @@ class ImportGroupWalker extends AbstractWalker<ConfigItem[]> {
    * @param configString 配置的匹配字符串
    * @returns 返回匹配结果
    */
-  private matchModulePath(path: string, configString: string): boolean {
-    let tester = this.buildTester(configString);
+  private matchModulePath(
+    path: string,
+    tester: ModuleGroupTester | RegExp,
+  ): boolean {
     if (typeof tester === 'function') {
       return tester(path);
     } else {
       return tester.test(path);
     }
   }
+
+  /** runtime模块或者npm模块的标志符 */
+  static readonly RUNTIME_NPM_MODULE_TAG = '$';
+  /** npm模块的安装位置 */
+  static readonly NPM_MODULE_POSITION = 'node_modules';
 }
