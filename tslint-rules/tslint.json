@@ -1,7 +1,16 @@
 {
   "extends": "vts/tslint-prettier",
   "rules": {
-    "import-group": [true, {"name": "runtime", "test": "$node"}]
+    "import-group": [
+      true,
+      {
+        "groups": [
+          {"name": "runtime", "test": "$node"},
+          {"name": "npm", "test": "$npm"}
+        ],
+        "ordered": false
+      }
+    ]
   },
-  "rulesDirectory": ["./src/rules/"]
+  "rulesDirectory": ["./bld/rules/"]
 }
