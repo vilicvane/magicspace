@@ -10,9 +10,11 @@
     "typescript": "*"
   },
   "dependencies": {
+    "resolve": "^1.8.1",
     "tsutils": "^2.28.0"
   },
   "devDependencies": {
-    "@types/node": "^10.5.2"
+    "@types/node": "^10.5.2",
+    "@types/resolve": "^0.0.8"
   }
 }

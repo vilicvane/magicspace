@@ -1,3 +1,6 @@
+import * as Path from 'path';
+
+import resolve = require('resolve');
 import {
   AbstractWalker,
   IOptions,
@@ -7,24 +10,47 @@ import {
   Rules,
 } from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
-import * as TS from 'typescript';
+import * as TypeScript from 'typescript';
+
 import {Dict} from '../@lang';
 
-/** faiture信息 */
-const SAME_GROUP_FAILURE_STRING = '同组之间不能有空行';
-const DIFF_GROUP_FAILURE_STRING = '异组之间必须有空行';
-const SEQUERENCE_FAILURE_STRING = '顺序错误';
-/** runtime模块或者npm模块的标志符 */
-const RUNTIME_NPM_MODULE_TAG = '$';
-/** npm模块的安装位置 */
-const NPM_MODULE_POSITION = 'node_modules';
+const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
+  'Unexpected empty line within the same import group.';
+const ERROR_MESSAGE_EXPECTING_EMPTY_LINE =
+  'Expecting an empty line between different import groups.';
+const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
+  'Import groups must be sorted according to given order.';
+const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
-/** 匹配字典 */
-const MatchDict: Dict<ModuleGroupTester> = {
-  $node: (path: string): boolean => require.resolve(path) === path,
-  $npm: (path: string): boolean =>
-    require.resolve(path).includes(NPM_MODULE_POSITION),
+const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
+  '$node-core'(path) {
+    try {
+      return require.resolve(path) === path;
+    } catch (error) {
+      return false;
+    }
+  },
+  '$node-modules'(modulePath, sourceFilePath) {
+    let basedir = Path.dirname(sourceFilePath);
+
+    let resolvedPath: string;
+
+    try {
+      resolvedPath = resolve.sync(modulePath, {basedir});
+    } catch (error) {
+      return false;
+    }
+
+    let relativePath = Path.relative(basedir, resolvedPath);
+
+    return /[\\/]node_modules[\\/]/.test(relativePath);
+  },
 };
+
+interface ModuleGroupConfigItem {
+  name: string;
+  test: string;
+}
 
 interface RawOptions {
   groups: ModuleGroupConfigItem[];
@@ -36,30 +62,36 @@ interface ParsedOptions {
   ordered: boolean;
 }
 
-/** 分组的tester */
-type ModuleGroupTester = (path: string) => boolean;
+type ModuleGroupTester = (
+  modulePath: string,
+  sourceFilePath: string,
+) => boolean;
 
-/** 分组的配置项 */
-interface ModuleGroupConfigItem {
-  name: string;
-  test: string;
-}
+class ModuleGroup {
+  readonly name: string;
+  private tester: ModuleGroupTester;
 
-/** 模块组（处理后的配置项） */
-interface ModuleGroup {
-  name: string;
-  test: RegExp | ModuleGroupTester;
-}
+  constructor({name, test: testConfig}: ModuleGroupConfigItem) {
+    this.name = name;
+    this.tester = this.buildTester(testConfig);
+  }
 
-interface ModuleImportInfo {
-  node: TS.Node;
-  index: number;
-  line: number;
+  test(modulePath: string, sourceFilePath: string): boolean {
+    return this.tester(modulePath, sourceFilePath);
+  }
+
+  private buildTester(config: string): ModuleGroupTester {
+    if (config.startsWith('$')) {
+      return BUILT_IN_MODULE_GROUP_TESTER_DICT[config] || (() => false);
+    } else {
+      let regex = new RegExp(config);
+      return path => regex.test(path);
+    }
+  }
 }
 
 export class Rule extends Rules.AbstractRule {
-  /** 用户配置项 */
-  private parsedOptions: ParsedOptions | undefined;
+  private parsedOptions: ParsedOptions;
 
   constructor(options: IOptions) {
     super(options);
@@ -68,273 +100,235 @@ export class Rule extends Rules.AbstractRule {
       .ruleArguments[0] as RawOptions;
 
     this.parsedOptions = {
-      groups: groupConfigItems.map(item => {
-        return {
-          name: item.name,
-          test: this.buildTester(item.test),
-        };
-      }),
+      groups: groupConfigItems.map(item => new ModuleGroup(item)),
       ordered: !!ordered,
     };
   }
 
-  apply(sourceFile: TS.SourceFile): RuleFailure[] {
+  apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportGroupWalker(
         sourceFile,
         Rule.metadata.ruleName,
-        this.parsedOptions!,
+        this.parsedOptions,
       ),
     );
   }
 
-  /**
-   * 创建tester
-   * @description 通过对module path的初步解析，创建tester
-   * @param configString 配置的匹配字符串
-   * @return 返回一个tester用于匹配实际路径
-   */
-  private buildTester(configString: string): RegExp | ModuleGroupTester {
-    if (configString.startsWith(RUNTIME_NPM_MODULE_TAG)) {
-      return MatchDict[configString] || ((_: string) => false);
-    } else {
-      return new RegExp(configString);
-    }
-  }
-
-  /** 元数据配置 */
   static metadata: IRuleMetadata = {
     ruleName: 'import-group',
-    description: '针对于传入的参数对import的模块进行分组',
+    description: 'Validate that module imports are grouped as expected.',
     optionsDescription: '',
     options: {
-      type: `{group:'array', order:boolean}`,
+      properties: {
+        groups: {
+          items: {
+            properties: {
+              name: {
+                type: 'string',
+              },
+              test: {
+                type: 'string',
+              },
+            },
+            type: 'object',
+          },
+          type: 'array',
+        },
+        ordered: {
+          type: 'boolean',
+        },
+      },
+      type: 'object',
     },
     optionExamples: [
       [
         true,
         {
-          groups: [{name: 'runtime', test: '$node'}],
-          order: true,
+          groups: [
+            {name: 'node-core', test: '$node-core'},
+            {name: 'node-modules', test: '$node-modules'},
+          ],
+          ordered: true,
         },
       ],
     ],
-    type: 'style',
+    type: 'maintainability',
     hasFix: true,
     typescriptOnly: false,
   };
 }
 
+interface ModuleImportInfo {
+  node: TypeScript.Node;
+  groupIndex: number;
+  /** 节点开始行. */
+  startLine: number;
+  /** 节点结束行. */
+  endLine: number;
+}
+
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
-  /** 分组容器 */
   private moduleImportInfos: ModuleImportInfo[] = [];
 
-  /** 修复对象 */
-  private fixer: Replacement | undefined;
+  walk(sourceFile: TypeScript.SourceFile): void {
+    let expressions = findImports(sourceFile, ImportKind.AllStaticImports);
 
-  walk(sourceFile: TS.SourceFile): void {
-    if (this.options.groups.length === 0) {
+    for (let expression of expressions) {
+      this.appendModuleImport(expression, sourceFile);
+    }
+
+    this.validate(this.moduleImportInfos);
+  }
+
+  private appendModuleImport(
+    expression: TypeScript.LiteralExpression,
+    sourceFile: TypeScript.SourceFile,
+  ): void {
+    let node: TypeScript.Node = expression;
+
+    while (node.parent!.kind !== TypeScript.SyntaxKind.SourceFile) {
+      node = node.parent!;
+    }
+
+    let modulePath = removeQuotes(expression.getText());
+    let sourceFilePath = sourceFile.fileName;
+
+    let groups = this.options.groups;
+
+    let index = groups.findIndex(group =>
+      group.test(modulePath, sourceFilePath),
+    );
+
+    this.moduleImportInfos.push({
+      node,
+      // 如果没有找到匹配的分组, 则归到 "其他" 一组, groupIndex 为 groups.length.
+      groupIndex: index < 0 ? groups.length : index,
+      startLine: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line,
+      endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
+    });
+  }
+
+  private validate(infos: ModuleImportInfo[]) {
+    if (!infos.length) {
       return;
     }
 
-    this.moduleImportInfos = [];
-    let expressions = findImports(sourceFile, ImportKind.AllStaticImports);
+    let {ordered} = this.options;
 
-    // 录入 import 语句到分组容器
-    for (let expression of expressions) {
-      let text = removeQuotes(expression.getText());
-      let line = TS.getLineAndCharacterOfPosition(
-        sourceFile,
-        expression.getStart(),
-      ).line;
-
-      this.moduleImportInfos = this.pushInModuleImportInfosArr(
-        expression.parent!,
-        text,
-        line,
-        this.moduleImportInfos,
-      );
+    interface FailureItem {
+      node: TypeScript.Node;
+      message: string;
     }
 
-    // 初始化fixer
-    this.fixer = this.buildFixer(this.moduleImportInfos);
+    let failureItems: FailureItem[] = [];
 
-    // 检查规则
-    this.validate(this.fixer, this.moduleImportInfos);
-  }
+    let [lastInfo, ...restInfos] = infos;
 
-  /**
-   * 根据容器index特征进行分类
-   * @param moduleImportInfos 分组容器
-   * @returns 分类完成的分组容器
-   */
-  private groupBy(moduleImportInfos: ModuleImportInfo[]): ModuleImportInfo[] {
-    let tmpArr = [];
-    for (let moduleImportInfo of moduleImportInfos) {
-      let index = moduleImportInfos.findIndex(
-        (ele: ModuleImportInfo) => ele.index === moduleImportInfo.index,
-      );
-      if (!index) {
-        tmpArr.push(moduleImportInfo);
-      } else {
-        tmpArr.splice(index, 0, moduleImportInfo);
-      }
-    }
-    return tmpArr;
-  }
+    let appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
 
-  /**
-   * 创建fixer
-   * @param moduleImportInfos 分组容器
-   * @returns Replacement对象，用于替换错误的行段
-   */
-  private buildFixer(
-    moduleImportInfos: ModuleImportInfo[],
-  ): Replacement | undefined {
-    moduleImportInfos = [...moduleImportInfos];
+    for (let info of restInfos) {
+      let checkOrdering = ordered;
 
-    if (moduleImportInfos.length < 2) {
-      return undefined;
-    }
+      if (info.groupIndex === lastInfo.groupIndex) {
+        // 只在分组第一项检查分组顺序.
+        checkOrdering = false;
 
-    let startItem = moduleImportInfos[0];
-    let endItem = moduleImportInfos[moduleImportInfos.length - 1];
-
-    // 排序
-    if (this.options.ordered) {
-      moduleImportInfos = moduleImportInfos.sort(
-        (a: ModuleImportInfo, b: ModuleImportInfo) => a.index - b.index,
-      );
-    } else {
-      // 根据容器index特征进行分类
-      moduleImportInfos = this.groupBy(moduleImportInfos);
-    }
-
-    /** 替代的字符串 */
-    let lines: string[] = [];
-
-    for (let index of Object.keys(moduleImportInfos)) {
-      let after = moduleImportInfos[Number(index) + 1];
-      let current = moduleImportInfos[Number(index)];
-
-      lines.push(current.node.getText());
-
-      if (after && after.index !== current.index) {
-        lines.push('\n');
-      }
-
-      lines.push('\n');
-    }
-
-    lines.push('\n');
-
-    return new Replacement(
-      startItem.node.getStart(),
-      endItem.node.getEnd(),
-      lines.join(''),
-    );
-  }
-
-  /**
-   * 检测规则, 遍历容器，不符合顺序的抛出failure
-   */
-  private validate(
-    fixer: Replacement | undefined,
-    moduleImportInfos: ModuleImportInfo[],
-  ) {
-    /** 当前索引 */
-    let currentIndex = 0;
-
-    /** 上一个节点 */
-    let prev: ModuleImportInfo | undefined;
-    // 遍历容器
-    for (let moduleImportInfo of moduleImportInfos) {
-      if (moduleImportInfo.index >= currentIndex) {
-        currentIndex = moduleImportInfo.index;
-        if (!this.options.ordered) {
-          currentIndex = -1;
+        // 如果当前分组和上一份组 groupIndex 相同, 则校验是否多了空行.
+        if (info.startLine - lastInfo.endLine > 1) {
+          failureItems.push({
+            node: info.node,
+            message: ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE,
+          });
         }
       } else {
-        this.addFailureAtNode(
-          moduleImportInfo.node,
-          SEQUERENCE_FAILURE_STRING,
-          fixer,
-        );
-      }
+        // 检验该组是否已经出现过.
+        if (appearedGroupIndexSet.has(info.groupIndex)) {
+          checkOrdering = false;
 
-      if (prev) {
-        let prevEnd = prev.node.getEnd();
-        let currentStart = moduleImportInfo.node.getStart();
-
-        if (
-          prev.index !== moduleImportInfo.index &&
-          prevEnd === currentStart - 1
-        ) {
-          this.addFailureAtNode(
-            moduleImportInfo.node,
-            DIFF_GROUP_FAILURE_STRING,
-            fixer,
-          );
-        } else if (
-          prev.index === moduleImportInfo.index &&
-          prevEnd !== currentStart - 1
-        ) {
-          this.addFailureAtNode(
-            moduleImportInfo.node,
-            SAME_GROUP_FAILURE_STRING,
-            fixer,
-          );
+          failureItems.push({
+            node: info.node,
+            message: ERROR_MESSAGE_NOT_GROUPED,
+          });
+        }
+        // 如果未出现过则校验是否少了空行.
+        else if (info.startLine - lastInfo.endLine < 2) {
+          failureItems.push({
+            node: info.node,
+            message: ERROR_MESSAGE_EXPECTING_EMPTY_LINE,
+          });
         }
       }
 
-      prev = moduleImportInfo;
-    }
-  }
+      if (checkOrdering) {
+        // 在要求分组顺序的情况下, 如果当前分组的 groupIndex 小于上一个分组的,
+        // 则说明顺序错误.
+        if (info.groupIndex < lastInfo.groupIndex) {
+          failureItems.push({
+            node: info.node,
+            message: ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER,
+          });
+        }
+      }
 
-  /**
-   * 将模块路径封装成ModuleImportInfo添加到数组里
-   * @param node AST中的一个节点
-   * @param path 模块路径
-   * @return 返回一个新的ModuleImportInfo数组
-   */
-  private pushInModuleImportInfosArr(
-    node: TS.Node,
-    path: string,
-    line: number,
-    moduleImportInfos: ModuleImportInfo[],
-  ): ModuleImportInfo[] {
-    let tmpArr = [...moduleImportInfos];
-    for (let index of Object.keys(this.options.groups)) {
-      if (this.matchModulePath(path, this.options.groups[Number(index)].test)) {
-        tmpArr.push({node, index: Number(index), line});
+      appearedGroupIndexSet.add(info.groupIndex);
+
+      lastInfo = info;
+    }
+
+    if (failureItems.length) {
+      let fixer = this.buildFixer(infos);
+
+      for (let {node, message} of failureItems) {
+        this.addFailureAtNode(node, message, fixer);
       }
     }
-    return tmpArr;
   }
 
-  /**
-   * 匹配路径
-   * @param path 模块路径
-   * @param configString 配置的匹配字符串
-   * @returns 返回匹配结果
-   */
-  private matchModulePath(
-    path: string,
-    tester: ModuleGroupTester | RegExp,
-  ): boolean {
-    if (typeof tester === 'function') {
-      return tester(path);
-    } else {
-      return tester.test(path);
-    }
+  private buildFixer(infos: ModuleImportInfo[]): Replacement | undefined {
+    let {ordered} = this.options;
+
+    let startNode = infos[0].node;
+    let endNode = infos[infos.length - 1].node;
+
+    let infoGroups = groupModuleImportInfos(infos, ordered);
+
+    let text = infoGroups
+      .map(group => group.map(info => info.node.getText()).join('\n'))
+      .join('\n\n');
+
+    return new Replacement(startNode.getStart(), endNode.getEnd(), text);
   }
 }
 
-/**
- * 去掉路径两边的引号
- * @param value 原始字符串
- * @returns 返回去掉引号后的字符串
- */
+function groupModuleImportInfos(
+  infos: ModuleImportInfo[],
+  ordered: boolean,
+): ModuleImportInfo[][] {
+  // 这里利用了 Map 和 Set 枚举顺序和键加入顺序一致的特性. 如果不需要按顺序分
+  // 组, 则遵照分组出现顺序.
+  let infoGroupMap = new Map<number, ModuleImportInfo[]>();
+
+  for (let info of infos) {
+    let infoGroup = infoGroupMap.get(info.groupIndex);
+
+    if (infoGroup) {
+      infoGroup.push(info);
+    } else {
+      infoGroup = [info];
+      infoGroupMap.set(info.groupIndex, infoGroup);
+    }
+  }
+
+  if (ordered) {
+    return Array.from(infoGroupMap.entries())
+      .sort(([indexX], [indexY]) => indexX - indexY)
+      .map(([, infoGroup]) => infoGroup);
+  } else {
+    return Array.from(infoGroupMap.values());
+  }
+}
+
 function removeQuotes(value: string): string {
   let groups = /^(['"])(.*)\1$/.exec(value);
   return groups ? groups[2] : '';
