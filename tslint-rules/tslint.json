@@ -1,3 +1,16 @@
 {
-  "extends": "vts/tslint-prettier"
+  "extends": "vts/tslint-prettier",
+  "rules": {
+    "import-group": [
+      true,
+      {
+        "groups": [
+          {"name": "node-core", "test": "$node-core"},
+          {"name": "node-modules", "test": "$node-modules"}
+        ],
+        "ordered": true
+      }
+    ]
+  },
+  "rulesDirectory": ["bld/rules"]
 }
