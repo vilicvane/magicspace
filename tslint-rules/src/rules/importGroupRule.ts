@@ -178,7 +178,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       this.appendModuleImport(expression, sourceFile);
     }
 
-    this.validate(this.moduleImportInfos);
+    this.validate();
   }
 
   private appendModuleImport(
@@ -209,7 +209,9 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     });
   }
 
-  private validate(infos: ModuleImportInfo[]) {
+  private validate() {
+    let infos = this.moduleImportInfos;
+
     if (!infos.length) {
       return;
     }
