@@ -9,7 +9,13 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {ImportKind, findImports} from 'tsutils';
+import {
+  ImportKind,
+  isExportDeclaration,
+  isImportDeclaration,
+  isImportEqualsDeclaration,
+  isTextualLiteral,
+} from 'tsutils';
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
@@ -22,6 +28,28 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
+const resolveWithCache = (() => {
+  let cache = new Map<string, string | undefined>();
+
+  return (id: string, basedir: string): string | undefined => {
+    let key = `${id}\n${basedir}`;
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+
+    let value: string | undefined;
+
+    try {
+      value = resolve.sync(id, {basedir});
+    } catch (error) {}
+
+    cache.set(key, value);
+
+    return value;
+  };
+})();
+
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core'(path) {
     try {
@@ -33,11 +61,9 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 
-    let resolvedPath: string;
+    let resolvedPath = resolveWithCache(modulePath, basedir);
 
-    try {
-      resolvedPath = resolve.sync(modulePath, {basedir});
-    } catch (error) {
+    if (!resolvedPath) {
       return false;
     }
 
@@ -170,15 +196,44 @@ interface ModuleImportInfo {
 
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   private moduleImportInfos: ModuleImportInfo[] = [];
+  private pendingStatements: TypeScript.Statement[] = [];
 
   walk(sourceFile: TypeScript.SourceFile): void {
-    let expressions = findImports(sourceFile, ImportKind.AllStaticImports);
+    let pendingCache: TypeScript.Statement[] = [];
 
-    for (let expression of expressions) {
-      this.appendModuleImport(expression, sourceFile);
+    let checkWithAppendModuleImport = (expression: TypeScript.Expression) => {
+      this.pendingStatements.push(...pendingCache);
+      pendingCache = [];
+
+      if (isTextualLiteral(expression)) {
+        this.appendModuleImport(expression, sourceFile);
+      }
+    };
+
+    for (let statement of sourceFile.statements) {
+      if (isImportDeclaration(statement)) {
+        if (ImportKind.ImportDeclaration) {
+          checkWithAppendModuleImport(statement.moduleSpecifier);
+        }
+      } else if (isImportEqualsDeclaration(statement)) {
+        if (
+          ImportKind.ImportEquals &&
+          statement.moduleReference.kind ===
+            TypeScript.SyntaxKind.ExternalModuleReference &&
+          statement.moduleReference.expression !== undefined
+        ) {
+          checkWithAppendModuleImport(statement.moduleReference.expression);
+        }
+      } else if (isExportDeclaration(statement)) {
+        if (statement.moduleSpecifier !== undefined && ImportKind.ExportFrom) {
+          checkWithAppendModuleImport(statement.moduleSpecifier);
+        }
+      } else {
+        pendingCache.push(statement);
+      }
     }
 
-    this.validate(this.moduleImportInfos);
+    this.validate();
   }
 
   private appendModuleImport(
@@ -209,7 +264,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     });
   }
 
-  private validate(infos: ModuleImportInfo[]) {
+  private validate() {
+    let infos = this.moduleImportInfos;
+    let pendingStatements = this.pendingStatements;
+
     if (!infos.length) {
       return;
     }
@@ -225,7 +283,16 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let [lastInfo, ...restInfos] = infos;
 
+    let fixerEnabled = !pendingStatements.length;
+
     let appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
+
+    for (let expression of pendingStatements) {
+      failureItems.push({
+        node: expression,
+        message: 'Unexpected code between import statements.',
+      });
+    }
 
     for (let info of restInfos) {
       let checkOrdering = ordered;
@@ -277,7 +344,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     }
 
     if (failureItems.length) {
-      let fixer = this.buildFixer(infos);
+      let fixer = fixerEnabled ? this.buildFixer(infos) : undefined;
 
       for (let {node, message} of failureItems) {
         this.addFailureAtNode(node, message, fixer);
