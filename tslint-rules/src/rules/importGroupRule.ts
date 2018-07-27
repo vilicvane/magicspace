@@ -20,14 +20,6 @@ import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
 
-let resolveCache = (() => {
-  let cache: Dict<string> = {};
-  return (id: string, opts: resolve.SyncOpts): string => {
-    const key = id + JSON.stringify(opts);
-    return cache[key] || (cache[key] = resolve.sync(id, opts));
-  };
-})();
-
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
 const ERROR_MESSAGE_EXPECTING_EMPTY_LINE =
@@ -35,6 +27,28 @@ const ERROR_MESSAGE_EXPECTING_EMPTY_LINE =
 const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
+
+const resolveWithCache = (() => {
+  let cache = new Map<string, string | undefined>();
+
+  return (id: string, basedir: string): string | undefined => {
+    let key = `${id}\n${basedir}`;
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+
+    let value: string | undefined;
+
+    try {
+      value = resolve.sync(id, {basedir});
+    } catch (error) {}
+
+    cache.set(key, value);
+
+    return value;
+  };
+})();
 
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core'(path) {
@@ -47,11 +61,9 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 
-    let resolvedPath: string;
+    let resolvedPath = resolveWithCache(modulePath, basedir);
 
-    try {
-      resolvedPath = resolveCache(modulePath, {basedir});
-    } catch (error) {
+    if (!resolvedPath) {
       return false;
     }
 
