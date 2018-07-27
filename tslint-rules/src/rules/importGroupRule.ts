@@ -197,13 +197,23 @@ interface ModuleImportInfo {
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   private moduleImportInfos: ModuleImportInfo[] = [];
   private pendingStatements: TypeScript.Statement[] = [];
-  private pendingCache: TypeScript.Statement[] = [];
 
   walk(sourceFile: TypeScript.SourceFile): void {
+    let pendingCache: TypeScript.Statement[] = [];
+
+    let checkWithAppendModuleImport = (expression: TypeScript.Expression) => {
+      this.pendingStatements.push(...pendingCache);
+      pendingCache = [];
+
+      if (isTextualLiteral(expression)) {
+        this.appendModuleImport(expression, sourceFile);
+      }
+    };
+
     for (let statement of sourceFile.statements) {
       if (isImportDeclaration(statement)) {
         if (ImportKind.ImportDeclaration) {
-          this.appendModuleImportCheck(statement.moduleSpecifier);
+          checkWithAppendModuleImport(statement.moduleSpecifier);
         }
       } else if (isImportEqualsDeclaration(statement)) {
         if (
@@ -212,27 +222,18 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
             TypeScript.SyntaxKind.ExternalModuleReference &&
           statement.moduleReference.expression !== undefined
         ) {
-          this.appendModuleImportCheck(statement.moduleReference.expression);
+          checkWithAppendModuleImport(statement.moduleReference.expression);
         }
       } else if (isExportDeclaration(statement)) {
         if (statement.moduleSpecifier !== undefined && ImportKind.ExportFrom) {
-          this.appendModuleImportCheck(statement.moduleSpecifier);
+          checkWithAppendModuleImport(statement.moduleSpecifier);
         }
       } else {
-        this.pendingCache.push(statement);
+        pendingCache.push(statement);
       }
     }
 
     this.validate();
-  }
-
-  private appendModuleImportCheck(expression: TypeScript.Expression) {
-    this.pendingStatements.push(...this.pendingCache);
-    this.pendingCache = [];
-
-    if (isTextualLiteral(expression)) {
-      this.appendModuleImport(expression, this.sourceFile);
-    }
   }
 
   private appendModuleImport(
