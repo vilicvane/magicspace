@@ -1,4 +1,3 @@
-import * as Crypto from 'crypto';
 import * as Path from 'path';
 
 import resolve = require('resolve');
@@ -18,13 +17,14 @@ import {
   isTextualLiteral,
 } from 'tsutils';
 import * as TypeScript from 'typescript';
+
 import {Dict} from '../@lang';
 
 let resolveCache = (() => {
   let cache: Dict<string> = {};
   return (id: string, opts: resolve.SyncOpts): string => {
     const key = id + JSON.stringify(opts);
-    return cache[key] || (cache[key] = resolve.sync(key, opts));
+    return cache[key] || (cache[key] = resolve.sync(id, opts));
   };
 })();
 
