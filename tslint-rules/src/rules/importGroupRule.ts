@@ -9,7 +9,13 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {ImportKind, findImports} from 'tsutils';
+import {
+  ImportKind,
+  isExportDeclaration,
+  isImportDeclaration,
+  isImportEqualsDeclaration,
+  isTextualLiteral,
+} from 'tsutils';
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
@@ -170,15 +176,43 @@ interface ModuleImportInfo {
 
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   private moduleImportInfos: ModuleImportInfo[] = [];
+  private pendingStatements: TypeScript.Statement[] = [];
+  private pendingCache: TypeScript.Statement[] = [];
 
   walk(sourceFile: TypeScript.SourceFile): void {
-    let expressions = findImports(sourceFile, ImportKind.AllStaticImports);
-
-    for (let expression of expressions) {
-      this.appendModuleImport(expression, sourceFile);
+    for (let statement of sourceFile.statements) {
+      if (isImportDeclaration(statement)) {
+        if (ImportKind.ImportDeclaration) {
+          this.appendModuleImportCheck(statement.moduleSpecifier);
+        }
+      } else if (isImportEqualsDeclaration(statement)) {
+        if (
+          ImportKind.ImportEquals &&
+          statement.moduleReference.kind ===
+            TypeScript.SyntaxKind.ExternalModuleReference &&
+          statement.moduleReference.expression !== undefined
+        ) {
+          this.appendModuleImportCheck(statement.moduleReference.expression);
+        }
+      } else if (isExportDeclaration(statement)) {
+        if (statement.moduleSpecifier !== undefined && ImportKind.ExportFrom) {
+          this.appendModuleImportCheck(statement.moduleSpecifier);
+        }
+      } else {
+        this.pendingCache.push(statement);
+      }
     }
 
     this.validate();
+  }
+
+  private appendModuleImportCheck(expression: TypeScript.Expression) {
+    this.pendingStatements.push(...this.pendingCache);
+    this.pendingCache = [];
+
+    if (isTextualLiteral(expression)) {
+      this.appendModuleImport(expression, this.sourceFile);
+    }
   }
 
   private appendModuleImport(
@@ -211,6 +245,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
   private validate() {
     let infos = this.moduleImportInfos;
+    let pendingStatements = this.pendingStatements;
 
     if (!infos.length) {
       return;
@@ -227,7 +262,16 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let [lastInfo, ...restInfos] = infos;
 
+    let fixerEnabled = !pendingStatements.length;
+
     let appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
+
+    for (let expression of pendingStatements) {
+      failureItems.push({
+        node: expression,
+        message: 'Unexpected code between import statements.',
+      });
+    }
 
     for (let info of restInfos) {
       let checkOrdering = ordered;
@@ -279,7 +323,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     }
 
     if (failureItems.length) {
-      let fixer = this.buildFixer(infos);
+      let fixer = fixerEnabled ? this.buildFixer(infos) : undefined;
 
       for (let {node, message} of failureItems) {
         this.addFailureAtNode(node, message, fixer);
