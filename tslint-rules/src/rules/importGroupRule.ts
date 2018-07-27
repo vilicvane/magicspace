@@ -1,3 +1,4 @@
+import * as Crypto from 'crypto';
 import * as Path from 'path';
 
 import resolve = require('resolve');
@@ -17,8 +18,15 @@ import {
   isTextualLiteral,
 } from 'tsutils';
 import * as TypeScript from 'typescript';
-
 import {Dict} from '../@lang';
+
+let resolveCache = (() => {
+  let cache: Dict<string> = {};
+  return (id: string, opts: resolve.SyncOpts): string => {
+    const key = id + JSON.stringify(opts);
+    return cache[key] || (cache[key] = resolve.sync(key, opts));
+  };
+})();
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
@@ -42,7 +50,7 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
     let resolvedPath: string;
 
     try {
-      resolvedPath = resolve.sync(modulePath, {basedir});
+      resolvedPath = resolveCache(modulePath, {basedir});
     } catch (error) {
       return false;
     }
