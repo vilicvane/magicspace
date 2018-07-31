@@ -14,8 +14,8 @@ let testDirs = glob
 let allPassed = true;
 
 for (let testDir of testDirs) {
-  let results = runTest(testDir);
-  let passed = consoleTestResultHandler(results, console);
+  let result = runTest(testDir);
+  let passed = consoleTestResultHandler(result, console);
 
   if (!passed) {
     allPassed = false;
