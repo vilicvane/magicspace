@@ -5,6 +5,10 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "scripts": {
+    "compile:test":"tsc -p test",
+    "test":"node ./bld/test/ruleTestRunner.js"
+  },
   "peerDependencies": {
     "tslint": "*",
     "typescript": "*"
@@ -14,7 +18,10 @@
     "tsutils": "^2.28.0"
   },
   "devDependencies": {
+    "@types/glob": "^5.0.35",
+    "@types/jest": "^23.3.1",
     "@types/node": "^10.5.2",
-    "@types/resolve": "^0.0.8"
+    "@types/resolve": "^0.0.8",
+    "glob": "^7.1.2"
   }
 }
