@@ -1,6 +1,6 @@
 {
   "rules": {
-    "import-group": [
+    "import-groups": [
       true,
       {
         "groups": [
