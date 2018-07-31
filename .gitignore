@@ -13,4 +13,4 @@ lerna-debug.log
 
 # Testing files
 
-test.*
+/test.*
