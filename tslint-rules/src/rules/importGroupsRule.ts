@@ -142,7 +142,7 @@ export class Rule extends Rules.AbstractRule {
   }
 
   static metadata: IRuleMetadata = {
-    ruleName: 'import-group',
+    ruleName: 'import-groups',
     description: 'Validate that module imports are grouped as expected.',
     optionsDescription: '',
     options: {

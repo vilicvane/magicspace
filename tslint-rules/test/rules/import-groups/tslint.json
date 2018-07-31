@@ -1,5 +1,4 @@
 {
-  "extends": "vts/tslint-prettier",
   "rules": {
     "import-groups": [
       true,
@@ -12,5 +11,5 @@
       }
     ]
   },
-  "rulesDirectory": ["bld/rules"]
+  "rulesDirectory": ["../../../bld/rules"]
 }
