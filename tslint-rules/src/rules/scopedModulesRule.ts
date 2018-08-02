@@ -1,7 +1,13 @@
 import * as Fs from 'fs';
 import * as Path from 'path';
 
-import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
+import {
+  AbstractWalker,
+  IRuleMetadata,
+  Replacement,
+  RuleFailure,
+  Rules,
+} from 'tslint';
 import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import * as Typescript from 'typescript';
 import {Dict} from '../@lang';
@@ -16,6 +22,26 @@ const ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT =
 const Tester: Dict<RegExp> = {
   canNotImportOrExport: /^@.+\//,
   indexFile: /index\.(js|ts)$/,
+};
+
+/** fixer 根据不同的tag返回不同的fixer */
+const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
+  removeNotExportFixer: node =>
+    new Replacement(node.getStart(), node.getWidth(), ''),
+  autoExportModuleFixer: (
+    sourceFile: Typescript.SourceFile,
+    exportNodesPath: string[],
+  ) =>
+    new Replacement(
+      sourceFile.getStart(),
+      sourceFile.getFullWidth(),
+      [
+        sourceFile.getText(),
+        ...exportNodesPath.map(
+          value => `export * from './${removeSuffix(value)}'`,
+        ),
+      ].join('\n'),
+    ),
 };
 
 /** rule 配置项 */
@@ -33,6 +59,7 @@ interface NodeInfo {
 interface FailureItem {
   message: string;
   node: Typescript.Node | undefined;
+  fixer?: Replacement;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -79,24 +106,28 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
     this.validate();
   }
 
-  // 验证 export 节点
-  private validateExports(text: string, node: Typescript.Node) {
+  private validateExportsAndImport(
+    message: string,
+    text: string,
+    node: Typescript.Node,
+  ) {
     if (Tester.canNotImportOrExport.test(text)) {
       this.failureManager.appendFailure({
-        message: ERROR_MESSAGE_CAN_NOT_EXPORT,
+        message,
         node,
+        fixer: fixerBuilder.removeNotExportFixer(node),
       });
     }
   }
 
+  // 验证 export 节点
+  private validateExports(text: string, node: Typescript.Node) {
+    this.validateExportsAndImport(ERROR_MESSAGE_CAN_NOT_EXPORT, text, node);
+  }
+
   // 验证 import 节点
   private validateImport(text: string, node: Typescript.Node) {
-    if (Tester.canNotImportOrExport.test(text)) {
-      this.failureManager.appendFailure({
-        message: ERROR_MESSAGE_CAN_NOT_IMPORT,
-        node,
-      });
-    }
+    this.validateExportsAndImport(ERROR_MESSAGE_CAN_NOT_IMPORT, text, node);
   }
 
   // 验证index文件
@@ -134,6 +165,10 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
         this.failureManager.appendFailure({
           node: undefined,
           message: ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT,
+          fixer: fixerBuilder.autoExportModuleFixer(
+            this.sourceFile,
+            waitExportFiles,
+          ),
         });
       }
     }
@@ -145,9 +180,15 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
     // TODO some logic
     for (let info of infos) {
       if (info.type === 'exports') {
-        this.validateExports(removeQuotes(info.node.getText()), info.node);
+        this.validateExports(
+          removeQuotes(info.node.getText()),
+          info.node.parent!,
+        );
       } else if (info.type === 'import') {
-        this.validateImport(removeQuotes(info.node.getText()), info.node);
+        this.validateImport(
+          removeQuotes(info.node.getText()),
+          info.node.parent!,
+        );
       }
     }
 
@@ -185,10 +226,11 @@ class FailureManager {
             this.sourceFile.getStart(),
             this.sourceFile.getEnd(),
             item.message,
+            item.fixer,
           );
         } else {
           let {node, message} = item;
-          this.ctx.addFailureAtNode(node, message);
+          this.ctx.addFailureAtNode(node, message, item.fixer);
         }
       }
     }
