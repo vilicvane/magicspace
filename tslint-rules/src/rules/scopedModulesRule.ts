@@ -20,11 +20,19 @@ const ERROR_MESSAGE_CAN_NOT_EXPORT =
 const ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT =
   'Some of the modules are not imported.';
 
-const Tester: Dict<RegExp> = {
-  canNotImport: /^@.+\//,
-  canNotExport: /@.+/,
-  indexFile: /index\.(js|ts|ts\.lint)$/,
+// import xxx from '../../@foo';
+// import xxx from '../../@foo/hia';
+// import xxx from '../bar/@foo';
+// import xxx from '../@pia/bar/@foo';
+
+const indexFileRegex = /[\\/]index\.(js|tsx?(?:\.lint)?)$/;
+
+const BannedPattern = {
+  import: /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/,
+  export: /[\\/]@/,
 };
+
+type BannedPatternName = keyof typeof BannedPattern;
 
 /** 根据不同的 tag 返回不同的 fixer */
 const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
@@ -40,7 +48,7 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
       [
         sourceFile.getText(),
         ...exportNodesPath.map(
-          value => `export * from './${removeSuffix(value)}'`,
+          value => `export * from './${removeFileNameSuffix(value)}'`,
         ),
       ].join('\n'),
     ),
@@ -89,6 +97,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
           type: 'import',
         });
       }
+
       if (isExportDeclaration(statement)) {
         this.nodeInfos.push({
           node: statement.moduleSpecifier!,
@@ -96,6 +105,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
         });
       }
     }
+
     this.validate();
   }
 
@@ -103,9 +113,9 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     message: string,
     text: string,
     node: Typescript.Node,
-    tag: 'canNotExport' | 'canNotImport',
+    tag: BannedPatternName,
   ) {
-    if (Tester[tag].test(text)) {
+    if (BannedPattern[tag].test(text)) {
       this.failureManager.appendFailure({
         message,
         node,
@@ -120,7 +130,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
       ERROR_MESSAGE_CAN_NOT_EXPORT,
       text,
       node,
-      'canNotExport',
+      'export',
     );
   }
 
@@ -130,7 +140,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
       ERROR_MESSAGE_CAN_NOT_IMPORT,
       text,
       node,
-      'canNotImport',
+      'import',
     );
   }
 
@@ -140,7 +150,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     let fileName = this.sourceFile.fileName;
     /** 当前路径 */
     let dirname = getDirnameFromPath(fileName);
-    if (Tester.indexFile.test(fileName)) {
+    if (indexFileRegex.test(fileName)) {
       /** 需要导出的文件 */
       let mustExportFiles: string[] = [];
       // 获取当前目录下的文件
@@ -152,12 +162,13 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
 
         if (
           info.isFile() &&
-          !Tester.indexFile.test(file) &&
-          !Tester.canNotExport.test(file)
+          !indexFileRegex.test(file) &&
+          !BannedPattern.export.test(file)
         ) {
           mustExportFiles.push(file);
         } else if (info.isDirectory()) {
           let folderFiles = Fs.readdirSync(currentPath);
+
           // 有目录可以导入
           if (
             folderFiles.indexOf('index.js') !== -1 ||
@@ -169,6 +180,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
       }
 
       let waitExportFiles = findDiffEleInArrays(exportsNodes, mustExportFiles);
+
       if (waitExportFiles.length !== 0) {
         this.failureManager.appendFailure({
           node: undefined,
@@ -225,7 +237,10 @@ class FailureManager {
   throwFailures() {
     if (this.failureItems.length) {
       for (let item of this.failureItems) {
-        if (!item.node) {
+        if (item.node) {
+          let {node, message} = item;
+          this.ctx.addFailureAtNode(node, message, item.fixer);
+        } else {
           let sourceFile = this.ctx.getSourceFile();
           this.ctx.addFailure(
             sourceFile.getStart(),
@@ -233,9 +248,6 @@ class FailureManager {
             ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT,
             item.fixer,
           );
-        } else {
-          let {node, message} = item;
-          this.ctx.addFailureAtNode(node, message, item.fixer);
         }
       }
     }
@@ -253,19 +265,22 @@ function getDirnameFromPath(path: string) {
 }
 
 // 找出两个数组的不相同的元素
-function findDiffEleInArrays(arr1: string[], arr2: string[]) {
-  return arr2.filter(mustincludePath => {
+function findDiffEleInArrays(arrA: string[], arrB: string[]) {
+  return arrB.filter(mustIncludePath => {
     let result = true;
-    for (let includePath of arr1) {
-      if (includePath.includes(removeSuffix(mustincludePath))) {
+
+    for (let includePath of arrA) {
+      if (includePath.includes(removeFileNameSuffix(mustIncludePath))) {
         result = false;
       }
     }
+
     return result;
   });
 }
 
-// 去掉文件后缀
-function removeSuffix(fileName: string) {
+// TODO: use Path.basename
+
+function removeFileNameSuffix(fileName: string) {
   return fileName.split('.')[0];
 }
