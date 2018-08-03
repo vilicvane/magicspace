@@ -10,21 +10,23 @@ import {
 } from 'tslint';
 import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import * as Typescript from 'typescript';
+
 import {Dict} from '../@lang';
 
 const ERROR_MESSAGE_CAN_NOT_IMPORT =
-  "this module can not import, because this module name start with the '@'";
+  "This module can not import, because this module name start with the '@'.";
 const ERROR_MESSAGE_CAN_NOT_EXPORT =
-  "this module can not exports, because this module name start with the '@'";
+  "This module can not exports, because this module name start with the '@'.";
 const ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT =
-  'Some of the modules are not imported';
+  'Some of the modules are not imported.';
 
 const Tester: Dict<RegExp> = {
-  canNotImportOrExport: /^@.+\//,
-  indexFile: /index\.(js|ts)$/,
+  canNotImport: /^@.+\//,
+  canNotExport: /@.+/,
+  indexFile: /index\.(js|ts|ts\.lint)$/,
 };
 
-/** fixer 根据不同的tag返回不同的fixer */
+/** 根据不同的 tag 返回不同的 fixer */
 const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
   removeNotExportFixer: node =>
     new Replacement(node.getStart(), node.getWidth(), ''),
@@ -44,11 +46,6 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
     ),
 };
 
-/** rule 配置项 */
-interface ParsedOptions {
-  modulePath: string;
-}
-
 /** 节点信息 */
 interface NodeInfo {
   node: Typescript.Node;
@@ -65,11 +62,7 @@ interface FailureItem {
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new ScopesModulesWalker(
-        sourceFile,
-        Rule.metadata.ruleName,
-        this.ruleArguments[0],
-      ),
+      new ScopesModulesWalker(sourceFile, Rule.metadata.ruleName, undefined),
     );
   }
 
@@ -84,9 +77,9 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
+class ScopesModulesWalker extends AbstractWalker<undefined> {
   private nodeInfos: NodeInfo[] = [];
-  private failureManager = new FailureManager(this.sourceFile, this);
+  private failureManager = new FailureManager(this);
 
   walk(sourceFile: Typescript.SourceFile): void {
     for (let statement of sourceFile.statements) {
@@ -110,8 +103,9 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
     message: string,
     text: string,
     node: Typescript.Node,
+    tag: 'canNotExport' | 'canNotImport',
   ) {
-    if (Tester.canNotImportOrExport.test(text)) {
+    if (Tester[tag].test(text)) {
       this.failureManager.appendFailure({
         message,
         node,
@@ -122,15 +116,25 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
 
   // 验证 export 节点
   private validateExports(text: string, node: Typescript.Node) {
-    this.validateExportsAndImport(ERROR_MESSAGE_CAN_NOT_EXPORT, text, node);
+    this.validateExportsAndImport(
+      ERROR_MESSAGE_CAN_NOT_EXPORT,
+      text,
+      node,
+      'canNotExport',
+    );
   }
 
   // 验证 import 节点
   private validateImport(text: string, node: Typescript.Node) {
-    this.validateExportsAndImport(ERROR_MESSAGE_CAN_NOT_IMPORT, text, node);
+    this.validateExportsAndImport(
+      ERROR_MESSAGE_CAN_NOT_IMPORT,
+      text,
+      node,
+      'canNotImport',
+    );
   }
 
-  // 验证index文件
+  // 验证 index 文件
   private validateIndexFile(exportsNodes: string[]) {
     /** 文件名称 */
     let fileName = this.sourceFile.fileName;
@@ -146,7 +150,11 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
         let currentPath = Path.join(dirname, file);
         let info = Fs.statSync(currentPath);
 
-        if (info.isFile() && !Tester.indexFile.test(file)) {
+        if (
+          info.isFile() &&
+          !Tester.indexFile.test(file) &&
+          !Tester.canNotExport.test(file)
+        ) {
           mustExportFiles.push(file);
         } else if (info.isDirectory()) {
           let folderFiles = Fs.readdirSync(currentPath);
@@ -177,7 +185,6 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
   private validate() {
     let infos = this.nodeInfos;
 
-    // TODO some logic
     for (let info of infos) {
       if (info.type === 'exports') {
         this.validateExports(
@@ -209,10 +216,7 @@ class ScopesModulesWalker extends AbstractWalker<ParsedOptions> {
 class FailureManager {
   private failureItems: FailureItem[] = [];
 
-  constructor(
-    private sourceFile: Typescript.SourceFile,
-    private ctx: ScopesModulesWalker,
-  ) {}
+  constructor(private ctx: ScopesModulesWalker) {}
 
   appendFailure(item: FailureItem) {
     this.failureItems.push(item);
@@ -222,10 +226,11 @@ class FailureManager {
     if (this.failureItems.length) {
       for (let item of this.failureItems) {
         if (!item.node) {
+          let sourceFile = this.ctx.getSourceFile();
           this.ctx.addFailure(
-            this.sourceFile.getStart(),
-            this.sourceFile.getEnd(),
-            item.message,
+            sourceFile.getStart(),
+            sourceFile.getEnd(),
+            ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT,
             item.fixer,
           );
         } else {

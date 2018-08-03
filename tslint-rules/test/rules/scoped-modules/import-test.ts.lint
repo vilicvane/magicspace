@@ -1,0 +1,7 @@
+import { Http } from '@angular/http'  // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        [This module can not import, because this module name start with the '@'.]
+
+import person from './@person'
+import student from '../student'
+
+import { sayHello } from './foo/@bar'
