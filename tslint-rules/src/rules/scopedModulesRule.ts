@@ -269,4 +269,3 @@ function removeFileNameSuffix(fileName: string) {
 
 function toRelativeCurrentPath(fileName: string) {
   return `./${fileName}`;
-}
