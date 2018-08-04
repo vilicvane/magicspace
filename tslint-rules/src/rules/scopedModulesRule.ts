@@ -1,6 +1,7 @@
-import * as Fs from 'fs';
+import * as FS from 'fs';
 import * as Path from 'path';
 
+import _ = require('lodash');
 import {
   AbstractWalker,
   IRuleMetadata,
@@ -13,14 +14,14 @@ import * as Typescript from 'typescript';
 
 import {Dict} from '../@lang';
 
-const ERROR_MESSAGE_CAN_NOT_IMPORT =
-  "This module can not import, because this module name start with the '@'.";
-const ERROR_MESSAGE_CAN_NOT_EXPORT =
-  "This module can not exports, because this module name start with the '@'.";
-const ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT =
-  'Some of the modules are not imported.';
+const ERROR_MESSAGE_BANNED_IMPORT =
+  "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
+const ERROR_MESSAGE_BANNED_EXPORT =
+  "This module can not be exported, because it contains internal module with prefix '@' under a parallel directory.";
+const ERROR_MESSAGE_MISSING_EXPORTS =
+  'Missing modules expected to be exported.';
 
-const indexFileRegex = /[\\/]index\.(js|tsx?(?:\.lint)?)$/;
+const INDEX_FILE_REGEX = /(?:^|[\\/])index\.((?:js|ts)x?)$/;
 
 const BannedPattern = {
   import: /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/,
@@ -40,19 +41,18 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
     new Replacement(
       sourceFile.getStart(),
       sourceFile.getFullWidth(),
-      [
-        sourceFile.getText(),
+      `${[
+        sourceFile.getText().trimRight(),
         ...exportNodesPath.map(
-          value => `export * from './${removeFileNameSuffix(value)}'`,
+          value => `export * from './${removeFileNameExtension(value)}';`,
         ),
-      ].join('\n'),
+      ].join('\n')}\n`,
     ),
 };
 
-/** 节点信息 */
 interface NodeInfo {
   node: Typescript.Node;
-  type: 'import' | 'exports';
+  type: 'import' | 'export';
 }
 
 /** 需要添加错误的项目 */
@@ -96,7 +96,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
       if (isExportDeclaration(statement)) {
         this.nodeInfos.push({
           node: statement.moduleSpecifier!,
-          type: 'exports',
+          type: 'export',
         });
       }
     }
@@ -119,73 +119,83 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     }
   }
 
-  // 验证 export 节点
   private validateExports(text: string, node: Typescript.Node) {
     this.validateExportsAndImport(
-      ERROR_MESSAGE_CAN_NOT_EXPORT,
+      ERROR_MESSAGE_BANNED_EXPORT,
       text,
       node,
       'export',
     );
   }
 
-  // 验证 import 节点
   private validateImport(text: string, node: Typescript.Node) {
     this.validateExportsAndImport(
-      ERROR_MESSAGE_CAN_NOT_IMPORT,
+      ERROR_MESSAGE_BANNED_IMPORT,
       text,
       node,
       'import',
     );
   }
 
-  // 验证 index 文件
-  private validateIndexFile(exportsNodes: string[]) {
-    /** 文件名称 */
+  private validateIndexFile(exportIds: string[]) {
     let fileName = this.sourceFile.fileName;
-    /** 当前路径 */
-    let dirname = getDirnameFromPath(fileName);
-    if (indexFileRegex.test(fileName)) {
-      /** 需要导出的文件 */
-      let mustExportFiles: string[] = [];
-      // 获取当前目录下的文件
-      let files = Fs.readdirSync(dirname);
 
-      for (let file of files) {
-        let currentPath = Path.join(dirname, file);
-        let info = Fs.statSync(currentPath);
+    if (!INDEX_FILE_REGEX.test(fileName)) {
+      return;
+    }
 
-        if (
-          info.isFile() &&
-          !indexFileRegex.test(toRelativeCurrentPath(file)) &&
-          !BannedPattern.export.test(toRelativeCurrentPath(file))
-        ) {
-          mustExportFiles.push(removeFileNameSuffix(file));
-        } else if (info.isDirectory()) {
-          let folderFiles = Fs.readdirSync(currentPath);
+    let dirName = getDirnameFromPath(fileName);
 
-          // 有目录可以导入
-          if (
-            folderFiles.indexOf('index.js') !== -1 ||
-            folderFiles.indexOf('index.ts') !== -1
-          ) {
-            mustExportFiles.push(removeFileNameSuffix(file));
+    let entryNames = FS.readdirSync(dirName);
+
+    let expectedExportIds = entryNames
+      .map(
+        (entryName): string | undefined => {
+          let entryFullPath = Path.join(dirName, entryName);
+          let stats = FS.statSync(entryFullPath);
+
+          if (stats.isFile()) {
+            if (INDEX_FILE_REGEX.test(entryName)) {
+              return undefined;
+            }
+
+            let entryModuleId = `./${removeModuleFileExtension(entryName)}`;
+
+            if (BannedPattern.export.test(entryModuleId)) {
+              return undefined;
+            }
+
+            return entryModuleId;
+          } else if (stats.isDirectory()) {
+            let entryNamesInFolder = FS.readdirSync(entryFullPath);
+
+            let hasIndexFile = entryNamesInFolder.some(entryNameInFolder =>
+              INDEX_FILE_REGEX.test(entryNameInFolder),
+            );
+
+            if (!hasIndexFile) {
+              return undefined;
+            }
+
+            return `./${entryName}`;
+          } else {
+            return undefined;
           }
-        }
-      }
+        },
+      )
+      .filter((entryName): entryName is string => !!entryName);
 
-      let waitExportFiles = findDiffEleInArrays(exportsNodes, mustExportFiles);
+    let missingExportIds = _.difference(expectedExportIds, exportIds);
 
-      if (waitExportFiles.length !== 0) {
-        this.failureManager.appendFailure({
-          node: undefined,
-          message: ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT,
-          fixer: fixerBuilder.autoExportModuleFixer(
-            this.sourceFile,
-            waitExportFiles,
-          ),
-        });
-      }
+    if (missingExportIds.length) {
+      this.failureManager.appendFailure({
+        node: undefined,
+        message: ERROR_MESSAGE_MISSING_EXPORTS,
+        fixer: fixerBuilder.autoExportModuleFixer(
+          this.sourceFile,
+          missingExportIds,
+        ),
+      });
     }
   }
 
@@ -193,7 +203,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     let infos = this.nodeInfos;
 
     for (let info of infos) {
-      if (info.type === 'exports') {
+      if (info.type === 'export') {
         this.validateExports(
           removeQuotes(info.node.getText()),
           info.node.parent!,
@@ -206,13 +216,11 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
       }
     }
 
-    let exportsNodes = infos.map(value => {
-      return value.type === 'exports'
-        ? removeFileNameSuffix(removeQuotes(value.node.getText()))
-        : '';
-    });
+    let exportIds = infos
+      .filter(info => info.type === 'export')
+      .map(info => removeQuotes(info.node.getText()));
 
-    this.validateIndexFile(exportsNodes);
+    this.validateIndexFile(exportIds);
 
     this.failureManager.throwFailures();
   }
@@ -238,7 +246,7 @@ class FailureManager {
           this.ctx.addFailure(
             sourceFile.getStart(),
             sourceFile.getEnd(),
-            ERROR_MESSAGE_HAVE_SOME_MODULE_NOT_EXPORT,
+            ERROR_MESSAGE_MISSING_EXPORTS,
             item.fixer,
           );
         }
@@ -256,16 +264,10 @@ function getDirnameFromPath(path: string): string {
   return Path.dirname(path);
 }
 
-// 找出两个数组的不相同的元素
-function findDiffEleInArrays(arrA: string[], arrB: string[]): string[] {
-  return arrA
-    .concat(arrB)
-    .filter(item => !arrA.includes(item) || !arrB.includes(item));
+function removeModuleFileExtension(fileName: string): string {
+  return fileName.replace(/\.(?:(?:js|ts)x?|d\.ts)?$/i, '');
 }
 
-function removeFileNameSuffix(fileName: string) {
+function removeFileNameExtension(fileName: string) {
   return Path.basename(fileName, Path.extname(fileName));
 }
-
-function toRelativeCurrentPath(fileName: string) {
-  return `./${fileName}`;

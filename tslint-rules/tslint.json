@@ -10,7 +10,8 @@
         ],
         "ordered": true
       }
-    ]
+    ],
+    "scoped-modules": true
   },
   "rulesDirectory": ["bld/rules"]
 }
