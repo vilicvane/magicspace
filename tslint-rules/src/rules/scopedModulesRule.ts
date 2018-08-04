@@ -65,7 +65,7 @@ interface FailureItem {
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new ScopesModulesWalker(sourceFile, Rule.metadata.ruleName, undefined),
+      new ScopedModuleWalker(sourceFile, Rule.metadata.ruleName, undefined),
     );
   }
 
@@ -80,7 +80,7 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-class ScopesModulesWalker extends AbstractWalker<undefined> {
+class ScopedModuleWalker extends AbstractWalker<undefined> {
   private nodeInfos: NodeInfo[] = [];
   private failureManager = new FailureManager(this);
 
@@ -111,7 +111,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     tag: BannedPatternName,
   ) {
     if (BannedPattern[tag].test(text)) {
-      this.failureManager.appendFailure({
+      this.failureManager.append({
         message,
         node,
         fixer: fixerBuilder.removeNotExportFixer(node),
@@ -188,7 +188,7 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
     let missingExportIds = _.difference(expectedExportIds, exportIds);
 
     if (missingExportIds.length) {
-      this.failureManager.appendFailure({
+      this.failureManager.append({
         node: undefined,
         message: ERROR_MESSAGE_MISSING_EXPORTS,
         fixer: fixerBuilder.autoExportModuleFixer(
@@ -222,34 +222,37 @@ class ScopesModulesWalker extends AbstractWalker<undefined> {
 
     this.validateIndexFile(exportIds);
 
-    this.failureManager.throwFailures();
+    this.failureManager.throw();
   }
 }
 
 class FailureManager {
-  private failureItems: FailureItem[] = [];
+  private items: FailureItem[] = [];
 
-  constructor(private ctx: ScopesModulesWalker) {}
+  constructor(private walker: ScopedModuleWalker) {}
 
-  appendFailure(item: FailureItem) {
-    this.failureItems.push(item);
+  append(item: FailureItem) {
+    this.items.push(item);
   }
 
-  throwFailures() {
-    if (this.failureItems.length) {
-      for (let item of this.failureItems) {
-        if (item.node) {
-          let {node, message} = item;
-          this.ctx.addFailureAtNode(node, message, item.fixer);
-        } else {
-          let sourceFile = this.ctx.getSourceFile();
-          this.ctx.addFailure(
-            sourceFile.getStart(),
-            sourceFile.getEnd(),
-            ERROR_MESSAGE_MISSING_EXPORTS,
-            item.fixer,
-          );
-        }
+  throw() {
+    let items = this.items;
+
+    if (!items.length) {
+      return;
+    }
+
+    for (let {node, message, fixer} of items) {
+      if (node) {
+        this.walker.addFailureAtNode(node, message, fixer);
+      } else {
+        let sourceFile = this.walker.getSourceFile();
+        this.walker.addFailure(
+          sourceFile.getStart(),
+          sourceFile.getEnd(),
+          ERROR_MESSAGE_MISSING_EXPORTS,
+          fixer,
+        );
       }
     }
   }
