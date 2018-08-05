@@ -47,7 +47,9 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
         ...exportNodesPath.map(
           value => `export * from '${removeModuleFileExtension(value)}';`,
         ),
-      ].join('\n')}\n`,
+      ]
+        .filter(text => !!text)
+        .join('\n')}\n`,
     ),
 };
 
