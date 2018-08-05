@@ -19,6 +19,7 @@ import {
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
+import {removeQuotes} from '../utils/pathUtils';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
@@ -394,9 +395,4 @@ function groupModuleImportInfos(
   } else {
     return Array.from(infoGroupMap.values());
   }
-}
-
-function removeQuotes(value: string): string {
-  let groups = /^(['"])(.*)\1$/.exec(value);
-  return groups ? groups[2] : '';
 }

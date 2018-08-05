@@ -13,6 +13,11 @@ import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import * as Typescript from 'typescript';
 
 import {Dict} from '../@lang';
+import {
+  removeFileNameExtension,
+  removeModuleFileExtension,
+  removeQuotes,
+} from '../utils/pathUtils';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
   "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
@@ -144,7 +149,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       return;
     }
 
-    let dirName = getDirnameFromPath(fileName);
+    let dirName = Path.dirname(fileName);
 
     let entryNames = FS.readdirSync(dirName);
 
@@ -256,21 +261,4 @@ class FailureManager {
       }
     }
   }
-}
-
-function removeQuotes(value: string): string {
-  let groups = /^(['"])(.*)\1$/.exec(value);
-  return groups ? groups[2] : '';
-}
-
-function getDirnameFromPath(path: string): string {
-  return Path.dirname(path);
-}
-
-function removeModuleFileExtension(fileName: string): string {
-  return fileName.replace(/\.(?:(?:js|ts)x?|d\.ts)?$/i, '');
-}
-
-function removeFileNameExtension(fileName: string) {
-  return Path.basename(fileName, Path.extname(fileName));
 }
