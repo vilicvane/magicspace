@@ -13,11 +13,7 @@ import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import * as Typescript from 'typescript';
 
 import {Dict} from '../@lang';
-import {
-  removeFileNameExtension,
-  removeModuleFileExtension,
-  removeQuotes,
-} from '../utils/pathUtils';
+import {removeModuleFileExtension, removeQuotes} from '../utils/path';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
   "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
@@ -49,7 +45,7 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
       `${[
         sourceFile.getText().trimRight(),
         ...exportNodesPath.map(
-          value => `export * from './${removeFileNameExtension(value)}';`,
+          value => `export * from '${removeModuleFileExtension(value)}';`,
         ),
       ].join('\n')}\n`,
     ),

@@ -19,7 +19,7 @@ import {
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
-import {removeQuotes} from '../utils/pathUtils';
+import {removeQuotes} from '../utils/path';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
