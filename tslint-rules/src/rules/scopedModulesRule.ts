@@ -13,6 +13,7 @@ import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import * as Typescript from 'typescript';
 
 import {Dict} from '../@lang';
+import {FailureManager} from '../utils/failure-manager';
 import {removeModuleFileExtension, removeQuotes} from '../utils/path';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
@@ -56,13 +57,6 @@ const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
 interface NodeInfo {
   node: Typescript.Node;
   type: 'import' | 'export';
-}
-
-/** 需要添加错误的项目 */
-interface FailureItem {
-  message: string;
-  node: Typescript.Node | undefined;
-  fixer?: Replacement;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -226,37 +220,5 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     this.validateIndexFile(exportIds);
 
     this.failureManager.throw();
-  }
-}
-
-class FailureManager {
-  private items: FailureItem[] = [];
-
-  constructor(private walker: ScopedModuleWalker) {}
-
-  append(item: FailureItem) {
-    this.items.push(item);
-  }
-
-  throw() {
-    let items = this.items;
-
-    if (!items.length) {
-      return;
-    }
-
-    for (let {node, message, fixer} of items) {
-      if (node) {
-        this.walker.addFailureAtNode(node, message, fixer);
-      } else {
-        let sourceFile = this.walker.getSourceFile();
-        this.walker.addFailure(
-          sourceFile.getStart(),
-          sourceFile.getEnd(),
-          ERROR_MESSAGE_MISSING_EXPORTS,
-          fixer,
-        );
-      }
-    }
   }
 }
