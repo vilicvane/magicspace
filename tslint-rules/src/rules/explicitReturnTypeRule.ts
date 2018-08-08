@@ -6,6 +6,7 @@ import {
   isMethodDeclaration,
 } from 'tsutils';
 import * as TypeScript from 'typescript';
+
 import {FailureManager} from '../utils/failure-manager';
 
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE =
