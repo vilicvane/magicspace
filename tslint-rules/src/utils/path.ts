@@ -9,6 +9,6 @@ export function removeModuleFileExtension(fileName: string): string {
   return fileName.replace(/\.(?:(?:js|ts)x?|d\.ts)?$/i, '');
 }
 
-export function getBaseNameWithoutExtension(fileName: string) {
+export function getBaseNameWithoutExtension(fileName: string): string {
   return Path.basename(fileName, Path.extname(fileName));
 }

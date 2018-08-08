@@ -106,7 +106,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     text: string,
     node: Typescript.Node,
     tag: BannedPatternName,
-  ) {
+  ): void {
     if (BannedPattern[tag].test(text)) {
       this.failureManager.append({
         message,
@@ -116,7 +116,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private validateExports(text: string, node: Typescript.Node) {
+  private validateExports(text: string, node: Typescript.Node): void {
     this.validateExportsAndImport(
       ERROR_MESSAGE_BANNED_EXPORT,
       text,
@@ -125,7 +125,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     );
   }
 
-  private validateImport(text: string, node: Typescript.Node) {
+  private validateImport(text: string, node: Typescript.Node): void {
     this.validateExportsAndImport(
       ERROR_MESSAGE_BANNED_IMPORT,
       text,
@@ -134,7 +134,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     );
   }
 
-  private validateIndexFile(exportIds: string[]) {
+  private validateIndexFile(exportIds: string[]): void {
     let fileName = this.sourceFile.fileName;
 
     if (!INDEX_FILE_REGEX.test(fileName)) {
@@ -196,7 +196,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private validate() {
+  private validate(): void {
     let infos = this.nodeInfos;
 
     for (let info of infos) {

@@ -58,7 +58,7 @@ class NoParentImportRule extends AbstractWalker<undefined> {
     this.validate();
   }
 
-  private validate() {
+  private validate(): void {
     let importExpressions = this.importExpressions;
     let sourceFileDirName = Path.dirname(this.sourceFile.fileName);
 

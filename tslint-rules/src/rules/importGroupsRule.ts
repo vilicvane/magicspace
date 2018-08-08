@@ -265,7 +265,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     });
   }
 
-  private validate() {
+  private validate(): void {
     let infos = this.moduleImportInfos;
     let pendingStatements = this.pendingStatements;
 

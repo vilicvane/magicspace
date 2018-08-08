@@ -13,11 +13,11 @@ export class FailureManager<T> {
 
   constructor(private walker: AbstractWalker<T>) {}
 
-  append(item: FailureItem) {
+  append(item: FailureItem): void {
     this.items.push(item);
   }
 
-  throw() {
+  throw(): void {
     let items = this.items;
 
     if (!items.length) {
