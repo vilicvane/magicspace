@@ -11,7 +11,8 @@
         "ordered": true
       }
     ],
-    "scoped-modules": true
+    "scoped-modules": true,
+    "explicit-return-type": true
   },
   "rulesDirectory": ["bld/rules"]
 }

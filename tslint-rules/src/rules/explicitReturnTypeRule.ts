@@ -1,6 +1,7 @@
 import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
 import {
   isArrowFunction,
+  isCallExpression,
   isFunctionDeclaration,
   isFunctionExpression,
   isMethodDeclaration,
@@ -39,6 +40,10 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
 
   walk(sourceFile: TypeScript.SourceFile): void {
     let cb = (node: TypeScript.Node) => {
+      if (isCallExpression(node)) {
+        return;
+      }
+
       if (
         (isArrowFunction(node) ||
           isFunctionDeclaration(node) ||
