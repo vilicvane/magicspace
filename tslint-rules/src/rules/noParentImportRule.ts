@@ -17,7 +17,7 @@ import {removeModuleFileExtension, removeQuotes} from '../utils/path';
 
 const RELATIVE_PATH = /^(?:\.{1,2}[\\/])+/;
 const ERROR_MESSAGE_BANNED_PARENT_IMPORT =
-  'this module can not be imported, because it is imported from parent directory.';
+  'Importing from parent directory is not allowed.';
 
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
@@ -28,7 +28,7 @@ export class Rule extends Rules.AbstractRule {
 
   static metadata: IRuleMetadata = {
     ruleName: 'no-parent-import',
-    description: 'No additional parameters are required',
+    description: '',
     optionsDescription: '',
     options: undefined,
     type: 'maintainability',

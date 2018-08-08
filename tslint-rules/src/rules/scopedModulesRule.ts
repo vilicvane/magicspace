@@ -68,7 +68,7 @@ export class Rule extends Rules.AbstractRule {
 
   static metadata: IRuleMetadata = {
     ruleName: 'scoped-modules',
-    description: 'No additional parameters are required',
+    description: '',
     optionsDescription: '',
     options: undefined,
     type: 'maintainability',
