@@ -1,0 +1,19 @@
+function foo() {}
+~~~~~~~~~~~~~~~~~ [This function require a explicit return type.]
+let foo = () => {}
+          ~~~~~~~~ [This function require a explicit return type.]
+let foo = {
+  bar(){}
+  ~~~~~~~ [This function require a explicit return type.]
+}
+
+class Foo{
+  bar(){}
+  ~~~~~~~ [This function require a explicit return type.]
+}
+
+let foo:Foo = () => {}
+
+let foo:Foo = {
+  bar(){}
+}

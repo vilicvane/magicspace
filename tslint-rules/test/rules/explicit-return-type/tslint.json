@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "explicit-return-type": true
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}
