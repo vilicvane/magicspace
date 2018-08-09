@@ -1,11 +1,37 @@
 {
   "name": "@magicspace/configs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "keywords": [
+    "TypeScript",
+    "tslint",
+    "prettier"
+  ],
+  "bugs": {
+    "url": "https://github.com/makeflow/magicspace/issues"
+  },
+  "files": [
+    "tslint.js",
+    "tslint-prettier.js",
+    "prettier.js",
+    "tsconfig.json",
+    "tsconfig-browser.json"
+  ],
   "dependencies": {
-    "@magicspace/tslint-rules": "^0.1.0"
+    "@magicspace/tslint-rules": "^0.1.0",
+    "tslint-config-prettier": "^1.10.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.14.0",
+    "resolve": "^1.8.1",
+    "tslint": "^5.11.0"
+  },
+  "peerDependencies": {
+    "prettier": "^1.14.0",
+    "tslint": "^5.11.0",
+    "tslint-language-service": "^0.9.9"
   }
 }
