@@ -1,4 +1,5 @@
 const resolve = require('resolve');
+const Path = require('path');
 
 module.exports = {
   defaultSeverity: 'error',
@@ -286,5 +287,7 @@ module.exports = {
     'scoped-modules': true,
     'explicit-return-type': true,
   },
-  rulesDirectory: [resolve.sync('@magicspace/tslint-rules/bld/rules')],
+  rulesDirectory: [
+    Path.dirname(resolve.sync('@magicspace/tslint-rules/bld/rules')),
+  ],
 };
