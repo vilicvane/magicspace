@@ -280,6 +280,8 @@ module.exports = {
         groups: [
           {name: 'node-core', test: '$node-core'},
           {name: 'node-modules', test: '$node-modules'},
+          {name: 'project-base', test: '^[@\\w]'},
+          {name: 'upper-directory', test: '^\\.\\./'},
         ],
         ordered: true,
       },
