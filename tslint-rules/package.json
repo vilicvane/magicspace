@@ -10,6 +10,9 @@
     "test": "yarn build && yarn bare-test",
     "bare-test": "node ./bld/test/runner.js"
   },
+  "files": [
+    "bld/**/*.js"
+  ],
   "peerDependencies": {
     "tslint": "*",
     "typescript": "*"
