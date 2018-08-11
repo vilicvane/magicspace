@@ -225,10 +225,6 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
         ) {
           checkWithAppendModuleImport(statement.moduleReference.expression);
         }
-      } else if (isExportDeclaration(statement)) {
-        if (statement.moduleSpecifier !== undefined && ImportKind.ExportFrom) {
-          checkWithAppendModuleImport(statement.moduleSpecifier);
-        }
       } else {
         pendingCache.push(statement);
       }
