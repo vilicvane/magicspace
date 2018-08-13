@@ -134,7 +134,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     }
 
     if (isArrowFunction(parent)) {
-      // example foo: () => () => {};
+      // foo: () => () => {};
       return this.checkReturnType(parent);
     }
 
