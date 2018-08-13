@@ -102,6 +102,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
       isReturnStatement(parent) ||
       // example: let foo: Foo = {bar() {}};
       isObjectLiteralExpression(parent) ||
+      // example: let foo: Foo = {bar:() => {}}
       TypeScript.isObjectLiteralElement(parent)
     ) {
       return this.hasExplicitType(parent);
