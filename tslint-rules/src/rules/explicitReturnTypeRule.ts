@@ -8,9 +8,13 @@ import {
   isMethodDeclaration,
   isReturnStatement,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   isVariableDeclaration,
 >>>>>>> import-path-convention
+=======
+  isVariableDeclaration,
+>>>>>>> 51c52a649be397a2cae4d2c5c72950444c9f9158
 } from 'tsutils';
 import * as TypeScript from 'typescript';
 
@@ -53,14 +57,19 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
 
   walk(sourceFile: TypeScript.SourceFile): void {
 <<<<<<< HEAD
+<<<<<<< HEAD
     let cb = (node: TypeScript.Node): void => {
 =======
     let callback = (node: TypeScript.Node): void => {
 >>>>>>> import-path-convention
+=======
+    let callback = (node: TypeScript.Node): void => {
+>>>>>>> 51c52a649be397a2cae4d2c5c72950444c9f9158
       if (
         (isArrowFunction(node) ||
           isFunctionDeclaration(node) ||
           isFunctionExpression(node) ||
+<<<<<<< HEAD
 <<<<<<< HEAD
           isMethodDeclaration(node)) &&
         !this.missingType(node)
@@ -69,6 +78,11 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
           isGetAccessorDeclaration(node)) &&
         !this.hasExplicitType(node)
 >>>>>>> import-path-convention
+=======
+          isMethodDeclaration(node) ||
+          isGetAccessorDeclaration(node)) &&
+        !this.hasExplicitType(node)
+>>>>>>> 51c52a649be397a2cae4d2c5c72950444c9f9158
       ) {
         this.failureManager.append({
           node,
@@ -84,6 +98,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     this.failureManager.throw();
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   private missingType(node: TypeScript.Node): boolean {
     let {type} = node as TypeScript.VariableDeclaration;
@@ -118,11 +133,31 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
         return false;
       }
 =======
+=======
+  private hasExplicitType(
+    node: RelatedFunctionLikeDeclaration | TypeScript.ReturnStatement,
+  ): boolean {
+    if ('type' in node && node.type) {
+      return true;
+    }
+
+    let parent = node.parent;
+
+    if (!parent) {
+      return false;
+    }
+
+    if (isCallExpression(parent)) {
+      return true;
+>>>>>>> 51c52a649be397a2cae4d2c5c72950444c9f9158
     } else if (isVariableDeclaration(parent)) {
       return !!parent.type;
     } else if (isReturnStatement(parent)) {
       return this.hasExplicitType(parent);
+<<<<<<< HEAD
 >>>>>>> import-path-convention
+=======
+>>>>>>> 51c52a649be397a2cae4d2c5c72950444c9f9158
     } else {
       return false;
     }
