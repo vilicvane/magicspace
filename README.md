@@ -121,7 +121,14 @@ import {foo} from './foo' //right
         true,
         {
             baseUrl:"src/core"
+            baseUrlDirSearchName:"tsconfig.json"
         }
     ]
 }
 ```
+
+baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
+
+比如，你可以指定 baseUrlDirSearchName 为 tsconfig.json，那么 import-path-convention 将会找到项目里的 tsconfig.json，以此来确定项目的根目录
+
+这两个字段都是很必要的，请在使用之前将它们配置好
