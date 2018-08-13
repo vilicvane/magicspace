@@ -1,8 +1,5 @@
 # 魔法空格
-<<<<<<< HEAD
-=======
 
->>>>>>> import-path-convention
 ## 使用
 
 添加依赖
@@ -11,11 +8,7 @@
 yarn add @magicspace/configs -D
 ```
 
-<<<<<<< HEAD
-然后， 你需要在tslint.json里显示的继承
-=======
 然后， 你需要在 tslint.json 里显示的继承
->>>>>>> import-path-convention
 
 ```
 {
@@ -24,11 +17,7 @@ yarn add @magicspace/configs -D
 }
 ```
 
-<<<<<<< HEAD
-你可以开始使用它了！！ 
-=======
 你可以开始使用它了！！
->>>>>>> import-path-convention
 
 ## 规则
 
@@ -49,13 +38,8 @@ import * as request from 'request'
 
 Import-Groups 提供了两种分组规则:
 
-<<<<<<< HEAD
-1. $node-core 对内建模块进行分组
-2. $node-modules 对第三方模块进行分组
-=======
 1.  $node-core 对内建模块进行分组
 2.  $node-modules 对第三方模块进行分组
->>>>>>> import-path-convention
 
 配置形如：
 
@@ -83,19 +67,10 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 
 ```
 {
-<<<<<<< HEAD
-	"scoped-modules": true 
-}
-```
-
-
-
-=======
 	"scoped-modules": true
 }
 ```
 
->>>>>>> import-path-convention
 ### Explicit-Return-Type
 
 此规则规定，必须要显示的声明函数的返回值， 但是又一些特殊情况可以不必添加返回值。比如
@@ -112,20 +87,11 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 }
 ```
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> import-path-convention
 ### Import-Path-Convention
 
 当你需要导入在 baseUrl 目录下的模块时，这个规则会特别有用
 
-<<<<<<< HEAD
-它会帮你检查引入的路径。比如 baseUrl 为 core，有一个模块 foo 存在于 core目录下
-=======
 它会帮你检查引入的路径。比如 baseUrl 为 core，有一个模块 foo 存在于 core 目录下
->>>>>>> import-path-convention
 
 假如当前模块在 baseUrl 之外
 
@@ -137,11 +103,7 @@ import {foo} from '../core/foo'	// failure
 import {foo} from 'foo' //right
 ```
 
-<<<<<<< HEAD
-假如当前模块在baseUrl内
-=======
 假如当前模块在 baseUrl 内
->>>>>>> import-path-convention
 
 ```
 import {foo} from 'foo' //failure
@@ -151,11 +113,7 @@ import {foo} from 'foo' //failure
 import {foo} from './foo' //right
 ```
 
-<<<<<<< HEAD
-如果你希望 Import-Path-Convention 帮你做这些检查， 并提供修复， 那么你可以在配置项里开启它，并在它的配置里写上baseUrl的路径
-=======
 如果你希望 Import-Path-Convention 帮你做这些检查， 并提供修复， 那么你可以在配置项里开启它，并在它的配置里写上 baseUrl 的路径
->>>>>>> import-path-convention
 
 ```
 {
@@ -167,7 +125,3 @@ import {foo} from './foo' //right
     ]
 }
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> import-path-convention
