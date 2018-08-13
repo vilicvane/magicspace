@@ -5,6 +5,7 @@ import {
   isFunctionDeclaration,
   isFunctionExpression,
   isMethodDeclaration,
+  isReturnStatement,
 } from 'tsutils';
 import * as TypeScript from 'typescript';
 
@@ -39,17 +40,13 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: TypeScript.SourceFile): void {
-    let cb = (node: TypeScript.Node) => {
-      if (isCallExpression(node)) {
-        return;
-      }
-
+    let cb = (node: TypeScript.Node): void => {
       if (
         (isArrowFunction(node) ||
           isFunctionDeclaration(node) ||
           isFunctionExpression(node) ||
           isMethodDeclaration(node)) &&
-        !this.printType(node)
+        !this.missingType(node)
       ) {
         this.failureManager.append({
           node,
@@ -65,13 +62,23 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     this.failureManager.throw();
   }
 
-  private printType(node: TypeScript.Node): boolean {
+  private missingType(node: TypeScript.Node): boolean {
     let {type} = node as TypeScript.VariableDeclaration;
 
     if (type) {
       return true;
     } else if (node.parent) {
-      return this.printType(node.parent);
+      let parent = node.parent;
+
+      if (isCallExpression(parent)) {
+        return true;
+      } else if ((parent as TypeScript.VariableDeclaration).type) {
+        return true;
+      } else if (isReturnStatement(parent)) {
+        return this.missingType(parent);
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
