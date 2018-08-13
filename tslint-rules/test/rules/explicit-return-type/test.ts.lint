@@ -1,19 +1,50 @@
 function foo() {}
-~~~~~~~~~~~~~~~~~ [This function require a explicit return type.]
-let foo = () => {}
-          ~~~~~~~~ [This function require a explicit return type.]
+~~~~~~~~~~~~~~~~~ [This function requires explicit return type.]
+let foo = () => {};
+          ~~~~~~~~ [This function requires explicit return type.]
 let foo = {
-  bar(){}
-  ~~~~~~~ [This function require a explicit return type.]
+  bar() {},
+  ~~~~~~~~ [This function requires explicit return type.]
+};
+
+class Foo {
+  bar() {}
+  ~~~~~~~~ [This function requires explicit return type.]
 }
 
-class Foo{
-  bar(){}
-  ~~~~~~~ [This function require a explicit return type.]
-}
+let foo: Foo = () => {};
 
-let foo:Foo = () => {}
+let foo: Foo = {
+  bar() {},
+};
 
-let foo:Foo = {
-  bar(){}
-}
+let foo: Foo = {
+  bar() {},
+  pia: () => {},
+  hia: function() {},
+};
+
+let foo = {
+  bar() {},
+  ~~~~~~~~ [This function requires explicit return type.]
+  pia: () => {},
+       ~~~~~~~~ [This function requires explicit return type.]
+  hia: function() {},
+       ~~~~~~~~~~~~~ [This function requires explicit return type.]
+};
+
+let foo: Foo = () => true;
+let foo: Foo = () => () => true;
+let foo = (): Foo => () => {
+  return true;
+};
+
+let foo = () => (): Foo => true;
+          ~~~~~~~~~~~~~~~~~~~~~  [This function requires explicit return type.]
+
+foo.bar = () => {};
+bar = () => true;
+
+map(() => {});
+map(() => () => true);
+map({foo: () => () => true});

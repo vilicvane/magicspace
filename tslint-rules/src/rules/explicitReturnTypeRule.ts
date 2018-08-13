@@ -1,36 +1,34 @@
 import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
 import {
   ArrowFunction,
-  ClassElement,
   FunctionDeclaration,
   FunctionExpression,
   GetAccessorDeclaration,
   MethodDeclaration,
   Node,
-  ObjectBindingPattern,
-  ObjectLiteralElement,
-  ObjectLiteralExpression,
-  ReturnStatement,
   SourceFile,
+  SyntaxKind,
   forEachChild,
   isArrowFunction,
+  isBinaryExpression,
   isCallExpression,
+  isClassDeclaration,
   isFunctionDeclaration,
   isFunctionExpression,
   isGetAccessorDeclaration,
   isMethodDeclaration,
-  isObjectLiteralElement,
-  isObjectLiteralExpression,
-  isPropertyAssignment,
   isReturnStatement,
   isVariableDeclaration,
 } from 'typescript';
-import {isPropertyDeclaration} from '../../../node_modules/tsutils';
+import {
+  isAssignmentKind,
+  isPropertyDeclaration,
+} from '../../../node_modules/tsutils';
 
 import {FailureManager} from '../utils/failure-manager';
 
-const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE =
-  'This function require a explicit return type.';
+const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
+  'This function requires explicit return type.';
 
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -54,17 +52,12 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-type ExplicitTypeCheckNode =
+type ReturnTypeRelatedFunctionLikeDeclaration =
   | ArrowFunction
   | FunctionDeclaration
   | FunctionExpression
   | MethodDeclaration
-  | GetAccessorDeclaration
-  | ReturnStatement
-  | ObjectLiteralExpression
-  | ObjectBindingPattern
-  | ObjectLiteralElement
-  | ClassElement;
+  | GetAccessorDeclaration;
 
 class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
@@ -72,17 +65,18 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   walk(sourceFile: SourceFile): void {
     let callback = (node: Node): void => {
       if (
-        (isArrowFunction(node) ||
-          isFunctionDeclaration(node) ||
-          isFunctionExpression(node) ||
-          isMethodDeclaration(node) ||
-          isGetAccessorDeclaration(node)) &&
-        !this.hasExplicitType(node)
+        isArrowFunction(node) ||
+        isFunctionDeclaration(node) ||
+        isFunctionExpression(node) ||
+        isMethodDeclaration(node) ||
+        isGetAccessorDeclaration(node)
       ) {
-        this.failureManager.append({
-          node,
-          message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE,
-        });
+        if (!this.checkReturnType(node)) {
+          this.failureManager.append({
+            node,
+            message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
+          });
+        }
       }
 
       forEachChild(node, callback);
@@ -93,12 +87,27 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     this.failureManager.throw();
   }
 
-  private hasExplicitType(node: ExplicitTypeCheckNode): boolean {
-    if ('type' in node && node.type) {
-      // The function like node has its own return type.
+  private checkReturnType(
+    node: ReturnTypeRelatedFunctionLikeDeclaration,
+  ): boolean {
+    if (node.type) {
       return true;
     }
 
+    if (isFunctionDeclaration(node)) {
+      // function foo() {}
+      return false;
+    }
+
+    if (isMethodDeclaration(node) && isClassDeclaration(node.parent!)) {
+      // class Foo {bar() {}}
+      return false;
+    }
+
+    return this.checkExpressionType(node);
+  }
+
+  private checkExpressionType(node: Node): boolean {
     let parent = node.parent;
 
     if (!parent) {
@@ -106,34 +115,37 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     }
 
     if (
-      // example: [].map(() => {});
-      isCallExpression(parent) ||
-      // example: foo.bar = () => {};
-      isPropertyAssignment(parent)
-    ) {
-      return true;
-    }
-
-    if (
-      // example: let foo: Foo = () => {};
+      // let foo: Foo = () => {};
       isVariableDeclaration(parent) ||
-      // example: class Foo {bar: Bar = () => {};}
+      // class Foo {bar: Bar = () => {};}
       isPropertyDeclaration(parent)
     ) {
       return !!parent.type;
     }
 
     if (
-      // example: return () => {};
-      isReturnStatement(parent) ||
-      // example: let foo: Foo = {bar() {}};
-      isObjectLiteralExpression(parent) ||
-      // example: let foo: Foo = {bar:() => {}}
-      isObjectLiteralElement(parent)
+      // [].map(() => {});
+      isCallExpression(parent) ||
+      // foo.bar = () => {};
+      (isBinaryExpression(parent) &&
+        isAssignmentKind(parent.operatorToken.kind))
     ) {
-      return this.hasExplicitType(parent);
+      return true;
     }
 
-    return false;
+    if (isArrowFunction(parent)) {
+      // example foo: () => () => {};
+      return this.checkReturnType(parent);
+    }
+
+    if (isReturnStatement(parent)) {
+      // return () => {};
+      let block = parent.parent!;
+      let declaration = block.parent! as ReturnTypeRelatedFunctionLikeDeclaration;
+
+      return this.checkReturnType(declaration);
+    }
+
+    return this.checkExpressionType(parent);
   }
 }
