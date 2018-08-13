@@ -25,6 +25,7 @@ const ERROR_MESSAGE_IMPORT_IN_BASEURL =
 
 interface RuleOptions {
   baseUrl: string;
+  baseUrlDirSearchName: string;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -54,6 +55,10 @@ export class Rule extends Rules.AbstractRule {
       properties: {
         baseUrl: {
           type: 'string',
+        },
+        baseUrlDirSearchName: {
+          type: 'string',
+          default: 'tsconfig',
         },
       },
     },
@@ -158,7 +163,10 @@ export class ImportPathConventionWalker extends AbstractWalker<RuleOptions> {
   }
 
   private getBaseUrl(): string {
-    let rootPath = findProjectRootPath(this.sourceDirname);
+    let rootPath = findProjectRootPath(
+      this.sourceDirname,
+      this.options.baseUrlDirSearchName,
+    );
 
     if (!rootPath) {
       throw new Error('can not find tslint.json');
@@ -196,10 +204,16 @@ export class ImportPathConventionWalker extends AbstractWalker<RuleOptions> {
   }
 }
 
-let findProjectRootPath = (() => {
+let findProjectRootPath = ((): ((
+  currentPath: string,
+  baseUrlDirSearchName: string,
+) => string | undefined) => {
   let rootPathCache: string | undefined;
 
-  return function inner(currentPath: string): string | undefined {
+  return function inner(
+    currentPath: string,
+    baseUrlDirSearchName: string,
+  ): string | undefined {
     if (rootPathCache) {
       return rootPathCache;
     }
@@ -207,14 +221,16 @@ let findProjectRootPath = (() => {
     try {
       let files = FS.readdirSync(currentPath);
 
-      if (_.includes(files, 'tslint.json')) {
+      if (_.includes(files, baseUrlDirSearchName)) {
         rootPathCache = currentPath;
         return currentPath;
       } else {
-        return inner(Path.join(currentPath, '..'));
+        return inner(Path.join(currentPath, '..'), baseUrlDirSearchName);
       }
     } catch (e) {
-      return undefined;
+      throw new Error(
+        `can not find such 'baseUrlDirSearchName' that ${baseUrlDirSearchName}`,
+      );
     }
   };
 })();
