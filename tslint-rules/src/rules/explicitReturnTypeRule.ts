@@ -79,7 +79,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
       | TypeScript.ReturnStatement
       | TypeScript.ObjectLiteralExpression
       | TypeScript.ObjectBindingPattern
-      | TypeScript.ObjectLiteralElement,
+      | TypeScript.ObjectLiteralElement
+      | TypeScript.ClassElement,
   ): boolean {
     if ('type' in node && (node as any).type) {
       return true;
@@ -103,7 +104,9 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
       // example: let foo: Foo = {bar() {}};
       isObjectLiteralExpression(parent) ||
       // example: let foo: Foo = {bar:() => {}}
-      TypeScript.isObjectLiteralElement(parent)
+      TypeScript.isObjectLiteralElement(parent) ||
+      //
+      TypeScript.isClassElement(parent)
     ) {
       return this.hasExplicitType(parent);
     } else {
