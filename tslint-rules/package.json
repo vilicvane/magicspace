@@ -1,6 +1,10 @@
 {
   "name": "@magicspace/tslint-rules",
+<<<<<<< HEAD
   "version": "0.1.3",
+=======
+  "version": "0.1.2",
+>>>>>>> import-path-convention
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
@@ -10,6 +14,9 @@
     "test": "yarn build && yarn bare-test",
     "bare-test": "node ./bld/test/runner.js"
   },
+  "files": [
+    "bld/**/*.js"
+  ],
   "peerDependencies": {
     "tslint": "*",
     "typescript": "*"
