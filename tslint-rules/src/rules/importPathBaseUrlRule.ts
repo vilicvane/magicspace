@@ -10,8 +10,8 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
+import {ImportKind, findImports} from 'tsutils';
 import * as TypeScript from 'typescript';
-import {ImportKind, findImports} from '../../../node_modules/tsutils';
 
 import {FailureManager} from '../utils/failure-manager';
 import {removeModuleFileExtension, removeQuotes} from '../utils/path';
@@ -43,7 +43,7 @@ export class Rule extends Rules.AbstractRule {
 
   apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new ImportPathConventionWalker(
+      new ImportPathBaseUrlWalker(
         sourceFile,
         Rule.metadata.ruleName,
         this.parsedOptions,
@@ -72,7 +72,7 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-export class ImportPathConventionWalker extends AbstractWalker<RuleOptions> {
+export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
   private sourceDirname: string;
   private importExpressions: TypeScript.Expression[] = [];
   private failureManager = new FailureManager(this);
