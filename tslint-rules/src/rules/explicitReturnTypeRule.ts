@@ -141,9 +141,9 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     if (isReturnStatement(parent)) {
       // return () => {};
       let block = parent.parent!;
-      let declaration = block.parent! as ReturnTypeRelatedFunctionLikeDeclaration;
+      let functionLike = block.parent! as ReturnTypeRelatedFunctionLikeDeclaration;
 
-      return this.checkReturnType(declaration);
+      return this.checkReturnType(functionLike);
     }
 
     return this.checkExpressionType(parent);
