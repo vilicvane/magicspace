@@ -4,7 +4,7 @@ import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
 import * as Typescript from 'typescript';
 
-import {removeQuotes} from '../utils/pathUtils';
+import {removeQuotes} from '../utils/path';
 
 const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{2})*[\\/]?$/;
 const ERROR_MESSAGE_BANNED_PARENT_IMPORT =
@@ -48,7 +48,7 @@ class NoParentImportRule extends AbstractWalker<undefined> {
     let sourceDirName = Path.dirname(this.sourceFile.fileName);
 
     for (let expression of importExpressions) {
-      let modulePath: string | undefined = removeQuotes(expression.getText());
+      let modulePath: string = removeQuotes(expression.getText());
 
       modulePath = Path.isAbsolute(modulePath)
         ? Path.relative(sourceDirName, modulePath)
