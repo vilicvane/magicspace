@@ -25,7 +25,7 @@ const ERROR_MESSAGE_IMPORT_IN_BASEURL =
 
 interface RuleOptions {
   baseUrl: string;
-  baseUrlDirSearchName: string;
+  baseUrlDirSearchName: string | undefined;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -206,13 +206,13 @@ export class ImportPathConventionWalker extends AbstractWalker<RuleOptions> {
 
 let findProjectRootPath = ((): ((
   currentPath: string,
-  baseUrlDirSearchName: string,
+  baseUrlDirSearchName: string | undefined,
 ) => string | undefined) => {
   let rootPathCache: string | undefined;
 
   return function inner(
     currentPath: string,
-    baseUrlDirSearchName: string,
+    baseUrlDirSearchName: string | undefined = 'tsconfig.json',
   ): string | undefined {
     if (rootPathCache) {
       return rootPathCache;
