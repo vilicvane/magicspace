@@ -97,7 +97,7 @@ module.exports = {
     'no-boolean-literal-compare': true,
     'no-conditional-assignment': true,
     'no-consecutive-blank-lines': true,
-    'no-console': true,
+    'no-console': [true, 'log'],
     'no-construct': true,
     'no-debugger': true,
     'no-default-export': false,
@@ -279,6 +279,7 @@ module.exports = {
       {
         groups: [
           {name: 'node-core', test: '$node-core'},
+          {name: 'node-modules', test: '$node-modules', sideEffect: true},
           {name: 'node-modules', test: '$node-modules'},
           {name: 'project-base', test: '^[@\\w]'},
           {name: 'upper-directory', test: '^\\.\\./'},

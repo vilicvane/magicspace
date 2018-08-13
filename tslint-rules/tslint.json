@@ -6,6 +6,7 @@
       {
         "groups": [
           {"name": "node-core", "test": "$node-core"},
+          {"name": "node-modules", "test": "$node-modules", "sideEffect": true},
           {"name": "node-modules", "test": "$node-modules"}
         ],
         "ordered": true
@@ -13,7 +14,7 @@
     ],
     "scoped-modules": true,
     "explicit-return-type": true,
-    "import-path-convention":true
+    "import-path-convention": true
   },
   "rulesDirectory": ["bld/rules"]
 }
