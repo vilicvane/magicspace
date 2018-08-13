@@ -6,6 +6,7 @@ import {
   isFunctionExpression,
   isGetAccessorDeclaration,
   isMethodDeclaration,
+  isObjectLiteralExpression,
   isReturnStatement,
   isVariableDeclaration,
 } from 'tsutils';
@@ -73,7 +74,12 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   }
 
   private hasExplicitType(
-    node: RelatedFunctionLikeDeclaration | TypeScript.ReturnStatement,
+    node:
+      | RelatedFunctionLikeDeclaration
+      | TypeScript.ReturnStatement
+      | TypeScript.ObjectLiteralExpression
+      | TypeScript.ObjectBindingPattern
+      | TypeScript.ObjectLiteralElement,
   ): boolean {
     if ('type' in node && (node as any).type) {
       return true;
@@ -86,10 +92,18 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
     }
 
     if (isCallExpression(parent)) {
+      // example: [].map(() => {});
       return true;
     } else if (isVariableDeclaration(parent)) {
+      // example: let foo: Foo = () => {};
       return !!parent.type;
-    } else if (isReturnStatement(parent)) {
+    } else if (
+      // example: return () => {};
+      isReturnStatement(parent) ||
+      // example: let foo: Foo = {bar() {}};
+      isObjectLiteralExpression(parent) ||
+      TypeScript.isObjectLiteralElement(parent)
+    ) {
       return this.hasExplicitType(parent);
     } else {
       return false;

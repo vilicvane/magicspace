@@ -28,7 +28,10 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
-const resolveWithCache = (() => {
+const resolveWithCache = ((): ((
+  id: string,
+  basedir: string,
+) => string | undefined) => {
   let cache = new Map<string, string | undefined>();
 
   return (id: string, basedir: string): string | undefined => {
@@ -108,10 +111,12 @@ class ModuleGroup {
 
   private buildTester(config: string): ModuleGroupTester {
     if (config.startsWith('$')) {
-      return BUILT_IN_MODULE_GROUP_TESTER_DICT[config] || (() => false);
+      return (
+        BUILT_IN_MODULE_GROUP_TESTER_DICT[config] || ((): boolean => false)
+      );
     } else {
       let regex = new RegExp(config);
-      return path => regex.test(path);
+      return (path): boolean => regex.test(path);
     }
   }
 }
@@ -201,7 +206,9 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   walk(sourceFile: TypeScript.SourceFile): void {
     let pendingCache: TypeScript.Statement[] = [];
 
-    let checkWithAppendModuleImport = (expression: TypeScript.Expression) => {
+    let checkWithAppendModuleImport = (
+      expression: TypeScript.Expression,
+    ): void => {
       this.pendingStatements.push(...pendingCache);
       pendingCache = [];
 
