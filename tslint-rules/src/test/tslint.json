@@ -1,5 +1,6 @@
 {
   "rules": {
-    "no-console": false
+    "no-console": [true, "log"],
+    "no-implicit-dependencies": [true, "dev"]
   }
 }
