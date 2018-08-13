@@ -4,8 +4,10 @@ import {
   isCallExpression,
   isFunctionDeclaration,
   isFunctionExpression,
+  isGetAccessorDeclaration,
   isMethodDeclaration,
   isReturnStatement,
+  isVariableDeclaration,
 } from 'tsutils';
 import * as TypeScript from 'typescript';
 
@@ -36,17 +38,25 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
+type RelatedFunctionLikeDeclaration =
+  | TypeScript.ArrowFunction
+  | TypeScript.FunctionDeclaration
+  | TypeScript.FunctionExpression
+  | TypeScript.MethodDeclaration
+  | TypeScript.GetAccessorDeclaration;
+
 class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: TypeScript.SourceFile): void {
-    let cb = (node: TypeScript.Node): void => {
+    let callback = (node: TypeScript.Node): void => {
       if (
         (isArrowFunction(node) ||
           isFunctionDeclaration(node) ||
           isFunctionExpression(node) ||
-          isMethodDeclaration(node)) &&
-        !this.missingType(node)
+          isMethodDeclaration(node) ||
+          isGetAccessorDeclaration(node)) &&
+        !this.hasExplicitType(node)
       ) {
         this.failureManager.append({
           node,
@@ -54,31 +64,33 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
         });
       }
 
-      TypeScript.forEachChild(node, cb);
+      TypeScript.forEachChild(node, callback);
     };
 
-    TypeScript.forEachChild(sourceFile, cb);
+    TypeScript.forEachChild(sourceFile, callback);
 
     this.failureManager.throw();
   }
 
-  private missingType(node: TypeScript.Node): boolean {
-    let {type} = node as TypeScript.VariableDeclaration;
-
-    if (type) {
+  private hasExplicitType(
+    node: RelatedFunctionLikeDeclaration | TypeScript.ReturnStatement,
+  ): boolean {
+    if ('type' in node && node.type) {
       return true;
-    } else if (node.parent) {
-      let parent = node.parent;
+    }
 
-      if (isCallExpression(parent)) {
-        return true;
-      } else if ((parent as TypeScript.VariableDeclaration).type) {
-        return true;
-      } else if (isReturnStatement(parent)) {
-        return this.missingType(parent);
-      } else {
-        return false;
-      }
+    let parent = node.parent;
+
+    if (!parent) {
+      return false;
+    }
+
+    if (isCallExpression(parent)) {
+      return true;
+    } else if (isVariableDeclaration(parent)) {
+      return !!parent.type;
+    } else if (isReturnStatement(parent)) {
+      return this.hasExplicitType(parent);
     } else {
       return false;
     }
