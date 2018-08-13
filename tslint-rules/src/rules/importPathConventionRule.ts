@@ -35,6 +35,10 @@ export class Rule extends Rules.AbstractRule {
     super(options);
 
     this.parsedOptions = options.ruleArguments[0];
+
+    if (!this.parsedOptions || !this.parsedOptions.baseUrl) {
+      throw new Error('Option baseUrl is required');
+    }
   }
 
   apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
