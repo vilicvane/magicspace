@@ -1,16 +1,31 @@
 import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
 import {
+  ArrowFunction,
+  ClassElement,
+  FunctionDeclaration,
+  FunctionExpression,
+  GetAccessorDeclaration,
+  MethodDeclaration,
+  Node,
+  ObjectBindingPattern,
+  ObjectLiteralElement,
+  ObjectLiteralExpression,
+  ReturnStatement,
+  SourceFile,
+  forEachChild,
   isArrowFunction,
   isCallExpression,
   isFunctionDeclaration,
   isFunctionExpression,
   isGetAccessorDeclaration,
   isMethodDeclaration,
+  isObjectLiteralElement,
   isObjectLiteralExpression,
+  isPropertyAssignment,
   isReturnStatement,
   isVariableDeclaration,
-} from 'tsutils';
-import * as TypeScript from 'typescript';
+} from 'typescript';
+import {isPropertyDeclaration} from '../../../node_modules/tsutils';
 
 import {FailureManager} from '../utils/failure-manager';
 
@@ -18,7 +33,7 @@ const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE =
   'This function require a explicit return type.';
 
 export class Rule extends Rules.AbstractRule {
-  apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ExplicitReturnTypeWalker(
         sourceFile,
@@ -39,18 +54,23 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-type RelatedFunctionLikeDeclaration =
-  | TypeScript.ArrowFunction
-  | TypeScript.FunctionDeclaration
-  | TypeScript.FunctionExpression
-  | TypeScript.MethodDeclaration
-  | TypeScript.GetAccessorDeclaration;
+type ExplicitTypeCheckNode =
+  | ArrowFunction
+  | FunctionDeclaration
+  | FunctionExpression
+  | MethodDeclaration
+  | GetAccessorDeclaration
+  | ReturnStatement
+  | ObjectLiteralExpression
+  | ObjectBindingPattern
+  | ObjectLiteralElement
+  | ClassElement;
 
 class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
-  walk(sourceFile: TypeScript.SourceFile): void {
-    let callback = (node: TypeScript.Node): void => {
+  walk(sourceFile: SourceFile): void {
+    let callback = (node: Node): void => {
       if (
         (isArrowFunction(node) ||
           isFunctionDeclaration(node) ||
@@ -65,24 +85,17 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
         });
       }
 
-      TypeScript.forEachChild(node, callback);
+      forEachChild(node, callback);
     };
 
-    TypeScript.forEachChild(sourceFile, callback);
+    forEachChild(sourceFile, callback);
 
     this.failureManager.throw();
   }
 
-  private hasExplicitType(
-    node:
-      | RelatedFunctionLikeDeclaration
-      | TypeScript.ReturnStatement
-      | TypeScript.ObjectLiteralExpression
-      | TypeScript.ObjectBindingPattern
-      | TypeScript.ObjectLiteralElement
-      | TypeScript.ClassElement,
-  ): boolean {
-    if ('type' in node && (node as any).type) {
+  private hasExplicitType(node: ExplicitTypeCheckNode): boolean {
+    if ('type' in node && node.type) {
+      // The function like node has its own return type.
       return true;
     }
 
@@ -92,25 +105,35 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
       return false;
     }
 
-    if (isCallExpression(parent)) {
+    if (
       // example: [].map(() => {});
+      isCallExpression(parent) ||
+      // example: foo.bar = () => {};
+      isPropertyAssignment(parent)
+    ) {
       return true;
-    } else if (isVariableDeclaration(parent)) {
+    }
+
+    if (
       // example: let foo: Foo = () => {};
+      isVariableDeclaration(parent) ||
+      // example: class Foo {bar: Bar = () => {};}
+      isPropertyDeclaration(parent)
+    ) {
       return !!parent.type;
-    } else if (
+    }
+
+    if (
       // example: return () => {};
       isReturnStatement(parent) ||
       // example: let foo: Foo = {bar() {}};
       isObjectLiteralExpression(parent) ||
       // example: let foo: Foo = {bar:() => {}}
-      TypeScript.isObjectLiteralElement(parent) ||
-      //
-      TypeScript.isClassElement(parent)
+      isObjectLiteralElement(parent)
     ) {
       return this.hasExplicitType(parent);
-    } else {
-      return false;
     }
+
+    return false;
   }
 }

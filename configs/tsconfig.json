@@ -4,8 +4,9 @@
     "module": "commonjs",
     "lib": ["esnext"],
     "types": [],
-    "sourceMap": true,
     "importHelpers": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
 
     "strict": true,
     "noUnusedLocals": true,
