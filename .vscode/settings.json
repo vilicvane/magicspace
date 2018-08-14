@@ -6,5 +6,6 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "tslint.autoFixOnSave": true
+  "tslint.autoFixOnSave": true,
+  "tslint.configFile": "node_modules/@magicspace/configs/tslint-vscode.js"
 }
