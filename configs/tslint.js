@@ -132,7 +132,7 @@ module.exports = {
     'no-redundant-jsdoc': true,
     'no-reference': true,
     'no-reference-import': true,
-    'no-require-imports': false,
+    'no-require-imports': true,
     'no-return-await': true,
     'no-shadowed-variable': false,
     'no-sparse-arrays': true,
