@@ -297,9 +297,16 @@ module.exports = {
 
 function getRulesDir() {
   let fakeIndexFilePath = resolve.sync('@magicspace/tslint-rules/bld/rules', {
+    basedir: __dirname,
     isFile(fileName) {
       if (Path.basename(fileName) === 'index.js') {
-        return true;
+        let dirName = Path.dirname(fileName);
+
+        try {
+          return FS.statSync(dirName).isDirectory();
+        } catch (error) {
+          return false;
+        }
       }
 
       try {
