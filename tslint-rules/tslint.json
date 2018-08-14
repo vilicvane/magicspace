@@ -14,7 +14,7 @@
     ],
     "scoped-modules": true,
     "explicit-return-type": true,
-    "import-path-convention": true
+    "import-path-base-url": false
   },
   "rulesDirectory": ["bld/rules"]
 }
