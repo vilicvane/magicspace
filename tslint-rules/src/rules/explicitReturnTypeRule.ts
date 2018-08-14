@@ -1,4 +1,5 @@
 import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
+import {isAssignmentKind, isPropertyDeclaration} from 'tsutils';
 import {
   ArrowFunction,
   FunctionDeclaration,
@@ -7,7 +8,6 @@ import {
   MethodDeclaration,
   Node,
   SourceFile,
-  SyntaxKind,
   forEachChild,
   isArrowFunction,
   isBinaryExpression,
@@ -20,10 +20,6 @@ import {
   isReturnStatement,
   isVariableDeclaration,
 } from 'typescript';
-import {
-  isAssignmentKind,
-  isPropertyDeclaration,
-} from '../../../node_modules/tsutils';
 
 import {FailureManager} from '../utils/failure-manager';
 
