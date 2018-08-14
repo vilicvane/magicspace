@@ -1,5 +1,4 @@
 # 魔法空格
-[![Build Status](https://travis-ci.org/michaelliao/openweixin.svg?branch=master)](https://travis-ci.org/michaelliao/openweixin)
 
 ## 使用
 
@@ -9,7 +8,7 @@
 yarn add @magicspace/configs -D
 ```
 
-然后， 你需要在 tslint.json 里显示的继承
+然后， 你需要在tslint.json里显示的继承
 
 ```
 {
@@ -18,7 +17,7 @@ yarn add @magicspace/configs -D
 }
 ```
 
-你可以开始使用它了！！
+你可以开始使用它了！！ 
 
 ## 规则
 
@@ -39,8 +38,8 @@ import * as request from 'request'
 
 Import-Groups 提供了两种分组规则:
 
-1.  $node-core 对内建模块进行分组
-2.  $node-modules 对第三方模块进行分组
+1. $node-core 对内建模块进行分组
+2. $node-modules 对第三方模块进行分组
 
 配置形如：
 
@@ -68,9 +67,11 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 
 ```
 {
-	"scoped-modules": true
+	"scoped-modules": true 
 }
 ```
+
+
 
 ### Explicit-Return-Type
 
@@ -88,11 +89,13 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 }
 ```
 
+
+
 ### Import-Path-Convention
 
 当你需要导入在 baseUrl 目录下的模块时，这个规则会特别有用
 
-它会帮你检查引入的路径。比如 baseUrl 为 core，有一个模块 foo 存在于 core 目录下
+它会帮你检查引入的路径。比如 baseUrl 为 core，有一个模块 foo 存在于 core目录下
 
 假如当前模块在 baseUrl 之外
 
@@ -104,7 +107,7 @@ import {foo} from '../core/foo'	// failure
 import {foo} from 'foo' //right
 ```
 
-假如当前模块在 baseUrl 内
+假如当前模块在baseUrl内
 
 ```
 import {foo} from 'foo' //failure
@@ -114,7 +117,7 @@ import {foo} from 'foo' //failure
 import {foo} from './foo' //right
 ```
 
-如果你希望 Import-Path-Convention 帮你做这些检查， 并提供修复， 那么你可以在配置项里开启它，并在它的配置里写上 baseUrl 的路径
+如果你希望 Import-Path-Convention 帮你做这些检查， 并提供修复， 那么你可以在配置项里开启它，并在它的配置里写上baseUrl的路径
 
 ```
 {
@@ -133,3 +136,16 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 比如，你可以指定 baseUrlDirSearchName 为 tsconfig.json，那么 import-path-convention 将会找到项目里的 tsconfig.json，以此来确定项目的根目录
 
 这两个字段都是很必要的，请在使用之前将它们配置好
+
+## No-Parent-Import
+
+这个规则能够帮助你避免循环引用
+
+如果需要开启，仅仅需要在配置文件里将它开启即可
+
+```
+{
+    no-parent-import:ture
+}
+```
+
