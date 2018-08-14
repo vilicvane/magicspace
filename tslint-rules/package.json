@@ -11,7 +11,8 @@
     "bare-test": "node ./bld/test/runner.js"
   },
   "files": [
-    "bld/**/*.js"
+    "bld/**/*.js",
+    "!bld/test/**"
   ],
   "peerDependencies": {
     "tslint": "*",
