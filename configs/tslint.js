@@ -1,5 +1,7 @@
-const resolve = require('resolve');
 const Path = require('path');
+const FS = require('fs');
+
+const resolve = require('resolve');
 
 module.exports = {
   defaultSeverity: 'error',
@@ -130,7 +132,7 @@ module.exports = {
     'no-redundant-jsdoc': true,
     'no-reference': true,
     'no-reference-import': true,
-    'no-require-imports': false,
+    'no-require-imports': true,
     'no-return-await': true,
     'no-shadowed-variable': false,
     'no-sparse-arrays': true,
@@ -290,7 +292,30 @@ module.exports = {
     'scoped-modules': true,
     'explicit-return-type': true,
   },
-  rulesDirectory: [
-    Path.dirname(resolve.sync('@magicspace/tslint-rules/bld/rules')),
-  ],
+  rulesDirectory: [getRulesDir()],
 };
+
+function getRulesDir() {
+  let fakeIndexFilePath = resolve.sync('@magicspace/tslint-rules/bld/rules', {
+    basedir: __dirname,
+    isFile(fileName) {
+      if (Path.basename(fileName) === 'index.js') {
+        let dirName = Path.dirname(fileName);
+
+        try {
+          return FS.statSync(dirName).isDirectory();
+        } catch (error) {
+          return false;
+        }
+      }
+
+      try {
+        return FS.statSync(fileName).isFile();
+      } catch (error) {
+        return false;
+      }
+    },
+  });
+
+  return Path.dirname(fakeIndexFilePath);
+}
