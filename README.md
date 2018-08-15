@@ -145,7 +145,7 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 
 ```
 {
-    no-parent-import:ture
+    no-parent-import:true
 }
 ```
 
