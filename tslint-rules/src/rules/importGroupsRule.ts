@@ -245,8 +245,8 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   ): void {
     let node: TypeScript.Node = expression;
 
-    while (node.parent!.kind !== TypeScript.SyntaxKind.SourceFile) {
-      node = node.parent!;
+    while (node.parent.kind !== TypeScript.SyntaxKind.SourceFile) {
+      node = node.parent;
     }
 
     let modulePath = removeQuotes(expression.getText());

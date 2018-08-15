@@ -62,7 +62,7 @@ class NoParentImportRule extends AbstractWalker<undefined> {
       }
 
       this.addFailureAtNode(
-        expression.parent!,
+        expression.parent,
         ERROR_MESSAGE_BANNED_PARENT_IMPORT,
       );
     }

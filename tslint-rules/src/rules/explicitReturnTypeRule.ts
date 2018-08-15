@@ -95,7 +95,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
       return false;
     }
 
-    if (isMethodDeclaration(node) && isClassDeclaration(node.parent!)) {
+    if (isMethodDeclaration(node) && isClassDeclaration(node.parent)) {
       // class Foo {bar() {}}
       return false;
     }
@@ -136,8 +136,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<undefined> {
 
     if (isReturnStatement(parent)) {
       // return () => {};
-      let block = parent.parent!;
-      let functionLike = block.parent! as ReturnTypeRelatedFunctionLikeDeclaration;
+      let block = parent.parent;
+      let functionLike = block.parent as ReturnTypeRelatedFunctionLikeDeclaration;
 
       return this.checkReturnType(functionLike);
     }
