@@ -1,0 +1,2 @@
+import * as Foo from './core/foo' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [This import path must use baseUrl.]

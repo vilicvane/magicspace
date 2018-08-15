@@ -1,0 +1,2 @@
+import * as Foo from "foo"
+~~~~~~~~~~~~~~~~~~~~~~~~~~  [This import path must be a relative path.]

@@ -1,8 +1,8 @@
-import * as Foo from '.';
+import * as Foo from '.'; // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~      [Importing from parent directory is not allowed.]
 
-import * as Foo from '..';
+import * as Foo from '..';  // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]
 
-import * as Foo from '../..';
+import * as Foo from '../..'; // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]

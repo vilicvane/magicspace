@@ -52,7 +52,7 @@ export class Rule extends Rules.AbstractRule {
   }
 
   static metadata: IRuleMetadata = {
-    ruleName: 'import-path-convention',
+    ruleName: 'import-path-base-url',
     description: 'Check import module from baseUrl',
     optionsDescription: '',
     options: {
@@ -136,8 +136,8 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
     }
 
     this.failureManager.append({
-      message: ERROR_MESSAGE_IMPORT_OUT_OF_BASEURL,
-      node: expression.parent!,
+      message: ERROR_MESSAGE_IMPORT_IN_BASEURL,
+      node: expression.parent,
       fixer: new Replacement(
         expression.getStart(),
         expression.getWidth(),
@@ -156,8 +156,8 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
     );
 
     this.failureManager.append({
-      message: ERROR_MESSAGE_IMPORT_IN_BASEURL,
-      node: expression.parent!,
+      message: ERROR_MESSAGE_IMPORT_OUT_OF_BASEURL,
+      node: expression.parent,
       fixer: new Replacement(
         expression.getStart(),
         expression.getWidth(),
