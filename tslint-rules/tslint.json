@@ -14,7 +14,11 @@
     ],
     "scoped-modules": true,
     "explicit-return-type": true,
+<<<<<<< HEAD
     "import-path-base-url": true
+=======
+    "import-path-base-url": false
+>>>>>>> 42ed71eebdf1fc7477cf12d8a96d89efb17a5dc0
   },
   "rulesDirectory": ["bld/rules"]
 }
