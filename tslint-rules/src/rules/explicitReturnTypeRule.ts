@@ -129,15 +129,14 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     private getReturnType(
         node: ReturnTypeRelatedFunctionLikeDeclaration,
     ): string | undefined {
-        let type = this.typeChecker.typeToString(
-            this.typeChecker.getTypeAtLocation(node).getCallSignatures()[0].getReturnType(),
-        );
-
-        if (!this.options.complexTypeFixer && !BASE_TYPES.some(v => v === type)) {
-            return undefined
-        }
-
         try {
+            let type = this.typeChecker.typeToString(
+                this.typeChecker.getTypeAtLocation(node).getCallSignatures()[0].getReturnType(),
+            );
+
+            if (!this.options.complexTypeFixer && !BASE_TYPES.some(v => v === type)) {
+                return undefined
+            }
             return type
         } catch (e) {
             return undefined;
