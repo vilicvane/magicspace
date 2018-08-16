@@ -5,9 +5,19 @@
       true,
       {
         "groups": [
-          {"name": "node-core", "test": "$node-core"},
-          {"name": "node-modules", "test": "$node-modules", "sideEffect": true},
-          {"name": "node-modules", "test": "$node-modules"}
+          {
+            "name": "node-core",
+            "test": "$node-core"
+          },
+          {
+            "name": "node-modules",
+            "test": "$node-modules",
+            "sideEffect": true
+          },
+          {
+            "name": "node-modules",
+            "test": "$node-modules"
+          }
         ],
         "ordered": true
       }
@@ -16,5 +26,7 @@
     "explicit-return-type": true,
     "import-path-base-url": false
   },
-  "rulesDirectory": ["bld/rules"]
+  "rulesDirectory": [
+    "bld/rules"
+  ]
 }
