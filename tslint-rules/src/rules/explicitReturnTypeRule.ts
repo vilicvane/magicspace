@@ -6,7 +6,7 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {isAssignmentKind, isPropertyDeclaration} from 'tsutils';
+import {getChildOfKind, isAssignmentKind, isPropertyDeclaration} from 'tsutils';
 import {
   ArrowFunction,
   FunctionDeclaration,
@@ -16,6 +16,7 @@ import {
   Node,
   Program,
   SourceFile,
+  SyntaxKind,
   Type,
   TypeChecker,
   forEachChild,
@@ -171,10 +172,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     }
 
     return new Replacement(
-      node
-        .getChildren()
-        .find(v => v.getText() === ')')!
-        .getEnd(),
+      getChildOfKind(node, SyntaxKind.CloseParenToken)!.getEnd(),
       0,
       `: ${missingReturnTypeString}`,
     );
