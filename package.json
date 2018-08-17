@@ -2,7 +2,7 @@
   "name": "magicspace",
   "private": true,
   "scripts": {
-    "test":"cd tslint-rules && yarn test",
+    "test":"echo hello",
     "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org"
   },
   "devDependencies": {
