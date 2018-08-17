@@ -2,6 +2,7 @@
   "name": "magicspace",
   "private": true,
   "scripts": {
+    "test":"echo test",
     "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org"
   },
   "devDependencies": {
