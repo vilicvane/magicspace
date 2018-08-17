@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf bld && tsc -p .",
-    "test": "yarn build && yarn bare-test",
+    "test": "echo hello",
     "bare-test": "node ./bld/test/runner.js"
   },
   "files": [
