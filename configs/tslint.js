@@ -292,7 +292,7 @@ module.exports = {
     'scoped-modules': true,
     'explicit-return-type': true,
     'import-path-base-url': false,
-    'no-import-parent': true,
+    'no-parent-import': true,
   },
   rulesDirectory: [getRulesDir()],
 };
