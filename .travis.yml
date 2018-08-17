@@ -3,5 +3,6 @@ node_js:
   - stable
   - '6'
   - '8'
-install: yarn install
+install:
+  - yarn install
 script: cd tslint-rules && yarn test
