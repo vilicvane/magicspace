@@ -5,4 +5,5 @@ node_js:
   - '6'
   - '8'
 
+install: npm install
 script: echo hello
