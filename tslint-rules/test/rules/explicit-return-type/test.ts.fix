@@ -1,0 +1,42 @@
+function foo(): void {}
+let foo = (): void => {};
+let foo = {
+  bar(): void {},
+};
+
+class Foo {
+  bar(): void {}
+}
+
+let foo: Foo = () => {};
+
+let foo: Foo = {
+  bar() {},
+};
+
+let foo: Foo = {
+  bar() {},
+  pia: () => {},
+  hia: function() {},
+};
+
+let foo = {
+  bar(): void {},
+  pia: (): void => {},
+  hia: function(): void {},
+};
+
+let foo: Foo = () => true;
+let foo: Foo = () => () => true;
+let foo = (): Foo => () => {
+  return true;
+};
+
+let foo = () => (): Foo => true;
+
+foo.bar = () => {};
+bar = () => true;
+
+map(() => {});
+map(() => () => true);
+map({foo: () => () => true});

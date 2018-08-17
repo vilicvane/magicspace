@@ -1,226 +1,244 @@
 import {
-    AbstractWalker,
-    IOptions,
-    IRuleMetadata,
-    Replacement,
-    RuleFailure,
-    Rules,
+  AbstractWalker,
+  IOptions,
+  IRuleMetadata,
+  Replacement,
+  RuleFailure,
+  Rules,
 } from 'tslint';
-import { isAssignmentKind, isPropertyDeclaration } from 'tsutils';
+import {isAssignmentKind, isPropertyDeclaration} from 'tsutils';
 import {
-    ArrowFunction,
-    FunctionDeclaration,
-    FunctionExpression,
-    GetAccessorDeclaration,
-    MethodDeclaration,
-    ModuleKind,
-    Node,
-    ScriptTarget,
-    SourceFile,
-    TypeChecker,
-    createProgram,
-    forEachChild,
-    isArrowFunction,
-    isBinaryExpression,
-    isCallExpression,
-    isClassDeclaration,
-    isFunctionDeclaration,
-    isFunctionExpression,
-    isGetAccessorDeclaration,
-    isMethodDeclaration,
-    isReturnStatement,
-    isVariableDeclaration,
+  ArrowFunction,
+  FunctionDeclaration,
+  FunctionExpression,
+  GetAccessorDeclaration,
+  MethodDeclaration,
+  Node,
+  Program,
+  SourceFile,
+  Type,
+  TypeChecker,
+  forEachChild,
+  isArrowFunction,
+  isBinaryExpression,
+  isCallExpression,
+  isClassDeclaration,
+  isFunctionDeclaration,
+  isFunctionExpression,
+  isGetAccessorDeclaration,
+  isMethodDeclaration,
+  isReturnStatement,
+  isVariableDeclaration,
 } from 'typescript';
 
-import { BASE_TYPES } from '../@lang';
-import { FailureManager } from '../utils/failure-manager';
+import {FailureManager} from '../utils/failure-manager';
 
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
-    'This function requires explicit return type.';
+  'This function requires explicit return type.';
 
-let typeChecker: TypeChecker | undefined
+export const BASE_TYPE_STRING_SET = new Set([
+  'boolean',
+  'number',
+  'string',
+  'array',
+  'tuple',
+  'null',
+  'undefined',
+  'never',
+  'void',
+]);
 
 interface ParseOptions {
-    complexTypeFixer: boolean
+  complexTypeFixer: boolean;
 }
 
-export class Rule extends Rules.AbstractRule {
+export class Rule extends Rules.TypedRule {
+  private parsedOptions: ParseOptions;
 
-    private parseOptions: ParseOptions
+  constructor(options: IOptions) {
+    super(options);
+    this.parsedOptions = options.ruleArguments[0] || {complexTypeFixer: false};
+  }
 
-    constructor(options: IOptions) {
-        super(options)
-        this.parseOptions = options.ruleArguments[0] || { complexTypeFixer: false }
-    }
+  applyWithProgram(sourceFile: SourceFile, program: Program): RuleFailure[] {
+    return this.applyWithWalker(
+      new ExplicitReturnTypeWalker(
+        sourceFile,
+        this.ruleName,
+        this.parsedOptions,
+        program.getTypeChecker(),
+      ),
+    );
+  }
 
-    apply(sourceFile: SourceFile): RuleFailure[] {
-        return this.applyWithWalker(
-            new ExplicitReturnTypeWalker(
-                sourceFile,
-                Rule.metadata.ruleName,
-                this.parseOptions,
-            ),
-        );
-    }
-
-    static metadata: IRuleMetadata = {
-        ruleName: 'explicit-return-type',
-        description: '',
-        optionsDescription: '',
-        options: {
-            properties: {
-                complexTypeFixer: { type: 'boolean' }
-            }
-        },
-        type: 'maintainability',
-        hasFix: true,
-        typescriptOnly: false,
-    };
+  static metadata: IRuleMetadata = {
+    ruleName: 'explicit-return-type',
+    description: '',
+    optionsDescription: '',
+    options: {
+      properties: {
+        complexTypeFixer: {type: 'boolean'},
+      },
+    },
+    type: 'maintainability',
+    hasFix: true,
+    typescriptOnly: true,
+    requiresTypeInfo: true,
+  };
 }
 
 type ReturnTypeRelatedFunctionLikeDeclaration =
-    | ArrowFunction
-    | FunctionDeclaration
-    | FunctionExpression
-    | MethodDeclaration
-    | GetAccessorDeclaration;
+  | ArrowFunction
+  | FunctionDeclaration
+  | FunctionExpression
+  | MethodDeclaration
+  | GetAccessorDeclaration;
 
 class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
-    private failureManager = new FailureManager(this);
-    private typeChecker: TypeChecker;
+  private failureManager = new FailureManager(this);
 
-    constructor(sourceFile: SourceFile, ruleName: string, options: ParseOptions) {
-        super(sourceFile, ruleName, options);
-        this.typeChecker = typeChecker || (typeChecker = createProgram([this.sourceFile.fileName], {
-            noEmitOnError: true,
-            noImplicitAny: true,
-            target: ScriptTarget.Latest,
-            module: ModuleKind.CommonJS,
-        }).getTypeChecker());
+  constructor(
+    sourceFile: SourceFile,
+    ruleName: string,
+    options: ParseOptions,
+    private readonly typeChecker: TypeChecker,
+  ) {
+    super(sourceFile, ruleName, options);
+  }
+
+  walk(sourceFile: SourceFile): void {
+    let callback = (node: Node): void => {
+      if (
+        isArrowFunction(node) ||
+        isFunctionDeclaration(node) ||
+        isFunctionExpression(node) ||
+        isMethodDeclaration(node) ||
+        isGetAccessorDeclaration(node)
+      ) {
+        if (!this.checkReturnType(node)) {
+          this.failureManager.append({
+            node,
+            message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
+            fixer: this.buildFixer(node),
+          });
+        }
+      }
+
+      forEachChild(node, callback);
+    };
+
+    forEachChild(sourceFile, callback);
+
+    this.failureManager.throw();
+  }
+
+  private getMissingReturnTypeString(
+    node: ReturnTypeRelatedFunctionLikeDeclaration,
+  ): string | undefined {
+    let nodeType: Type;
+
+    try {
+      nodeType = this.typeChecker.getTypeAtLocation(node);
+    } catch (error) {
+      return undefined;
     }
 
-    walk(sourceFile: SourceFile): void {
-        let callback = (node: Node): void => {
+    let returnType = nodeType.getCallSignatures()[0].getReturnType();
 
-            if (
-                isArrowFunction(node) ||
-                isFunctionDeclaration(node) ||
-                isFunctionExpression(node) ||
-                isMethodDeclaration(node) ||
-                isGetAccessorDeclaration(node)
-            ) {
-                if (!this.checkReturnType(node)) {
-                    this.failureManager.append({
-                        node,
-                        message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
-                        fixer: this.buildFixer(node),
-                    });
-                }
-            }
+    let returnTypeString = this.typeChecker.typeToString(returnType);
 
-            forEachChild(node, callback);
-        };
-
-        forEachChild(sourceFile, callback);
-
-        this.failureManager.throw();
+    if (
+      !this.options.complexTypeFixer &&
+      !BASE_TYPE_STRING_SET.has(returnTypeString)
+    ) {
+      return undefined;
     }
 
-    private getReturnType(
-        node: ReturnTypeRelatedFunctionLikeDeclaration,
-    ): string | undefined {
-        try {
-            let type = this.typeChecker.typeToString(
-                this.typeChecker.getTypeAtLocation(node).getCallSignatures()[0].getReturnType(),
-            );
+    return returnTypeString;
+  }
 
-            if (!this.options.complexTypeFixer && !BASE_TYPES.some(v => v === type)) {
-                return undefined
-            }
-            return type
-        } catch (e) {
-            return undefined;
-        }
+  private buildFixer(
+    node: ReturnTypeRelatedFunctionLikeDeclaration,
+  ): Replacement | undefined {
+    if (!node.body) {
+      return undefined;
     }
 
-    private buildFixer(
-        node: ReturnTypeRelatedFunctionLikeDeclaration,
-    ): Replacement | undefined {
-        function typeFactory(type: string): string {
-            return `: ${type} `;
-        }
+    let missingReturnTypeString = this.getMissingReturnTypeString(node);
 
-        let body = node.body;
-        let returnType = this.getReturnType(node)
-
-        return body && returnType
-            ? new Replacement(
-                node.getChildren().find(v => v.getText() === ")")!.getEnd(),
-                0,
-                typeFactory(returnType),
-            )
-            : undefined;
+    if (!missingReturnTypeString) {
+      return undefined;
     }
 
-    private checkReturnType(
-        node: ReturnTypeRelatedFunctionLikeDeclaration,
-    ): boolean {
-        if (node.type) {
-            return true;
-        }
+    return new Replacement(
+      node
+        .getChildren()
+        .find(v => v.getText() === ')')!
+        .getEnd(),
+      0,
+      `: ${missingReturnTypeString}`,
+    );
+  }
 
-        if (isFunctionDeclaration(node)) {
-            // function foo() {}
-            return false;
-        }
-
-        if (isMethodDeclaration(node) && isClassDeclaration(node.parent)) {
-            // class Foo {bar() {}}
-            return false;
-        }
-
-        return this.checkExpressionType(node);
+  private checkReturnType(
+    node: ReturnTypeRelatedFunctionLikeDeclaration,
+  ): boolean {
+    if (node.type) {
+      return true;
     }
 
-    private checkExpressionType(node: Node): boolean {
-        let parent = node.parent;
-
-        if (!parent) {
-            return false;
-        }
-
-        if (
-            // let foo: Foo = () => {};
-            isVariableDeclaration(parent) ||
-            // class Foo {bar: Bar = () => {};}
-            isPropertyDeclaration(parent)
-        ) {
-            return !!parent.type;
-        }
-
-        if (
-            // [].map(() => {});
-            isCallExpression(parent) ||
-            // foo.bar = () => {};
-            (isBinaryExpression(parent) &&
-                isAssignmentKind(parent.operatorToken.kind))
-        ) {
-            return true;
-        }
-
-        if (isArrowFunction(parent)) {
-            // foo: () => () => {};
-            return this.checkReturnType(parent);
-        }
-
-        if (isReturnStatement(parent)) {
-            // return () => {};
-            let block = parent.parent;
-            let functionLike = block.parent as ReturnTypeRelatedFunctionLikeDeclaration;
-
-            return this.checkReturnType(functionLike);
-        }
-
-        return this.checkExpressionType(parent);
+    if (isFunctionDeclaration(node)) {
+      // function foo() {}
+      return false;
     }
+
+    if (isMethodDeclaration(node) && isClassDeclaration(node.parent)) {
+      // class Foo {bar() {}}
+      return false;
+    }
+
+    return this.checkExpressionType(node);
+  }
+
+  private checkExpressionType(node: Node): boolean {
+    let parent = node.parent;
+
+    if (!parent) {
+      return false;
+    }
+
+    if (
+      // let foo: Foo = () => {};
+      isVariableDeclaration(parent) ||
+      // class Foo {bar: Bar = () => {};}
+      isPropertyDeclaration(parent)
+    ) {
+      return !!parent.type;
+    }
+
+    if (
+      // [].map(() => {});
+      isCallExpression(parent) ||
+      // foo.bar = () => {};
+      (isBinaryExpression(parent) &&
+        isAssignmentKind(parent.operatorToken.kind))
+    ) {
+      return true;
+    }
+
+    if (isArrowFunction(parent)) {
+      // foo: () => () => {};
+      return this.checkReturnType(parent);
+    }
+
+    if (isReturnStatement(parent)) {
+      // return () => {};
+      let block = parent.parent;
+      let functionLike = block.parent as ReturnTypeRelatedFunctionLikeDeclaration;
+
+      return this.checkReturnType(functionLike);
+    }
+
+    return this.checkExpressionType(parent);
+  }
 }
