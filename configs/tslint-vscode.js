@@ -9,6 +9,7 @@ const PICKING_RULE_NAMES = [
   'import-groups',
   'scoped-modules',
   'import-path-base-url',
+  'explicit-return-type',
 ];
 
 const {rules, rulesDirectory} = TSLint.Configuration.loadConfigurationFromPath(
