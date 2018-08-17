@@ -5,5 +5,5 @@ node_js:
   - '6'
   - '8'
 
-install: npm install
+install: yarn install
 script: yarn workspace @magicspace/tslint-rules test
