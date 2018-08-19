@@ -40,3 +40,5 @@ bar = () => true;
 map(() => {});
 map(() => () => true);
 map({foo: () => () => true});
+
+`${props => true}`;

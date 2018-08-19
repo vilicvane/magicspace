@@ -1,15 +1,15 @@
 function foo() {}
-~~~~~~~~~~~~~~~~~ [This function requires explicit return type.]
+~~~~~~~~~~~~~~~~~ [require-explicit-return-type]
 let foo = () => {};
-          ~~~~~~~~ [This function requires explicit return type.]
+          ~~~~~~~~ [require-explicit-return-type]
 let foo = {
   bar() {},
-  ~~~~~~~~ [This function requires explicit return type.]
+  ~~~~~~~~ [require-explicit-return-type]
 };
 
 class Foo {
   bar() {}
-  ~~~~~~~~ [This function requires explicit return type.]
+  ~~~~~~~~ [require-explicit-return-type]
 }
 
 let foo: Foo = () => {};
@@ -26,11 +26,11 @@ let foo: Foo = {
 
 let foo = {
   bar() {},
-  ~~~~~~~~ [This function requires explicit return type.]
+  ~~~~~~~~ [require-explicit-return-type]
   pia: () => {},
-       ~~~~~~~~ [This function requires explicit return type.]
+       ~~~~~~~~ [require-explicit-return-type]
   hia: function() {},
-       ~~~~~~~~~~~~~ [This function requires explicit return type.]
+       ~~~~~~~~~~~~~ [require-explicit-return-type]
 };
 
 let foo: Foo = () => true;
@@ -40,7 +40,7 @@ let foo = (): Foo => () => {
 };
 
 let foo = () => (): Foo => true;
-          ~~~~~~~~~~~~~~~~~~~~~  [This function requires explicit return type.]
+          ~~~~~~~~~~~~~~~~~~~~~  [require-explicit-return-type]
 
 foo.bar = () => {};
 bar = () => true;
@@ -48,3 +48,7 @@ bar = () => true;
 map(() => {});
 map(() => () => true);
 map({foo: () => () => true});
+
+`${props => true}`;
+
+[require-explicit-return-type]: This function requires explicit return type.

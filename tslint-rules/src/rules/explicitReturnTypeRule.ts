@@ -29,6 +29,7 @@ import {
   isGetAccessorDeclaration,
   isMethodDeclaration,
   isReturnStatement,
+  isTemplateSpan,
   isVariableDeclaration,
 } from 'typescript';
 
@@ -223,6 +224,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     if (
       // [].map(() => {});
       isCallExpression(parent) ||
+      // `${() => {}}`;
+      isTemplateSpan(parent) ||
       // foo.bar = () => {};
       (isBinaryExpression(parent) &&
         isAssignmentKind(parent.operatorToken.kind))
