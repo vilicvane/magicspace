@@ -171,8 +171,14 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
       return undefined;
     }
 
+    let closeParenToken = getChildOfKind(node, SyntaxKind.CloseParenToken);
+
+    if (!closeParenToken) {
+      return undefined;
+    }
+
     return new Replacement(
-      getChildOfKind(node, SyntaxKind.CloseParenToken)!.getEnd(),
+      closeParenToken.getEnd(),
       0,
       `: ${missingReturnTypeString}`,
     );
