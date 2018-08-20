@@ -50,5 +50,6 @@ map(() => () => true);
 map({foo: () => () => true});
 
 `${props => true}`;
+let foo = `${props => true}`;
 
 [require-explicit-return-type]: This function requires explicit return type.

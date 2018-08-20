@@ -42,3 +42,4 @@ map(() => () => true);
 map({foo: () => () => true});
 
 `${props => true}`;
+let foo = `${props => true}`;
