@@ -1,0 +1,3 @@
+import * as Foo from 'core/foo';
+
+import * as Util from 'util';

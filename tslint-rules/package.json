@@ -28,6 +28,7 @@
     "@types/lodash": "^4.14.116",
     "@types/node": "^10.5.2",
     "@types/resolve": "^0.0.8",
-    "glob": "^7.1.2"
+    "glob": "^7.1.2",
+    "source-map-support": "^0.5.9"
   }
 }

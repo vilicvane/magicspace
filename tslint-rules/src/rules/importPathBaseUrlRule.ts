@@ -14,14 +14,21 @@ import {ImportKind, findImports} from 'tsutils';
 import * as TypeScript from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
-import {removeModuleFileExtension, removeQuotes} from '../utils/path';
+import {
+  hasKnownModuleExtension,
+  removeModuleFileExtension,
+  removeQuotes,
+} from '../utils/path';
 
-const PARENT_DIRNAME = /^(?:\.{2})/;
-const RELATIVE_PATH = /^(?:\.{1,2}[\\/])+/;
-const ERROR_MESSAGE_IMPORT_OUT_OF_BASEURL =
+const RELATIVE_PATH_REGEX = /^(?:\.{1,2}[\\/])+/;
+const PATH_PART_REGEX = /[^\\/]+/;
+
+const ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL =
   'This import path must use baseUrl.';
-const ERROR_MESSAGE_IMPORT_IN_BASEURL =
+const ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH =
   'This import path must be a relative path.';
+const ERROR_MESSAGE_IMPORT_OUT_OF_BASE_URL_DIR =
+  'Import path is not in directory configured by baseUrl';
 
 interface RuleOptions {
   baseUrl: string;
@@ -62,7 +69,7 @@ export class Rule extends Rules.AbstractRule {
         },
         baseUrlDirSearchName: {
           type: 'string',
-          default: 'tsconfig',
+          default: 'tsconfig.json',
         },
       },
     },
@@ -73,8 +80,11 @@ export class Rule extends Rules.AbstractRule {
 }
 
 export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
-  private sourceDirname: string;
-  private importExpressions: TypeScript.Expression[] = [];
+  private sourceDir: string;
+  private baseUrlDir: string;
+  private baseUrlNameSet: Set<string>;
+
+  private imports: TypeScript.LiteralExpression[] = [];
   private failureManager = new FailureManager(this);
 
   constructor(
@@ -83,158 +93,165 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
     options: RuleOptions,
   ) {
     super(sourceFile, ruleName, options);
-    this.sourceDirname = Path.dirname(sourceFile.fileName);
+
+    this.sourceDir = Path.dirname(sourceFile.fileName);
+
+    let baseUrlDir = (this.baseUrlDir = searchBaseUrlDir(
+      this.sourceDir,
+      options.baseUrlDirSearchName || 'tsconfig.json',
+    ));
+
+    let baseUrlNames = FS.readdirSync(baseUrlDir).reduce(
+      (names, entryName) => {
+        let entryPath = Path.join(baseUrlDir, entryName);
+
+        if (FS.statSync(entryPath).isDirectory()) {
+          return [...names, entryName];
+        } else if (hasKnownModuleExtension(entryName)) {
+          return [...names, entryName, removeModuleFileExtension(entryName)];
+        }
+
+        return names;
+      },
+      [] as string[],
+    );
+
+    this.baseUrlNameSet = new Set(baseUrlNames);
   }
 
   walk(sourceFile: TypeScript.SourceFile): void {
-    for (const expression of findImports(
-      sourceFile,
-      ImportKind.AllStaticImports,
-    )) {
-      this.importExpressions.push(expression);
+    let imports = findImports(sourceFile, ImportKind.AllStaticImports);
+
+    for (const expression of imports) {
+      this.imports.push(expression);
     }
 
     this.validate();
   }
 
   private validate(): void {
-    let importExpressions = this.importExpressions;
+    for (let expression of this.imports) {
+      this.validateModuleSpecifier(expression);
+    }
+  }
 
-    for (let expression of importExpressions) {
-      let text = removeQuotes(expression.getText());
-      if (
-        !this.isModuleInbaseUrl(this.sourceDirname) &&
-        this.isModuleInbaseUrl(text) &&
-        RELATIVE_PATH.test(text)
-      ) {
-        // sourceFile 不在 baseUrl 目录下， 且模块用的是相对路径
-        this.sourceFileOutOfBaseUrl(expression, text);
-      } else if (
-        this.isModuleInbaseUrl(this.sourceDirname) &&
-        this.isModuleInbaseUrl(text) &&
-        !RELATIVE_PATH.test(text)
-      ) {
-        // sourceFile 在 baseUrl 目录下， 且模块没有用相对路径
-        this.sourceFileInBaseUrl(expression, text);
+  private validateModuleSpecifier(
+    expression: TypeScript.LiteralExpression,
+  ): void {
+    let sourceDir = this.sourceDir;
+    let baseUrlDir = this.baseUrlDir;
+
+    let specifier = removeQuotes(expression.getText());
+    let relative = RELATIVE_PATH_REGEX.test(specifier);
+
+    let fullSpecifierPath: string;
+
+    if (relative) {
+      fullSpecifierPath = Path.join(sourceDir, specifier);
+    } else {
+      let specifierFirstPart = PATH_PART_REGEX.exec(specifier)![0];
+
+      if (!this.baseUrlNameSet.has(specifierFirstPart)) {
+        return;
       }
 
-      this.failureManager.throw();
-    }
-  }
-
-  private sourceFileInBaseUrl(
-    expression: TypeScript.Expression,
-    text: string,
-  ): void {
-    let importPath = Path.relative(
-      this.sourceDirname,
-      Path.join(this.getBaseUrl(), text),
-    );
-
-    if (!PARENT_DIRNAME.test(importPath)) {
-      importPath = `./${importPath}`;
+      fullSpecifierPath = Path.join(baseUrlDir, specifier);
     }
 
-    this.failureManager.append({
-      message: ERROR_MESSAGE_IMPORT_IN_BASEURL,
-      node: expression.parent,
-      fixer: new Replacement(
-        expression.getStart(),
-        expression.getWidth(),
-        `'${importPath}'`,
-      ),
-    });
-  }
+    let relativeSourceDir = Path.relative(baseUrlDir, sourceDir);
 
-  private sourceFileOutOfBaseUrl(
-    expression: TypeScript.Expression,
-    text: string,
-  ): void {
-    let importPath = Path.relative(
-      this.getBaseUrl(),
-      Path.join(this.sourceDirname, text),
-    );
+    let relativeSourceDirFirstPart =
+      relativeSourceDir && PATH_PART_REGEX.exec(relativeSourceDir)![0];
 
-    this.failureManager.append({
-      message: ERROR_MESSAGE_IMPORT_OUT_OF_BASEURL,
-      node: expression.parent,
-      fixer: new Replacement(
-        expression.getStart(),
-        expression.getWidth(),
-        `'${importPath}'`,
-      ),
-    });
-  }
-
-  private getBaseUrl(): string {
-    let rootPath = findProjectRootPath(
-      this.sourceDirname,
-      this.options.baseUrlDirSearchName,
-    );
-
-    if (!rootPath) {
-      throw new Error('can not find tslint.json');
+    // sourceDir 在 baseUrlDir 以外.
+    if (relativeSourceDirFirstPart === '..') {
+      return;
     }
 
-    return Path.join(rootPath, this.options.baseUrl);
-  }
+    let relativeSpecifierPath = Path.relative(baseUrlDir, fullSpecifierPath);
 
-  private isModuleInbaseUrl(filePath: string): boolean {
-    if (RELATIVE_PATH.test(filePath) || Path.isAbsolute(filePath)) {
-      return this.isFileInDirectory(filePath, this.getBaseUrl());
+    let relativeSpecifierPathFirstPart =
+      relativeSpecifierPath && PATH_PART_REGEX.exec(relativeSpecifierPath)![0];
+
+    // specifier 在 baseUrlDir 以外.
+    if (relativeSpecifierPathFirstPart === '..') {
+      this.failureManager.append({
+        message: ERROR_MESSAGE_IMPORT_OUT_OF_BASE_URL_DIR,
+        node: expression,
+      });
+      return;
     }
 
-    filePath = Path.join(this.getBaseUrl(), filePath);
-    let basename = removeModuleFileExtension(Path.basename(filePath));
-    let dirname = Path.dirname(filePath);
-    let files = FS.readdirSync(dirname).map(file =>
-      removeModuleFileExtension(file),
-    );
+    if (relativeSourceDirFirstPart === relativeSpecifierPathFirstPart) {
+      if (!relative) {
+        let relativeSpecifier = `'${formatModulePath(
+          Path.relative(sourceDir, fullSpecifierPath),
+          true,
+        )}'`;
 
-    if (_.includes(files, basename)) {
-      return true;
+        let replacement = new Replacement(
+          expression.getStart(),
+          expression.getWidth(),
+          relativeSpecifier,
+        );
+
+        this.failureManager.append({
+          message: ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH,
+          node: expression,
+          replacement,
+        });
+      }
+    } else {
+      if (relative) {
+        let baseUrlSpecifier = `'${formatModulePath(
+          Path.relative(baseUrlDir, fullSpecifierPath),
+          false,
+        )}'`;
+
+        let replacement = new Replacement(
+          expression.getStart(),
+          expression.getWidth(),
+          baseUrlSpecifier,
+        );
+
+        this.failureManager.append({
+          message: ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL,
+          node: expression,
+          replacement,
+        });
+      }
     }
-    return false;
-  }
-
-  private isFileInDirectory(filePath: string, directoryPath: string): boolean {
-    let modulePath = filePath;
-
-    if (!Path.isAbsolute(filePath)) {
-      modulePath = Path.join(this.sourceDirname, filePath);
-    }
-
-    return !PARENT_DIRNAME.test(Path.relative(directoryPath, modulePath));
   }
 }
 
-let findProjectRootPath = ((): ((
-  currentPath: string,
-  baseUrlDirSearchName: string | undefined,
-) => string | undefined) => {
-  let rootPathCache: string | undefined;
+function searchBaseUrlDir(from: string, searchName: string): string {
+  let nextDir = from;
 
-  return function inner(
-    currentPath: string,
-    baseUrlDirSearchName: string | undefined = 'tsconfig.json',
-  ): string | undefined {
-    if (rootPathCache) {
-      return rootPathCache;
+  while (true) {
+    let currentDir = nextDir;
+
+    let searchPath = Path.join(currentDir, searchName);
+
+    if (FS.existsSync(searchPath)) {
+      return currentDir;
     }
 
-    try {
-      let files = FS.readdirSync(currentPath);
+    nextDir = Path.dirname(currentDir);
 
-      if (_.includes(files, baseUrlDirSearchName)) {
-        rootPathCache = currentPath;
-        return currentPath;
-      } else {
-        return inner(Path.join(currentPath, '..'), baseUrlDirSearchName);
-      }
-    } catch (e) {
+    if (nextDir === currentDir) {
       throw new Error(
-        `can not find such 'baseUrlDirSearchName' that ${baseUrlDirSearchName}`,
+        `Cannot find base url directory by search name "${searchName}"`,
       );
     }
-  };
-})();
+  }
+}
+
+function formatModulePath(path: string, relative: boolean): string {
+  path = removeModuleFileExtension(path).replace(/\\/g, '/');
+
+  if (relative && !RELATIVE_PATH_REGEX.test(path)) {
+    path = `./${path}`;
+  }
+
+  return path;
+}

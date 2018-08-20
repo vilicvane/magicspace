@@ -124,7 +124,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
           this.failureManager.append({
             node,
             message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
-            fixer: this.buildFixer(node),
+            replacement: this.buildFixer(node),
           });
         }
       }
@@ -133,8 +133,6 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     };
 
     forEachChild(sourceFile, callback);
-
-    this.failureManager.throw();
   }
 
   private getMissingReturnTypeString(
