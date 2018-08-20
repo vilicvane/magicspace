@@ -79,6 +79,7 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
 interface ModuleGroupConfigItem {
   name: string;
   test: string;
+  sideEffect: boolean | undefined;
 }
 
 interface RawOptions {
@@ -98,15 +99,25 @@ type ModuleGroupTester = (
 
 class ModuleGroup {
   readonly name: string;
-  private tester: ModuleGroupTester;
 
-  constructor({name, test: testConfig}: ModuleGroupConfigItem) {
+  private tester: ModuleGroupTester;
+  private sideEffect: boolean | undefined;
+
+  constructor({name, test: testConfig, sideEffect}: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
+    this.sideEffect = sideEffect;
   }
 
-  test(modulePath: string, sourceFilePath: string): boolean {
-    return this.tester(modulePath, sourceFilePath);
+  match(
+    modulePath: string,
+    sideEffect: boolean,
+    sourceFilePath: string,
+  ): boolean {
+    return (
+      (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
+      this.tester(modulePath, sourceFilePath)
+    );
   }
 
   private buildTester(config: string): ModuleGroupTester {
@@ -208,19 +219,23 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let checkWithAppendModuleImport = (
       expression: TypeScript.Expression,
+      sideEffect: boolean,
     ): void => {
       this.pendingStatements.push(...pendingCache);
       pendingCache = [];
 
       if (isTextualLiteral(expression)) {
-        this.appendModuleImport(expression, sourceFile);
+        this.appendModuleImport(expression, sideEffect, sourceFile);
       }
     };
 
     for (let statement of sourceFile.statements) {
       if (isImportDeclaration(statement)) {
         if (ImportKind.ImportDeclaration) {
-          checkWithAppendModuleImport(statement.moduleSpecifier);
+          checkWithAppendModuleImport(
+            statement.moduleSpecifier,
+            !!statement.importClause,
+          );
         }
       } else if (isImportEqualsDeclaration(statement)) {
         if (
@@ -229,7 +244,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
             TypeScript.SyntaxKind.ExternalModuleReference &&
           statement.moduleReference.expression !== undefined
         ) {
-          checkWithAppendModuleImport(statement.moduleReference.expression);
+          checkWithAppendModuleImport(
+            statement.moduleReference.expression,
+            false,
+          );
         }
       } else {
         pendingCache.push(statement);
@@ -241,6 +259,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
+    sideEffect: boolean,
     sourceFile: TypeScript.SourceFile,
   ): void {
     let node: TypeScript.Node = expression;
@@ -255,7 +274,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let groups = this.options.groups;
 
     let index = groups.findIndex(group =>
-      group.test(modulePath, sourceFilePath),
+      group.match(modulePath, sideEffect, sourceFilePath),
     );
 
     this.moduleImportInfos.push({
