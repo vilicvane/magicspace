@@ -43,3 +43,9 @@ map({foo: () => () => true});
 
 `${props => true}`;
 let foo = `${props => true}`;
+
+function foo(): any {
+  if (true) {
+    return () => {};
+  }
+}
