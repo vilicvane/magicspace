@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "empty-line-around-statements": true
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}

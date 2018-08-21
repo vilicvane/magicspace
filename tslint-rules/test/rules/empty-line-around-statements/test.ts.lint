@@ -1,0 +1,3 @@
+function foo() {}
+               ~~ [empty-line-around-block]
+let bar;
