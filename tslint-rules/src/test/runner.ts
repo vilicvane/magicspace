@@ -12,7 +12,7 @@ let pattern = process.argv[2];
 console.info('Testing Lint Rules:');
 
 let testDirs = glob
-  .sync('../../test/rules/empty-line-around-statements/tslint.json', {
+  .sync('../../test/rules/empty-line-around-block/tslint.json', {
     cwd: __dirname,
     absolute: true,
   })

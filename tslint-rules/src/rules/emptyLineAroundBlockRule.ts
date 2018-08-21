@@ -27,9 +27,9 @@ import {
 import {FailureManager} from '../utils/failure-manager';
 
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
-  'Enough empty lines should be left around the statement.';
+  'An empty line is expected before the statement.';
 
-type WantedStatement =
+type BlockIncludedStatement =
   | IfStatement
   | DoStatement
   | WhileStatement
@@ -41,17 +41,17 @@ type WantedStatement =
 export class Rule extends Rules.TypedRule {
   applyWithProgram(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new EmptyLineAroundStatementsWalker(sourceFile, this.ruleName, undefined),
+      new EmptyLineAroundBlockWalker(sourceFile, this.ruleName, undefined),
     );
   }
 }
 
-class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
+class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: SourceFile): void {
     let callback = (node: Node): void => {
-      if (isWantedStatement(node)) {
+      if (isBlockIncludedStatement(node)) {
         if (!this.checkCertainWantedStatement(node)) {
           this.failureManager.append({
             node,
@@ -62,7 +62,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
 
         let nextStatement = getNextStatement(node);
 
-        if (nextStatement && !isWantedStatement(nextStatement)) {
+        if (nextStatement && !isBlockIncludedStatement(nextStatement)) {
           if (!this.checkNextAffectedNode(nextStatement, node)) {
             this.failureManager.append({
               node: nextStatement,
@@ -78,6 +78,8 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
 
     forEachChild(sourceFile, callback);
   }
+
+  walkNode(node: Node): void {}
 
   checkCertainWantedStatement(node: Statement): boolean {
     let parent = node.parent;
@@ -122,7 +124,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
   }
 }
 
-function isWantedStatement(node: Node): node is WantedStatement {
+function isBlockIncludedStatement(node: Node): node is BlockIncludedStatement {
   return (
     isIfStatement(node) ||
     isDoStatement(node) ||
