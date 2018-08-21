@@ -11,7 +11,6 @@ import {
 } from 'tslint';
 import {
   ImportKind,
-  forEachComment,
   isImportDeclaration,
   isImportEqualsDeclaration,
   isTextualLiteral,
