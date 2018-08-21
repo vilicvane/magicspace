@@ -235,34 +235,6 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     this.validate();
   }
 
-  private getCommentLine(
-    node: TypeScript.Node,
-    sourceFile: TypeScript.SourceFile,
-  ): number {
-    let commentLine = 0;
-
-    forEachComment(node, (_, {pos, end, kind}) => {
-      let commentEndLine = sourceFile.getLineAndCharacterOfPosition(end).line;
-
-      if (
-        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line <=
-        commentEndLine
-      ) {
-        return;
-      }
-      if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
-        commentLine++;
-      } else {
-        commentLine +=
-          commentEndLine +
-          1 -
-          sourceFile.getLineAndCharacterOfPosition(pos).line;
-      }
-    });
-
-    return commentLine;
-  }
-
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
     sideEffect: boolean,
