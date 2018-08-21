@@ -28,31 +28,6 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
-const resolveWithCache = ((): ((
-  id: string,
-  basedir: string,
-) => string | undefined) => {
-  let cache = new Map<string, string | undefined>();
-
-  return (id: string, basedir: string): string | undefined => {
-    let key = `${id}\n${basedir}`;
-
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-
-    let value: string | undefined;
-
-    try {
-      value = resolve.sync(id, {basedir});
-    } catch (error) {}
-
-    cache.set(key, value);
-
-    return value;
-  };
-})();
-
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core'(path) {
     try {
@@ -64,9 +39,11 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 
-    let resolvedPath = resolveWithCache(modulePath, basedir);
+    let resolvedPath: string;
 
-    if (!resolvedPath) {
+    try {
+      resolvedPath = resolve.sync(modulePath, {basedir});
+    } catch (error) {
       return false;
     }
 
