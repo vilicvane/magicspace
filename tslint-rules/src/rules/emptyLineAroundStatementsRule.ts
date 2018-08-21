@@ -18,6 +18,7 @@ import {
   TryStatement,
   WhileStatement,
   forEachChild,
+  isBlock,
   isForInStatement,
   isForOfStatement,
   isIfStatement,
@@ -51,7 +52,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
   walk(sourceFile: SourceFile): void {
     let callback = (node: Node): void => {
       if (isWantedStatement(node)) {
-        if (!this.checkCertainStatement(node)) {
+        if (!this.checkCertainWantedStatement(node)) {
           this.failureManager.append({
             node,
             message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
@@ -78,13 +79,23 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
     forEachChild(sourceFile, callback);
   }
 
-  checkCertainStatement(node: Statement): boolean {
+  checkCertainWantedStatement(node: Statement): boolean {
     let parent = node.parent;
 
-    let syntaxList = parent.getChildAt(1);
+    if (isBlock(parent)) {
+      let syntaxList = parent.getChildAt(1);
 
-    if (syntaxList.getChildAt(0) === node) {
-      return true;
+      if (firstInSyntaxList(node, syntaxList)) {
+        return true;
+      }
+    }
+
+    if (parent.getChildCount() > 1) {
+      let syntaxList = parent.getChildAt(0);
+
+      if (firstInSyntaxList(node, syntaxList)) {
+        return true;
+      }
     }
 
     if (emptyLineExistsBeforeNode(node)) {
@@ -123,12 +134,20 @@ function isWantedStatement(node: Node): node is WantedStatement {
   );
 }
 
+function firstInSyntaxList(node: Node, syntaxList: Node): boolean {
+  return (
+    syntaxList &&
+    syntaxList.getChildCount() > 1 &&
+    syntaxList.getChildAt(0) === node
+  );
+}
+
 function emptyLineExistsBeforeNode(node: Node): boolean {
   let nonCodeLength = node.getStart() - node.getFullStart();
 
-  let nonCode = node.getFullText().slice(0, nonCodeLength - 1);
+  let nonCode = node.getFullText().slice(0, nonCodeLength);
 
-  if (nonCode.match(/^\n\n+((.|\s)*)/)) {
+  if (nonCode.match(/^\s*\n\s*\n+((.|\s)*)/)) {
     return true;
   }
 
