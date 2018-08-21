@@ -234,7 +234,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
         if (ImportKind.ImportDeclaration) {
           checkWithAppendModuleImport(
             statement.moduleSpecifier,
-            !!statement.importClause,
+            !statement.importClause,
           );
         }
       } else if (isImportEqualsDeclaration(statement)) {
