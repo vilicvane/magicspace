@@ -52,7 +52,7 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   walk(sourceFile: SourceFile): void {
     let callback = (node: Node): void => {
       if (isBlockIncludedStatement(node)) {
-        if (!this.checkCertainWantedStatement(node)) {
+        if (!this.checkBlockIncludedStatement(node)) {
           this.failureManager.append({
             node,
             message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
@@ -81,7 +81,7 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
 
   walkNode(node: Node): void {}
 
-  checkCertainWantedStatement(node: Statement): boolean {
+  checkBlockIncludedStatement(node: Statement): boolean {
     let parent = node.parent;
 
     if (isBlock(parent)) {
