@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import resolve = require('resolve');
+import resolve from 'resolve';
 import {
   AbstractWalker,
   IOptions,
@@ -11,6 +11,7 @@ import {
 } from 'tslint';
 import {
   ImportKind,
+  forEachComment,
   isImportDeclaration,
   isImportEqualsDeclaration,
   isTextualLiteral,
@@ -28,31 +29,6 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
-const resolveWithCache = ((): ((
-  id: string,
-  basedir: string,
-) => string | undefined) => {
-  let cache = new Map<string, string | undefined>();
-
-  return (id: string, basedir: string): string | undefined => {
-    let key = `${id}\n${basedir}`;
-
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-
-    let value: string | undefined;
-
-    try {
-      value = resolve.sync(id, {basedir});
-    } catch (error) {}
-
-    cache.set(key, value);
-
-    return value;
-  };
-})();
-
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core'(path) {
     try {
@@ -64,9 +40,11 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 
-    let resolvedPath = resolveWithCache(modulePath, basedir);
+    let resolvedPath: string;
 
-    if (!resolvedPath) {
+    try {
+      resolvedPath = resolve.sync(modulePath, {basedir});
+    } catch (error) {
       return false;
     }
 
@@ -79,6 +57,7 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
 interface ModuleGroupConfigItem {
   name: string;
   test: string;
+  sideEffect: boolean | undefined;
 }
 
 interface RawOptions {
@@ -98,15 +77,25 @@ type ModuleGroupTester = (
 
 class ModuleGroup {
   readonly name: string;
-  private tester: ModuleGroupTester;
 
-  constructor({name, test: testConfig}: ModuleGroupConfigItem) {
+  private tester: ModuleGroupTester;
+  private sideEffect: boolean | undefined;
+
+  constructor({name, test: testConfig, sideEffect}: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
+    this.sideEffect = sideEffect;
   }
 
-  test(modulePath: string, sourceFilePath: string): boolean {
-    return this.tester(modulePath, sourceFilePath);
+  match(
+    modulePath: string,
+    sideEffect: boolean,
+    sourceFilePath: string,
+  ): boolean {
+    return (
+      (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
+      this.tester(modulePath, sourceFilePath)
+    );
   }
 
   private buildTester(config: string): ModuleGroupTester {
@@ -208,19 +197,23 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let checkWithAppendModuleImport = (
       expression: TypeScript.Expression,
+      sideEffect: boolean,
     ): void => {
       this.pendingStatements.push(...pendingCache);
       pendingCache = [];
 
       if (isTextualLiteral(expression)) {
-        this.appendModuleImport(expression, sourceFile);
+        this.appendModuleImport(expression, sideEffect, sourceFile);
       }
     };
 
     for (let statement of sourceFile.statements) {
       if (isImportDeclaration(statement)) {
         if (ImportKind.ImportDeclaration) {
-          checkWithAppendModuleImport(statement.moduleSpecifier);
+          checkWithAppendModuleImport(
+            statement.moduleSpecifier,
+            !statement.importClause,
+          );
         }
       } else if (isImportEqualsDeclaration(statement)) {
         if (
@@ -229,7 +222,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
             TypeScript.SyntaxKind.ExternalModuleReference &&
           statement.moduleReference.expression !== undefined
         ) {
-          checkWithAppendModuleImport(statement.moduleReference.expression);
+          checkWithAppendModuleImport(
+            statement.moduleReference.expression,
+            false,
+          );
         }
       } else {
         pendingCache.push(statement);
@@ -239,8 +235,37 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     this.validate();
   }
 
+  private getCommentLine(
+    node: TypeScript.Node,
+    sourceFile: TypeScript.SourceFile,
+  ): number {
+    let commentLine = 0;
+
+    forEachComment(node, (_, {pos, end, kind}) => {
+      let commentEndLine = sourceFile.getLineAndCharacterOfPosition(end).line;
+
+      if (
+        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line <=
+        commentEndLine
+      ) {
+        return;
+      }
+      if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
+        commentLine++;
+      } else {
+        commentLine +=
+          commentEndLine +
+          1 -
+          sourceFile.getLineAndCharacterOfPosition(pos).line;
+      }
+    });
+
+    return commentLine;
+  }
+
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
+    sideEffect: boolean,
     sourceFile: TypeScript.SourceFile,
   ): void {
     let node: TypeScript.Node = expression;
@@ -252,17 +277,21 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let modulePath = removeQuotes(expression.getText());
     let sourceFilePath = sourceFile.fileName;
 
+    let lineIncrement = this.getCommentLine(node, sourceFile);
+
     let groups = this.options.groups;
 
     let index = groups.findIndex(group =>
-      group.test(modulePath, sourceFilePath),
+      group.match(modulePath, sideEffect, sourceFilePath),
     );
 
     this.moduleImportInfos.push({
       node,
       // 如果没有找到匹配的分组, 则归到 "其他" 一组, groupIndex 为 groups.length.
       groupIndex: index < 0 ? groups.length : index,
-      startLine: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line,
+      startLine:
+        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
+        lineIncrement,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }

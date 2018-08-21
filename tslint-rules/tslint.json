@@ -1,5 +1,5 @@
 {
-  "extends": "vts/tslint-prettier",
+  "extends": "@magicspace/configs/tslint-prettier",
   "rules": {
     "import-groups": [
       true,
@@ -26,7 +26,5 @@
     "explicit-return-type": true,
     "import-path-base-url": false
   },
-  "rulesDirectory": [
-    "bld/rules"
-  ]
+  "rulesDirectory": ["bld/rules"]
 }

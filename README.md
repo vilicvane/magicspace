@@ -1,5 +1,5 @@
 # 魔法空格
-
+[![Build Status](https://www.travis-ci.org/makeflow/magicspace.svg?branch=master)](https://www.travis-ci.org/makeflow/magicspace)
 ## 使用
 
 添加依赖

@@ -1,2 +1,6 @@
-import * as Foo from './core/foo' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [This import path must use baseUrl.]
+import * as Foo from './core/foo';
+                     ~~~~~~~~~~~~ [must-use-base-url]
+
+import * as Util from 'util';
+
+[must-use-base-url]: This import path must use baseUrl.

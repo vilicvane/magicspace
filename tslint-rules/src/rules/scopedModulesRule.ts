@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import _ = require('lodash');
+import _ from 'lodash';
 import {
   AbstractWalker,
   IRuleMetadata,
@@ -18,7 +18,11 @@ import {
 } from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
-import {removeModuleFileExtension, removeQuotes} from '../utils/path';
+import {
+  hasKnownModuleExtension,
+  removeModuleFileExtension,
+  removeQuotes,
+} from '../utils/path';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
   "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
@@ -28,8 +32,6 @@ const ERROR_MESSAGE_MISSING_EXPORTS =
   'Missing modules expected to be exported.';
 
 const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
-
-const EXPORTABLE_EXTENSION_REGEX = /\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 
 const BANNED_IMPORT_REGEX = /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/;
 const BANNED_EXPORT_REGEX = /[\\/]@/;
@@ -122,7 +124,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       this.failureManager.append({
         message,
         node: statement,
-        fixer: buildBannedImportsAndExportsFixer(statement),
+        replacement: buildBannedImportsAndExportsFixer(statement),
       });
     }
   }
@@ -149,12 +151,12 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
           if (stats.isFile()) {
             if (
               INDEX_FILE_REGEX.test(fileName) ||
-              !EXPORTABLE_EXTENSION_REGEX.test(fileName)
+              !hasKnownModuleExtension(fileName)
             ) {
               return undefined;
             }
 
-            specifier = `./${fileName.replace(EXPORTABLE_EXTENSION_REGEX, '')}`;
+            specifier = `./${removeModuleFileExtension(fileName)}`;
           } else if (stats.isDirectory()) {
             let entryNamesInFolder = FS.readdirSync(entryFullPath);
 
@@ -189,7 +191,10 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       this.failureManager.append({
         node: undefined,
         message: ERROR_MESSAGE_MISSING_EXPORTS,
-        fixer: buildAddMissingExportsFixer(this.sourceFile, missingExportIds),
+        replacement: buildAddMissingExportsFixer(
+          this.sourceFile,
+          missingExportIds,
+        ),
       });
     }
   }
@@ -206,8 +211,6 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       .map(info => info.specifier);
 
     this.validateIndexFile(exportSpecifiers);
-
-    this.failureManager.throw();
   }
 }
 

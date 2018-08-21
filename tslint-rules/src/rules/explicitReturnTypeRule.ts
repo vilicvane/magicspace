@@ -6,11 +6,12 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {getChildOfKind, isAssignmentKind, isPropertyDeclaration} from 'tsutils';
+import {getChildOfKind, isAssignmentKind} from 'tsutils';
 import {
   ArrowFunction,
   FunctionDeclaration,
   FunctionExpression,
+  FunctionLikeDeclaration,
   GetAccessorDeclaration,
   MethodDeclaration,
   Node,
@@ -28,11 +29,14 @@ import {
   isFunctionExpression,
   isGetAccessorDeclaration,
   isMethodDeclaration,
+  isPropertyDeclaration,
   isReturnStatement,
+  isTemplateSpan,
   isVariableDeclaration,
 } from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
+import {getFunctionLikeParent} from '../utils/function';
 
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
   'This function requires explicit return type.';
@@ -120,7 +124,7 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
           this.failureManager.append({
             node,
             message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
-            fixer: this.buildFixer(node),
+            replacement: this.buildFixer(node),
           });
         }
       }
@@ -129,8 +133,6 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     };
 
     forEachChild(sourceFile, callback);
-
-    this.failureManager.throw();
   }
 
   private getMissingReturnTypeString(
@@ -171,8 +173,14 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
       return undefined;
     }
 
+    let closeParenToken = getChildOfKind(node, SyntaxKind.CloseParenToken);
+
+    if (!closeParenToken) {
+      return undefined;
+    }
+
     return new Replacement(
-      getChildOfKind(node, SyntaxKind.CloseParenToken)!.getEnd(),
+      closeParenToken.getEnd(),
       0,
       `: ${missingReturnTypeString}`,
     );
@@ -217,6 +225,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
     if (
       // [].map(() => {});
       isCallExpression(parent) ||
+      // `${() => {}}`;
+      isTemplateSpan(parent) ||
       // foo.bar = () => {};
       (isBinaryExpression(parent) &&
         isAssignmentKind(parent.operatorToken.kind))
@@ -231,12 +241,32 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
 
     if (isReturnStatement(parent)) {
       // return () => {};
-      let block = parent.parent;
-      let functionLike = block.parent as ReturnTypeRelatedFunctionLikeDeclaration;
+      let functionLikeParent = getFunctionLikeParent(parent);
 
-      return this.checkReturnType(functionLike);
+      if (
+        functionLikeParent &&
+        isReturnTypeRelatedFunctionLikeDeclaration(functionLikeParent)
+      ) {
+        return this.checkReturnType(functionLikeParent);
+      } else {
+        // Actually return statement should be invalid here in setter and
+        // constructor.
+        return true;
+      }
     }
 
     return this.checkExpressionType(parent);
   }
+}
+
+function isReturnTypeRelatedFunctionLikeDeclaration(
+  node: FunctionLikeDeclaration,
+): node is ReturnTypeRelatedFunctionLikeDeclaration {
+  return (
+    isFunctionDeclaration(node) ||
+    isFunctionExpression(node) ||
+    isArrowFunction(node) ||
+    isMethodDeclaration(node) ||
+    isGetAccessorDeclaration(node)
+  );
 }

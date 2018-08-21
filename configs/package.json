@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/configs",
-  "version": "0.1.17",
+  "version": "0.1.21",
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
@@ -23,7 +23,7 @@
     "tsconfig-browser.json"
   ],
   "dependencies": {
-    "@magicspace/tslint-rules": "^0.1.12",
+    "@magicspace/tslint-rules": "^0.1.16",
     "tslint-config-prettier": "^1.10.0"
   },
   "devDependencies": {
