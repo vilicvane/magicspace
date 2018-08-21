@@ -2,10 +2,13 @@
   if(1) {
     let a;
   }
+
   //ADWADASDAWD
   do{}while(1)
+
+  let a = 1;
 }
 
-  if(1) {
-    let a;
-  }
+if(1) {
+  let a;
+}

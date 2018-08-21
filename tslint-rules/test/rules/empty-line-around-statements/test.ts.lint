@@ -8,9 +8,11 @@
   let a = 1;
   ~~~~~~~~~~ [empty-line-around-statements]
 }
-
-  if(1) {
-    let a;
-  }
+if(1) {
+~~~~~~~
+  let a;
+~~~~~~~~
+}
+~ [empty-line-around-statements]
 
 [empty-line-around-statements]: Enough empty lines should be left around the statement.
