@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import resolve = require('resolve');
+import resolve from 'resolve';
 import {
   AbstractWalker,
   IOptions,
@@ -11,6 +11,7 @@ import {
 } from 'tslint';
 import {
   ImportKind,
+  forEachComment,
   isImportDeclaration,
   isImportEqualsDeclaration,
   isTextualLiteral,
@@ -234,6 +235,34 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     this.validate();
   }
 
+  private getCommentLine(
+    node: TypeScript.Node,
+    sourceFile: TypeScript.SourceFile,
+  ): number {
+    let commentLine = 0;
+
+    forEachComment(node, (_, {pos, end, kind}) => {
+      let commentEndLine = sourceFile.getLineAndCharacterOfPosition(end).line;
+
+      if (
+        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line <=
+        commentEndLine
+      ) {
+        return;
+      }
+      if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
+        commentLine++;
+      } else {
+        commentLine +=
+          commentEndLine +
+          1 -
+          sourceFile.getLineAndCharacterOfPosition(pos).line;
+      }
+    });
+
+    return commentLine;
+  }
+
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
     sideEffect: boolean,
@@ -248,6 +277,8 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let modulePath = removeQuotes(expression.getText());
     let sourceFilePath = sourceFile.fileName;
 
+    let lineIncrement = this.getCommentLine(node, sourceFile);
+
     let groups = this.options.groups;
 
     let index = groups.findIndex(group =>
@@ -258,7 +289,9 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       node,
       // 如果没有找到匹配的分组, 则归到 "其他" 一组, groupIndex 为 groups.length.
       groupIndex: index < 0 ? groups.length : index,
-      startLine: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line,
+      startLine:
+        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
+        lineIncrement,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }

@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import _ = require('lodash');
+import _ from 'lodash';
 import {
   AbstractWalker,
   IRuleMetadata,
