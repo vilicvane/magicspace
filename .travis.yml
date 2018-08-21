@@ -9,7 +9,9 @@ before_install:
 cache:
   directory:
     - $HOME/.yarn/bin
+
 install: yarn install
+
 script:
   - yarn workspace @magicspace/tslint-rules test
   - yarn workspace @magicspace/tslint-rules tslint -p tsconfig.json
