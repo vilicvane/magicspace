@@ -28,6 +28,15 @@ import {FailureManager} from '../utils/failure-manager';
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
   'Enough empty lines should be left around the statement.';
 
+type WantedStatement =
+  | IfStatement
+  | DoStatement
+  | WhileStatement
+  | ForStatement
+  | ForInStatement
+  | ForOfStatement
+  | TryStatement;
+
 export class Rule extends Rules.TypedRule {
   applyWithProgram(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
@@ -41,7 +50,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
 
   walk(sourceFile: SourceFile): void {
     let callback = (node: Node): void => {
-      if (isWantedStatementKind(node)) {
+      if (isWantedStatement(node)) {
         if (!this.checkCertainStatement(node)) {
           this.failureManager.append({
             node,
@@ -52,7 +61,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
 
         let nextStatement = getNextStatement(node);
 
-        if (nextStatement && !isWantedStatementKind(nextStatement)) {
+        if (nextStatement && !isWantedStatement(nextStatement)) {
           if (!this.checkNextAffectedNode(nextStatement, node)) {
             this.failureManager.append({
               node: nextStatement,
@@ -102,16 +111,7 @@ class EmptyLineAroundStatementsWalker extends AbstractWalker<undefined> {
   }
 }
 
-function isWantedStatementKind(
-  node: Node,
-): node is
-  | IfStatement
-  | DoStatement
-  | WhileStatement
-  | ForStatement
-  | ForInStatement
-  | ForOfStatement
-  | TryStatement {
+function isWantedStatement(node: Node): node is WantedStatement {
   return (
     isIfStatement(node) ||
     isDoStatement(node) ||
