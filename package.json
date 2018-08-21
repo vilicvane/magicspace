@@ -10,8 +10,7 @@
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3.0.1",
-    "vts": "^5.8.6"
+    "typescript": "^3.0.1"
   },
   "workspaces": {
     "packages": [

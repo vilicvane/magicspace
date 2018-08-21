@@ -1892,12 +1892,6 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vts@^5.8.6:
-  version "5.8.6"
-  resolved "http://registry.npm.taobao.org/vts/download/vts-5.8.6.tgz#17318f3258a28aaeecc26237765414779040524e"
-  dependencies:
-    tslint-config-prettier "^1.10.0"
-
 wcwidth@^1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/wcwidth/download/wcwidth-1.0.1.tgz#f0b0dcf915bc5ff1528afadb2c0e17b532da2fe8"
