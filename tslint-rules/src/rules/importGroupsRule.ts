@@ -277,7 +277,11 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let modulePath = removeQuotes(expression.getText());
     let sourceFilePath = sourceFile.fileName;
 
-    let lineIncrement = this.getCommentLine(node, sourceFile);
+    let comments = node.getFullText();
+    comments = comments.slice(comments.indexOf('/'), comments.length);
+    let commentLine =
+      (comments.match(/\n/g) || []).length -
+      (comments.match(/\n\n/g) || []).length;
 
     let groups = this.options.groups;
 
@@ -291,7 +295,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       groupIndex: index < 0 ? groups.length : index,
       startLine:
         sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
-        lineIncrement,
+        commentLine,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }
