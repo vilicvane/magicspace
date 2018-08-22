@@ -10,11 +10,11 @@ if(1) {}
   let a = 1;
   ~~~~~~~~~~ [empty-line-around-statement]
 }
-if(1) {
-~~~~~~~
-  let a;
-~~~~~~~~
+if (1) {
+~~~~~~~~~
 }
 ~ [empty-line-around-statement]
+
+if(2) {}
 
 [empty-line-around-statement]: An empty line is expected before the statement.

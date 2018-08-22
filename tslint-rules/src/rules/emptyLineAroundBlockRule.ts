@@ -53,13 +53,13 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
     forEachChild(sourceFile, this.walkNode);
   }
 
-  walkNode(node: Node): void {
+  walkNode = (node: Node): void => {
     if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
     }
 
     forEachChild(node, this.walkNode);
-  }
+  };
 
   walkBlockIncludedStatement(node: Statement): void {
     if (!this.checkBlockIncludedStatement(node)) {

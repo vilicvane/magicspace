@@ -24,6 +24,8 @@ let allPassed = true;
 for (let testDir of testDirs) {
   let result = runTest(testDir);
 
+  // console.log(result);
+
   let passed = consoleTestResultHandler(result, console);
 
   if (!passed) {
