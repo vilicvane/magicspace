@@ -84,9 +84,7 @@ const obj = {
     methodA(path){
     },
     methodB(name){
-    ~~~~~~~~~~~~~~
     }
-~~~~~ [empty-line-around-statement]
 }
 
 [empty-line-around-statement]: An empty line is expected before the statement.
@@ -168,7 +166,6 @@ if(1){
 const obj = {
     methodA(path){
     },
-
     methodB(name){
     }
 }

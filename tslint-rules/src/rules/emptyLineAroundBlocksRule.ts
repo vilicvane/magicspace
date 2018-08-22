@@ -133,6 +133,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
   private walkNode = (node: Node): void => {
     if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
+      // to allow leaving no empty line between methods in ObjectLiteralExpression
       if (!isObjectLiteralExpression(node.parent)) {
         this.walkFunctionOrMethodDeclaration(node);
       }
@@ -352,11 +353,7 @@ function getFirstSignature<T extends FunctionDeclaration | MethodDeclaration>(
 }
 
 function firstInSyntaxList(node: Node, syntaxList: SyntaxList): boolean {
-  return (
-    syntaxList &&
-    syntaxList.getChildCount() > 0 &&
-    syntaxList.getChildAt(0) === node
-  );
+  return syntaxList.getChildCount() > 0 && syntaxList.getChildAt(0) === node;
 }
 
 function emptyLineExistsBeforeNode(node: Node): boolean {
