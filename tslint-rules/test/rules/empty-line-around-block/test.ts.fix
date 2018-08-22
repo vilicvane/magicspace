@@ -5,12 +5,13 @@ if(1) {}
     let a;
   }
 
-  //ADWADASDAWD
+  // A meaningless comment
   do{}while(1)
 
   let a = 1;
 }
 
-if(1) {
-  let a;
+if (1) {
 }
+
+if(2) {}
