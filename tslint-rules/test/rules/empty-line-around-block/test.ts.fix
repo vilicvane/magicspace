@@ -18,5 +18,8 @@ if (1) {
 
 if(2) {}
 
+function a() {
+}
+
 class haha{
 }

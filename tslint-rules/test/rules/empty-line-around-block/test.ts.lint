@@ -18,6 +18,10 @@ if (1) {
 ~ [empty-line-around-statement]
 if(2) {}
 ~~~~~~~~ [empty-line-around-statement]
+function a() {
+~~~~~~~~~~~~~~
+}
+~ [empty-line-around-declaration]
 class haha{
 ~~~~~~~~~~~
 }

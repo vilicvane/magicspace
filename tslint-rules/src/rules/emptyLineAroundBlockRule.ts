@@ -122,7 +122,7 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
       });
     }
 
-    let nextStatement = getNextStatement(node);
+    let nextStatement = getNextSibling(node);
 
     if (nextStatement && !isBlockIncludedNode(nextStatement)) {
       if (!this.checkNextAffectedNode(nextStatement, node)) {
@@ -225,6 +225,42 @@ function getParentSyntaxList(node: Node): SyntaxList | undefined {
 
   if (parent.getChildCount() > 0) {
     return parent.getChildAt(0) as SyntaxList;
+  }
+
+  return undefined;
+}
+
+function findInSyntaxList(node: Node, syntaxList: SyntaxList): number {
+  let childrenCount = syntaxList.getChildCount();
+
+  for (let i = 0; i < childrenCount; i++) {
+    if (syntaxList.getChildAt(i) === node) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+function getNextSibling(node: Node): Node | undefined {
+  if (isBlockIncludedStatement(node)) {
+    return getNextStatement(node);
+  }
+
+  let assumedNext = getNextStatement(node as Statement);
+
+  if (assumedNext) {
+    return assumedNext;
+  }
+
+  let syntaxList = getParentSyntaxList(node);
+
+  if (syntaxList) {
+    let nextPosition = findInSyntaxList(node, syntaxList) + 1;
+
+    if (nextPosition && nextPosition < syntaxList.getChildCount() - 1) {
+      return syntaxList.getChildAt(nextPosition);
+    }
   }
 
   return undefined;
