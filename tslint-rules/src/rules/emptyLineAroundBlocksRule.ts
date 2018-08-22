@@ -22,9 +22,9 @@ import {
   isMethodDeclaration,
   isModuleBlock,
   isModuleDeclaration,
+  isObjectLiteralExpression,
   isTryStatement,
   isWhileStatement,
-  isObjectLiteralExpression,
 } from 'tsutils';
 import {
   Block,
@@ -101,10 +101,14 @@ const BlockIncludedStatementValidators: NodeValidator[] = [
   isPlainBlock,
 ];
 
-export class Rule extends Rules.TypedRule {
-  applyWithProgram(sourceFile: SourceFile): RuleFailure[] {
+export class Rule extends Rules.AbstractRule {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new EmptyLineAroundBlocksWalker(sourceFile, this.ruleName, undefined),
+      new EmptyLineAroundBlocksWalker(
+        sourceFile,
+        Rule.metadata.ruleName,
+        undefined,
+      ),
     );
   }
 
