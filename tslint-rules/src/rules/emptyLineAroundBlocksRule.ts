@@ -170,7 +170,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
       let firstSignature = getFirstSignature(node);
 
       if (firstSignature) {
-        if (!emptyLineExistsBeforeNode(firstSignature)) {
+        if (!this.checkBlockIncludedStatement(firstSignature)) {
           this.failureManager.append({
             node: firstSignature,
             message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
@@ -329,6 +329,7 @@ function getFirstSignature<T extends FunctionDeclaration | MethodDeclaration>(
 
       if (
         isSpecificDeclaration(candidate) &&
+        !candidate.body &&
         candidate.name &&
         candidate.name.getText() === node.name.getText()
       ) {
