@@ -103,6 +103,7 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
 
   private walkNode = (node: Node): void => {
     if (isFunctionDeclaration(node)) {
+      this.walkFunctionDeclaration(node);
     } else if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
     }
@@ -133,14 +134,22 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   }
 
   private walkFunctionDeclaration(node: FunctionDeclaration): void {
-    let parentSyntaxList = getParentSyntaxList(node);
+    if (node.body) {
+      let firstSignature = getFunctionDeclarationFirstSignature(node);
 
-    if (parentSyntaxList) {
-      let position = findInSyntaxList(node, parentSyntaxList);
-
-      if (position)
-        if (position !== -1) {
+      if (firstSignature) {
+        if (!emptyLineExistsBeforeNode(firstSignature)) {
+          this.failureManager.append({
+            node: firstSignature,
+            message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+            replacement: this.buildFixer(firstSignature),
+          });
         }
+
+        return;
+      }
+
+      this.walkBlockIncludedStatement(node);
     }
   }
 
@@ -242,6 +251,38 @@ function getNextSibling(node: Node): Node | undefined {
     if (nextPosition && nextPosition < syntaxList.getChildCount() - 1) {
       return syntaxList.getChildAt(nextPosition);
     }
+  }
+
+  return undefined;
+}
+
+function getFunctionDeclarationFirstSignature(
+  node: FunctionDeclaration,
+): FunctionDeclaration | undefined {
+  let parentSyntaxList = getParentSyntaxList(node);
+
+  if (parentSyntaxList && node.name) {
+    let position = findInSyntaxList(node, parentSyntaxList);
+
+    let firstSignature: FunctionDeclaration | undefined;
+
+    for (let i = position - 1; i >= 0; i--) {
+      let candidate = parentSyntaxList.getChildAt(i);
+
+      if (
+        isFunctionDeclaration(candidate) &&
+        candidate.name &&
+        candidate.name.getText() === node.name.getText()
+      ) {
+        firstSignature = candidate;
+
+        continue;
+      }
+
+      break;
+    }
+
+    return firstSignature;
   }
 
   return undefined;
