@@ -1,27 +1,6 @@
-if(1) {}
-
-{
-  if(1) {
-    let a;
+class Test{
+  test(name: number): number;
+  test(name: string): void;
+  test(name: string|number): void|number{
   }
-
-  // A meaningless comment
-  do{}while(1)
-
-  let a = 1;
-
-  if(1) {
-    while(1){}
-  }
-}
-
-if (1) {
-}
-
-if(2) {}
-
-function a() {
-}
-
-class haha{
 }

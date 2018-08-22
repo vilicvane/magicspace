@@ -13,6 +13,7 @@ import {
   isIfStatement,
   isInterfaceDeclaration,
   isMethodDeclaration,
+  isModuleBlock,
   isModuleDeclaration,
   isTryStatement,
   isWhileStatement,
@@ -20,7 +21,6 @@ import {
 import {
   ClassDeclaration,
   ConstructorDeclaration,
-  Declaration,
   DoStatement,
   EnumDeclaration,
   ForInStatement,
@@ -102,7 +102,8 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   }
 
   private walkNode = (node: Node): void => {
-    if (isBlockIncludedStatement(node)) {
+    if (isFunctionDeclaration(node)) {
+    } else if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
     }
 
@@ -128,6 +129,18 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
           replacement: this.buildFixer(nextStatement),
         });
       }
+    }
+  }
+
+  private walkFunctionDeclaration(node: FunctionDeclaration): void {
+    let parentSyntaxList = getParentSyntaxList(node);
+
+    if (parentSyntaxList) {
+      let position = findInSyntaxList(node, parentSyntaxList);
+
+      if (position)
+        if (position !== -1) {
+        }
     }
   }
 
@@ -183,8 +196,12 @@ function isBlockIncludedStatement(node: Node): node is BlockIncludedStatement {
 function getParentSyntaxList(node: Node): SyntaxList | undefined {
   let parent = node.parent;
 
-  if (isBlock(parent)) {
+  let siblingCount = parent.getChildCount();
+
+  if (isBlock(parent) || isModuleBlock(parent)) {
     return parent.getChildAt(1) as SyntaxList;
+  } else if (isClassDeclaration(parent) || isInterfaceDeclaration(parent)) {
+    return parent.getChildAt(siblingCount - 2) as SyntaxList;
   }
 
   if (parent.getChildCount() > 0) {
