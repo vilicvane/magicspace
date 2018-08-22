@@ -10,7 +10,7 @@
 yarn add @magicspace/configs -D
 ```
 
-然后， 你需要在 tslint.json 里显示的继承
+然后, 你需要在 tslint.json 里显式的继承
 
 ```json
 {
@@ -65,7 +65,7 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 
 此外， 如果有 index.ts (.js)，那么，在此目录下任何不为 @ 的模块都必须被导出
 
-配置 `tslint.json` 下的  `rules` 开启该规则:
+配置 `tslint.json` 下的 `rules` 开启该规则:
 
 ```json
 {
@@ -81,7 +81,7 @@ name 字段可以指定 group 的名字，test 为 group 的匹配规则， 除�
 [1, 2, 3].map(item => item + 1);
 ```
 
-配置 `tslint.json` 下的  `rules` 开启该规则:
+配置 `tslint.json` 下的 `rules` 开启该规则:
 
 ```json
 {
@@ -119,13 +119,13 @@ import {foo} from './foo'; //right
 
 ```json
 {
-    "import-path-convention":[
-        true,
-        {
-            "baseUrl": "src/core"
-            "baseUrlDirSearchName": "tsconfig.json"
-        }
-    ]
+  "import-path-convention": [
+    true,
+    {
+      "baseUrl": "src/core",
+      "baseUrlDirSearchName": "tsconfig.json"
+    }
+  ]
 }
 ```
 
@@ -135,11 +135,11 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 
 这两个字段都是很必要的，请在使用之前将它们配置好
 
-## No-Parent-Import
+### No-Parent-Import
 
 这个规则能够帮助你避免循环引用
 
-配置 `tslint.json` 下的  `rules` 开启该规则:
+配置 `tslint.json` 下的 `rules` 开启该规则:
 
 ```json
 {
@@ -147,11 +147,11 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 }
 ```
 
-## Empty-Line-Around-Blocks
+### Empty-Line-Around-Blocks
 
 该规则要求在多数含有代码块的语句周围存在适当的空行
 
-配置 `tslint.json` 下的  `rules` 开启该规则:
+配置 `tslint.json` 下的 `rules` 开启该规则:
 
 ```json
 {
