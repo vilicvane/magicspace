@@ -9,9 +9,14 @@ if(1) {}
   do{}while(1)
 
   let a = 1;
+
+  if(1) {}
 }
 
 if (1) {
 }
 
 if(2) {}
+
+class haha{
+}

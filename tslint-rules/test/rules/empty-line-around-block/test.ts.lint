@@ -9,6 +9,8 @@ if(1) {}
   ~~~~~~~~~~~~ [empty-line-around-statement]
   let a = 1;
   ~~~~~~~~~~ [empty-line-around-statement]
+  if(1) {}
+  ~~~~~~~~ [empty-line-around-statement]
 }
 if (1) {
 ~~~~~~~~
@@ -16,5 +18,10 @@ if (1) {
 ~ [empty-line-around-statement]
 if(2) {}
 ~~~~~~~~ [empty-line-around-statement]
+class haha{
+~~~~~~~~~~~
+}
+~ [empty-line-around-declaration]
 
 [empty-line-around-statement]: An empty line is expected before the statement.
+[empty-line-around-declaration]: An empty line is expected before the declaration.
