@@ -269,7 +269,7 @@ function getNextSibling(node: Node): Node | undefined {
 function firstInSyntaxList(node: Node, syntaxList: SyntaxList): boolean {
   return (
     syntaxList &&
-    syntaxList.getChildCount() > 1 &&
+    syntaxList.getChildCount() > 0 &&
     syntaxList.getChildAt(0) === node
   );
 }
