@@ -50,36 +50,38 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: SourceFile): void {
-    let callback = (node: Node): void => {
-      if (isBlockIncludedStatement(node)) {
-        if (!this.checkBlockIncludedStatement(node)) {
-          this.failureManager.append({
-            node,
-            message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-            replacement: this.buildFixer(node),
-          });
-        }
-
-        let nextStatement = getNextStatement(node);
-
-        if (nextStatement && !isBlockIncludedStatement(nextStatement)) {
-          if (!this.checkNextAffectedNode(nextStatement, node)) {
-            this.failureManager.append({
-              node: nextStatement,
-              message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-              replacement: this.buildFixer(nextStatement),
-            });
-          }
-        }
-      }
-
-      forEachChild(node, callback);
-    };
-
-    forEachChild(sourceFile, callback);
+    forEachChild(sourceFile, this.walkNode);
   }
 
-  walkNode(node: Node): void {}
+  walkNode(node: Node): void {
+    if (isBlockIncludedStatement(node)) {
+      this.walkBlockIncludedStatement(node);
+    }
+
+    forEachChild(node, this.walkNode);
+  }
+
+  walkBlockIncludedStatement(node: Statement): void {
+    if (!this.checkBlockIncludedStatement(node)) {
+      this.failureManager.append({
+        node,
+        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+        replacement: this.buildFixer(node),
+      });
+    }
+
+    let nextStatement = getNextStatement(node);
+
+    if (nextStatement && !isBlockIncludedStatement(nextStatement)) {
+      if (!this.checkNextAffectedNode(nextStatement, node)) {
+        this.failureManager.append({
+          node: nextStatement,
+          message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+          replacement: this.buildFixer(nextStatement),
+        });
+      }
+    }
+  }
 
   checkBlockIncludedStatement(node: Statement): boolean {
     let parent = node.parent;
