@@ -102,8 +102,8 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   }
 
   private walkNode = (node: Node): void => {
-    if (isFunctionDeclaration(node)) {
-      this.walkFunctionDeclaration(node);
+    if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
+      this.walkFunctionOrMethodDeclaration(node);
     } else if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
     }
@@ -133,9 +133,11 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private walkFunctionDeclaration(node: FunctionDeclaration): void {
+  private walkFunctionOrMethodDeclaration(
+    node: FunctionDeclaration | MethodDeclaration,
+  ): void {
     if (node.body) {
-      let firstSignature = getFunctionDeclarationFirstSignature(node);
+      let firstSignature = getFirstSignature(node);
 
       if (firstSignature) {
         if (!emptyLineExistsBeforeNode(firstSignature)) {
@@ -256,25 +258,29 @@ function getNextSibling(node: Node): Node | undefined {
   return undefined;
 }
 
-function getFunctionDeclarationFirstSignature(
-  node: FunctionDeclaration,
-): FunctionDeclaration | undefined {
+function getFirstSignature<T extends FunctionDeclaration | MethodDeclaration>(
+  node: T,
+): T | undefined {
   let parentSyntaxList = getParentSyntaxList(node);
+
+  let isSpecificDeclaration = isFunctionDeclaration(node)
+    ? isFunctionDeclaration
+    : isMethodDeclaration;
 
   if (parentSyntaxList && node.name) {
     let position = findInSyntaxList(node, parentSyntaxList);
 
-    let firstSignature: FunctionDeclaration | undefined;
+    let firstSignature: T | undefined;
 
     for (let i = position - 1; i >= 0; i--) {
       let candidate = parentSyntaxList.getChildAt(i);
 
       if (
-        isFunctionDeclaration(candidate) &&
+        isSpecificDeclaration(candidate) &&
         candidate.name &&
         candidate.name.getText() === node.name.getText()
       ) {
-        firstSignature = candidate;
+        firstSignature = candidate as T;
 
         continue;
       }

@@ -1,9 +1,8 @@
-let a = 1;
+class Test{
+  hello: string = '1';
 
-function asd(as: number): number;
-function asd(as: string): void;
-function asd(as: string | number): void|number{
-
+  test(name: number): number;
+  test(name: string): void;
+  test(name: string|number): void|number{
+  }
 }
-
-function test(): void {}

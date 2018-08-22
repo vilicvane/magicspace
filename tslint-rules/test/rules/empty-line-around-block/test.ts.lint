@@ -1,11 +1,10 @@
-let a = 1;
-function asd(as: number): number;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
-function asd(as: string): void;
-function asd(as: string | number): void|number{
-
+class Test{
+  hello: string = '1';
+  test(name: number): number;
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
+  test(name: string): void;
+  test(name: string|number): void|number{
+  }
 }
-function test(): void {}
-~~~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
 
 [empty-line-around-statement]: An empty line is expected before the statement.
