@@ -36,6 +36,7 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
       return false;
     }
   },
+
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 

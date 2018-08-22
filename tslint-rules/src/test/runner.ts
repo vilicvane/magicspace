@@ -1,5 +1,4 @@
 // tslint:disable:import-groups
-
 import * as Path from 'path';
 
 import 'source-map-support/register';
