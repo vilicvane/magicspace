@@ -42,6 +42,12 @@ function test(): void {}
 ~~~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
 
 class Test{
+  test(){}
+  a = 1;
+  ~~~~~~ [empty-line-around-statement]
+}
+
+class Test{
   hello: string = '1';
   test(name: number): number;
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
@@ -124,6 +130,12 @@ function foo(arg: string | number): void|number{
 function test(): void {}
 
 class Test{
+  test(){}
+
+  a = 1;
+}
+
+class Test{
   hello: string = '1';
 
   test(name: number): number;
@@ -160,4 +172,3 @@ const obj = {
     methodB(name){
     }
 }
-

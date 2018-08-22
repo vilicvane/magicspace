@@ -133,7 +133,9 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
   private walkNode = (node: Node): void => {
     if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
-      this.walkFunctionOrMethodDeclaration(node);
+      if (!isObjectLiteralExpression(node.parent)) {
+        this.walkFunctionOrMethodDeclaration(node);
+      }
     } else if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
     }
@@ -141,15 +143,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     forEachChild(node, this.walkNode);
   };
 
-  private walkBlockIncludedStatement(node: BlockIncludedStatement): void {
-    if (!this.checkBlockIncludedStatement(node)) {
-      this.failureManager.append({
-        node,
-        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-        replacement: this.buildFixer(node),
-      });
-    }
-
+  private walkNextAffectedNode(node: Node): void {
     let nextStatement = getNextSibling(node);
 
     if (nextStatement && !isBlockIncludedNode(nextStatement)) {
@@ -161,6 +155,18 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
         });
       }
     }
+  }
+
+  private walkBlockIncludedStatement(node: BlockIncludedStatement): void {
+    if (!this.checkBlockIncludedStatement(node)) {
+      this.failureManager.append({
+        node,
+        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+        replacement: this.buildFixer(node),
+      });
+    }
+
+    this.walkNextAffectedNode(node);
   }
 
   private walkFunctionOrMethodDeclaration(
@@ -177,6 +183,8 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
             replacement: this.buildFixer(firstSignature),
           });
         }
+
+        this.walkNextAffectedNode(node);
 
         return;
       }
@@ -287,10 +295,6 @@ function findInSyntaxList(node: Node, syntaxList: SyntaxList): number {
 }
 
 function getNextSibling(node: Node): Node | undefined {
-  if (isBlockIncludedStatement(node)) {
-    return getNextStatement(node as Statement);
-  }
-
   let assumedNext = getNextStatement(node as Statement);
 
   if (assumedNext) {
@@ -302,7 +306,7 @@ function getNextSibling(node: Node): Node | undefined {
   if (syntaxList) {
     let nextPosition = findInSyntaxList(node, syntaxList) + 1;
 
-    if (nextPosition && nextPosition < syntaxList.getChildCount() - 1) {
+    if (nextPosition && nextPosition < syntaxList.getChildCount()) {
       return syntaxList.getChildAt(nextPosition);
     }
   }
