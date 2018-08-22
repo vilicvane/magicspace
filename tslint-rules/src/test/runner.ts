@@ -1,5 +1,4 @@
 // tslint:disable:import-groups
-
 import * as Path from 'path';
 
 import 'source-map-support/register';
@@ -12,10 +11,7 @@ let pattern = process.argv[2];
 console.info('Testing Lint Rules:');
 
 let testDirs = glob
-  .sync('../../test/rules/empty-line-around-block/tslint.json', {
-    cwd: __dirname,
-    absolute: true,
-  })
+  .sync('../../test/rules/**/tslint.json', {cwd: __dirname, absolute: true})
   .filter(path => !pattern || path.includes(pattern))
   .map(path => Path.dirname(path));
 

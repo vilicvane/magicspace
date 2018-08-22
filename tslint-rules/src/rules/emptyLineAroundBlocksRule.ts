@@ -1,7 +1,14 @@
-import {AbstractWalker, Replacement, RuleFailure, Rules} from 'tslint';
+import {
+  AbstractWalker,
+  IRuleMetadata,
+  Replacement,
+  RuleFailure,
+  Rules,
+} from 'tslint';
 import {
   getNextStatement,
   isBlock,
+  isBlockLike,
   isClassDeclaration,
   isConstructorDeclaration,
   isDoStatement,
@@ -17,8 +24,10 @@ import {
   isModuleDeclaration,
   isTryStatement,
   isWhileStatement,
+  isObjectLiteralExpression,
 } from 'tsutils';
 import {
+  Block,
   ClassDeclaration,
   ConstructorDeclaration,
   DoStatement,
@@ -49,12 +58,16 @@ const REGEX_EMPTY_LINE_IN_NON_CODE = /^\s*\n\s*\n+((.|\s)*)/;
 
 type NodeValidator = (node: Node) => boolean;
 
+interface NotInElsePartIfStatement extends IfStatement {}
+
+interface PlainBlock extends Block {}
+
 type BlockIncludedNode = BlockIncludedStatement;
 
 const BlockIncludedNodeValidators: NodeValidator[] = [isBlockIncludedStatement];
 
 type BlockIncludedStatement =
-  | IfStatement
+  | NotInElsePartIfStatement
   | DoStatement
   | WhileStatement
   | ForStatement
@@ -67,10 +80,11 @@ type BlockIncludedStatement =
   | MethodDeclaration
   | InterfaceDeclaration
   | EnumDeclaration
-  | ModuleDeclaration;
+  | ModuleDeclaration
+  | PlainBlock;
 
 const BlockIncludedStatementValidators: NodeValidator[] = [
-  isIfStatement,
+  isNotInElsePartIfStatement,
   isDoStatement,
   isWhileStatement,
   isForStatement,
@@ -84,17 +98,29 @@ const BlockIncludedStatementValidators: NodeValidator[] = [
   isInterfaceDeclaration,
   isEnumDeclaration,
   isModuleDeclaration,
+  isPlainBlock,
 ];
 
 export class Rule extends Rules.TypedRule {
   applyWithProgram(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new EmptyLineAroundBlockWalker(sourceFile, this.ruleName, undefined),
+      new EmptyLineAroundBlocksWalker(sourceFile, this.ruleName, undefined),
     );
   }
+
+  static metadata: IRuleMetadata = {
+    ruleName: 'empty-line-around-blocks',
+    description:
+      'Validate and insert appropriate empty lines around block-included statements',
+    optionsDescription: '',
+    options: undefined,
+    type: 'maintainability',
+    hasFix: true,
+    typescriptOnly: false,
+  };
 }
 
-class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
+class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: SourceFile): void {
@@ -204,12 +230,34 @@ function isBlockIncludedStatement(node: Node): node is BlockIncludedStatement {
   return validate(node, BlockIncludedStatementValidators);
 }
 
+function isNotInElsePartIfStatement(
+  node: Node,
+): node is NotInElsePartIfStatement {
+  if (isIfStatement(node) && !isIfStatement(node.parent)) {
+    return true;
+  }
+
+  return false;
+}
+
+function isPlainBlock(node: Node): node is PlainBlock {
+  if (isBlock(node) && isBlockLike(node.parent)) {
+    return true;
+  }
+
+  return false;
+}
+
 function getParentSyntaxList(node: Node): SyntaxList | undefined {
   let parent = node.parent;
 
   let siblingCount = parent.getChildCount();
 
-  if (isBlock(parent) || isModuleBlock(parent)) {
+  if (
+    isBlock(parent) ||
+    isModuleBlock(parent) ||
+    isObjectLiteralExpression(parent)
+  ) {
     return parent.getChildAt(1) as SyntaxList;
   } else if (isClassDeclaration(parent) || isInterfaceDeclaration(parent)) {
     return parent.getChildAt(siblingCount - 2) as SyntaxList;

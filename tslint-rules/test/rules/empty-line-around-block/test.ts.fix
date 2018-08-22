@@ -1,8 +1,0 @@
-class Test{
-  hello: string = '1';
-
-  test(name: number): number;
-  test(name: string): void;
-  test(name: string|number): void|number{
-  }
-}

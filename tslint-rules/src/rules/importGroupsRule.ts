@@ -37,6 +37,7 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
       return false;
     }
   },
+
   '$node-modules'(modulePath, sourceFilePath) {
     let basedir = Path.dirname(sourceFilePath);
 
@@ -250,6 +251,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       ) {
         return;
       }
+
       if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
         commentLine++;
       } else {
