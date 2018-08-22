@@ -25,11 +25,10 @@ if(2) {}
 function a() {
 ~~~~~~~~~~~~~~
 }
-~ [empty-line-around-declaration]
+~ [empty-line-around-statement]
 class haha{
 ~~~~~~~~~~~
 }
-~ [empty-line-around-declaration]
+~ [empty-line-around-statement]
 
 [empty-line-around-statement]: An empty line is expected before the statement.
-[empty-line-around-declaration]: An empty line is expected before the declaration.

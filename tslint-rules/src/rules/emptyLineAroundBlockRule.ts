@@ -3,6 +3,7 @@ import {
   getNextStatement,
   isBlock,
   isClassDeclaration,
+  isConstructorDeclaration,
   isDoStatement,
   isEnumDeclaration,
   isForInStatement,
@@ -11,11 +12,14 @@ import {
   isFunctionDeclaration,
   isIfStatement,
   isInterfaceDeclaration,
+  isMethodDeclaration,
+  isModuleDeclaration,
   isTryStatement,
   isWhileStatement,
 } from 'tsutils';
 import {
   ClassDeclaration,
+  ConstructorDeclaration,
   Declaration,
   DoStatement,
   EnumDeclaration,
@@ -25,6 +29,7 @@ import {
   FunctionDeclaration,
   IfStatement,
   InterfaceDeclaration,
+  MethodDeclaration,
   ModuleDeclaration,
   Node,
   SourceFile,
@@ -33,26 +38,20 @@ import {
   TryStatement,
   WhileStatement,
   forEachChild,
-  isModuleDeclaration,
 } from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
 
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
   'An empty line is expected before the statement.';
-const ERROR_MESSAGE_EMPTY_LINE_AROUND_DECLARATION_REQUIRED =
-  'An empty line is expected before the declaration.';
 
 const REGEX_EMPTY_LINE_IN_NON_CODE = /^\s*\n\s*\n+((.|\s)*)/;
 
 type NodeValidator = (node: Node) => boolean;
 
-type BlockIncludedNode = BlockIncludedStatement | BlockIncludedDeclaration;
+type BlockIncludedNode = BlockIncludedStatement;
 
-const BlockIncludedNodeValidators: NodeValidator[] = [
-  isBlockIncludedStatement,
-  isBlockIncludedDeclaration,
-];
+const BlockIncludedNodeValidators: NodeValidator[] = [isBlockIncludedStatement];
 
 type BlockIncludedStatement =
   | IfStatement
@@ -61,7 +60,14 @@ type BlockIncludedStatement =
   | ForStatement
   | ForInStatement
   | ForOfStatement
-  | TryStatement;
+  | TryStatement
+  | FunctionDeclaration
+  | ClassDeclaration
+  | ConstructorDeclaration
+  | MethodDeclaration
+  | InterfaceDeclaration
+  | EnumDeclaration
+  | ModuleDeclaration;
 
 const BlockIncludedStatementValidators: NodeValidator[] = [
   isIfStatement,
@@ -71,18 +77,10 @@ const BlockIncludedStatementValidators: NodeValidator[] = [
   isForInStatement,
   isForOfStatement,
   isTryStatement,
-];
-
-type BlockIncludedDeclaration =
-  | FunctionDeclaration
-  | ClassDeclaration
-  | InterfaceDeclaration
-  | EnumDeclaration
-  | ModuleDeclaration;
-
-const BlockIncludedDeclarationValidators: NodeValidator[] = [
   isFunctionDeclaration,
   isClassDeclaration,
+  isConstructorDeclaration,
+  isMethodDeclaration,
   isInterfaceDeclaration,
   isEnumDeclaration,
   isModuleDeclaration,
@@ -106,14 +104,12 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
   private walkNode = (node: Node): void => {
     if (isBlockIncludedStatement(node)) {
       this.walkBlockIncludedStatement(node);
-    } else if (isBlockIncludedDeclaration(node)) {
-      this.walkBlockIncludedDeclaration(node);
     }
 
     forEachChild(node, this.walkNode);
   };
 
-  private walkBlockIncludedStatement(node: Statement): void {
+  private walkBlockIncludedStatement(node: BlockIncludedStatement): void {
     if (!this.checkBlockIncludedStatement(node)) {
       this.failureManager.append({
         node,
@@ -147,37 +143,11 @@ class EmptyLineAroundBlockWalker extends AbstractWalker<undefined> {
     return false;
   }
 
-  private checkBlockIncludedStatement(node: Statement): boolean {
+  private checkBlockIncludedStatement(node: BlockIncludedStatement): boolean {
     let parentSyntaxList = getParentSyntaxList(node);
 
     if (parentSyntaxList && firstInSyntaxList(node, parentSyntaxList)) {
       return true;
-    }
-
-    if (emptyLineExistsBeforeNode(node)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private walkBlockIncludedDeclaration(node: Declaration): void {
-    if (!this.checkBlockIncludedDeclaration(node)) {
-      this.failureManager.append({
-        node,
-        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_DECLARATION_REQUIRED,
-        replacement: this.buildFixer(node),
-      });
-    }
-  }
-
-  private checkBlockIncludedDeclaration(node: Declaration): boolean {
-    let parentSyntaxList = getParentSyntaxList(node);
-
-    if (parentSyntaxList) {
-      if (firstInSyntaxList(node, parentSyntaxList)) {
-        return true;
-      }
     }
 
     if (emptyLineExistsBeforeNode(node)) {
@@ -210,12 +180,6 @@ function isBlockIncludedStatement(node: Node): node is BlockIncludedStatement {
   return validate(node, BlockIncludedStatementValidators);
 }
 
-function isBlockIncludedDeclaration(
-  node: Node,
-): node is BlockIncludedDeclaration {
-  return validate(node, BlockIncludedDeclarationValidators);
-}
-
 function getParentSyntaxList(node: Node): SyntaxList | undefined {
   let parent = node.parent;
 
@@ -244,7 +208,7 @@ function findInSyntaxList(node: Node, syntaxList: SyntaxList): number {
 
 function getNextSibling(node: Node): Node | undefined {
   if (isBlockIncludedStatement(node)) {
-    return getNextStatement(node);
+    return getNextStatement(node as Statement);
   }
 
   let assumedNext = getNextStatement(node as Statement);
