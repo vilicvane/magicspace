@@ -11,7 +11,6 @@ import {
 } from 'tslint';
 import {
   ImportKind,
-  forEachComment,
   isImportDeclaration,
   isImportEqualsDeclaration,
   isTextualLiteral,
@@ -236,35 +235,6 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     this.validate();
   }
 
-  private getCommentLine(
-    node: TypeScript.Node,
-    sourceFile: TypeScript.SourceFile,
-  ): number {
-    let commentLine = 0;
-
-    forEachComment(node, (_, {pos, end, kind}) => {
-      let commentEndLine = sourceFile.getLineAndCharacterOfPosition(end).line;
-
-      if (
-        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line <=
-        commentEndLine
-      ) {
-        return;
-      }
-
-      if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
-        commentLine++;
-      } else {
-        commentLine +=
-          commentEndLine +
-          1 -
-          sourceFile.getLineAndCharacterOfPosition(pos).line;
-      }
-    });
-
-    return commentLine;
-  }
-
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
     sideEffect: boolean,
@@ -279,7 +249,11 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let modulePath = removeQuotes(expression.getText());
     let sourceFilePath = sourceFile.fileName;
 
-    let lineIncrement = this.getCommentLine(node, sourceFile);
+    let comments = node.getFullText();
+    comments = comments.slice(comments.indexOf('/'), comments.length);
+    let commentLine =
+      (comments.match(/\n/g) || []).length -
+      (comments.match(/\n\n/g) || []).length;
 
     let groups = this.options.groups;
 
@@ -293,7 +267,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       groupIndex: index < 0 ? groups.length : index,
       startLine:
         sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
-        lineIncrement,
+        commentLine,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }
