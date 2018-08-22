@@ -87,6 +87,24 @@ const obj = {
     }
 }
 
+class Test{
+  arrowProp = () => {};
+  arrowProp2 = () => {};
+  ~~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
+}
+
+class Test{
+  a = 2;
+  arrowProp = () => {};
+  ~~~~~~~~~~~~~~~~~~~~~ [empty-line-around-statement]
+}
+
+class Test{
+  arrowProp = () => {};
+  a = 2;
+  ~~~~~~ [empty-line-around-statement]
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.
 ===================================================================================
 if(1) {}
@@ -168,4 +186,22 @@ const obj = {
     },
     methodB(name){
     }
+}
+
+class Test{
+  arrowProp = () => {};
+
+  arrowProp2 = () => {};
+}
+
+class Test{
+  a = 2;
+
+  arrowProp = () => {};
+}
+
+class Test{
+  arrowProp = () => {};
+
+  a = 2;
 }

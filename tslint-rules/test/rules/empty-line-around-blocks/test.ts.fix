@@ -78,3 +78,21 @@ const obj = {
     methodB(name){
     }
 }
+
+class Test{
+  arrowProp = () => {};
+
+  arrowProp2 = () => {};
+}
+
+class Test{
+  a = 2;
+
+  arrowProp = () => {};
+}
+
+class Test{
+  arrowProp = () => {};
+
+  a = 2;
+}

@@ -7,6 +7,7 @@ import {
 } from 'tslint';
 import {
   getNextStatement,
+  isArrowFunction,
   isBlock,
   isBlockLike,
   isClassDeclaration,
@@ -23,6 +24,7 @@ import {
   isModuleBlock,
   isModuleDeclaration,
   isObjectLiteralExpression,
+  isPropertyDeclaration,
   isTryStatement,
   isWhileStatement,
 } from 'tsutils';
@@ -60,6 +62,8 @@ type NodeValidator = (node: Node) => boolean;
 
 interface NotInElsePartIfStatement extends IfStatement {}
 
+interface ArrowFunctionInitializedPropertyDeclaration extends IfStatement {}
+
 interface PlainBlock extends Block {}
 
 type BlockIncludedNode = BlockIncludedStatement;
@@ -81,6 +85,7 @@ type BlockIncludedStatement =
   | InterfaceDeclaration
   | EnumDeclaration
   | ModuleDeclaration
+  | ArrowFunctionInitializedPropertyDeclaration
   | PlainBlock;
 
 const BlockIncludedStatementValidators: NodeValidator[] = [
@@ -98,6 +103,7 @@ const BlockIncludedStatementValidators: NodeValidator[] = [
   isInterfaceDeclaration,
   isEnumDeclaration,
   isModuleDeclaration,
+  isArrowFunctionInitializedPropertyDeclaration,
   isPlainBlock,
 ];
 
@@ -247,6 +253,20 @@ function isNotInElsePartIfStatement(
   node: Node,
 ): node is NotInElsePartIfStatement {
   if (isIfStatement(node) && !isIfStatement(node.parent)) {
+    return true;
+  }
+
+  return false;
+}
+
+function isArrowFunctionInitializedPropertyDeclaration(
+  node: Node,
+): node is ArrowFunctionInitializedPropertyDeclaration {
+  if (
+    isPropertyDeclaration(node) &&
+    node.initializer &&
+    isArrowFunction(node.initializer)
+  ) {
     return true;
   }
 
