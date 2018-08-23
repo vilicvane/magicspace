@@ -19,6 +19,7 @@ import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
 import {removeQuotes} from '../utils/path';
+import {trimLeftEmptyLines} from '../utils/string';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
@@ -356,6 +357,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
       for (let {node, message} of failureItems) {
         this.addFailureAtNode(node, message, fixer);
+
+        if (fixer) {
+          fixer = undefined;
+        }
       }
     }
   }
@@ -369,10 +374,14 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let infoGroups = groupModuleImportInfos(infos, ordered);
 
     let text = infoGroups
-      .map(group => group.map(info => info.node.getText()).join('\n'))
+      .map(group =>
+        group
+          .map(info => trimLeftEmptyLines(info.node.getFullText()))
+          .join('\n'),
+      )
       .join('\n\n');
 
-    let start = startNode.getStart();
+    let start = startNode.getFullStart();
     let length = endNode.getEnd() - start;
 
     return new Replacement(start, length, text);
