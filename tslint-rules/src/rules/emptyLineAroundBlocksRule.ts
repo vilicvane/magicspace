@@ -145,7 +145,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
   private walkNode = (node: Node): void => {
     if (isConstructorDeclaration(node)) {
-      this.walkContructorDeclaration(node);
+      this.walkConstructorDeclaration(node);
     } else if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
       // to allow leaving no empty line between methods in ObjectLiteralExpression
       if (!isObjectLiteralExpression(node.parent)) {
@@ -172,7 +172,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private walkContructorDeclaration(node: ConstructorDeclaration): void {
+  private walkConstructorDeclaration(node: ConstructorDeclaration): void {
     if (node.body) {
       let firstSignature = getConstructorFirstSignature(node);
 
