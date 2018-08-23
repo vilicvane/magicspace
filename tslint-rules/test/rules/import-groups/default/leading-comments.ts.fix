@@ -1,0 +1,6 @@
+// hello, thank you
+
+import * as FS from 'fs';
+import * as Path from 'path';
+
+// hello, thank you, thank you very much

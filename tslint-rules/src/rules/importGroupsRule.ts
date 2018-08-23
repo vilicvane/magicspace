@@ -250,6 +250,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       ) {
         return;
       }
+
       if (kind === TypeScript.SyntaxKind.SingleLineCommentTrivia) {
         commentLine++;
       } else {
@@ -396,7 +397,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       .map(group => group.map(info => info.node.getText()).join('\n'))
       .join('\n\n');
 
-    return new Replacement(startNode.getStart(), endNode.getEnd(), text);
+    let start = startNode.getStart();
+    let length = endNode.getEnd() - start;
+
+    return new Replacement(start, length, text);
   }
 }
 
