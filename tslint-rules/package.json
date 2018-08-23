@@ -1,14 +1,15 @@
 {
   "name": "@magicspace/tslint-rules",
-  "version": "0.1.16",
+  "version": "0.1.19",
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "scripts": {
     "build": "rimraf bld && tsc -p .",
-    "test": "yarn build && yarn bare-test",
-    "bare-test": "node ./bld/test/runner.js"
+    "test": "yarn build && yarn bare-test && yarn lint",
+    "bare-test": "node ./bld/test/runner.js",
+    "lint": "yarn tslint -p tsconfig.json"
   },
   "files": [
     "bld/**/*.js",

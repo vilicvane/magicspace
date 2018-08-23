@@ -293,6 +293,7 @@ module.exports = {
     'explicit-return-type': true,
     'import-path-base-url': false,
     'no-parent-import': true,
+    'empty-line-around-blocks': true,
   },
   rulesDirectory: [getRulesDir()],
 };
