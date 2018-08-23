@@ -143,7 +143,7 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 
 ```json
 {
-  "empty-line-around-blocks": true
+  "no-parent-import": true
 }
 ```
 

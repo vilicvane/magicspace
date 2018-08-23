@@ -66,11 +66,13 @@ interface ArrowFunctionInitializedPropertyDeclaration extends IfStatement {}
 
 interface PlainBlock extends Block {}
 
-type BlockIncludedNode = BlockIncludedStatement;
+type BlockIncludingNode = BlockIncludingStatement;
 
-const BlockIncludedNodeValidators: NodeValidator[] = [isBlockIncludedStatement];
+const BlockIncludingNodeValidators: NodeValidator[] = [
+  isBlockIncludingStatement,
+];
 
-type BlockIncludedStatement =
+type BlockIncludingStatement =
   | NotInElsePartIfStatement
   | DoStatement
   | WhileStatement
@@ -88,7 +90,7 @@ type BlockIncludedStatement =
   | ArrowFunctionInitializedPropertyDeclaration
   | PlainBlock;
 
-const BlockIncludedStatementValidators: NodeValidator[] = [
+const BlockIncludingStatementValidators: NodeValidator[] = [
   isNotInElsePartIfStatement,
   isDoStatement,
   isWhileStatement,
@@ -143,8 +145,8 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
       if (!isObjectLiteralExpression(node.parent)) {
         this.walkFunctionOrMethodDeclaration(node);
       }
-    } else if (isBlockIncludedStatement(node)) {
-      this.walkBlockIncludedStatement(node);
+    } else if (isBlockIncludingStatement(node)) {
+      this.walkBlockIncludingStatement(node);
     }
 
     forEachChild(node, this.walkNode);
@@ -164,8 +166,8 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private walkBlockIncludedStatement(node: BlockIncludedStatement): void {
-    if (!this.checkBlockIncludedStatement(node)) {
+  private walkBlockIncludingStatement(node: BlockIncludingStatement): void {
+    if (!this.checkBlockIncludingStatement(node)) {
       this.failureManager.append({
         node,
         message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
@@ -183,7 +185,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
       let firstSignature = getFirstSignature(node);
 
       if (firstSignature) {
-        if (!this.checkBlockIncludedStatement(firstSignature)) {
+        if (!this.checkBlockIncludingStatement(firstSignature)) {
           this.failureManager.append({
             node: firstSignature,
             message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
@@ -196,7 +198,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
         return;
       }
 
-      this.walkBlockIncludedStatement(node);
+      this.walkBlockIncludingStatement(node);
     }
   }
 
@@ -212,7 +214,7 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     return false;
   }
 
-  private checkBlockIncludedStatement(node: BlockIncludedStatement): boolean {
+  private checkBlockIncludingStatement(node: BlockIncludingStatement): boolean {
     let parentSyntaxList = getParentSyntaxList(node);
 
     if (parentSyntaxList && firstInSyntaxList(node, parentSyntaxList)) {
@@ -241,12 +243,14 @@ function validate(node: Node, validators: NodeValidator[]): boolean {
   return false;
 }
 
-function isBlockIncludedNode(node: Node): node is BlockIncludedNode {
-  return validate(node, BlockIncludedNodeValidators);
+function isBlockIncludedNode(node: Node): node is BlockIncludingNode {
+  return validate(node, BlockIncludingNodeValidators);
 }
 
-function isBlockIncludedStatement(node: Node): node is BlockIncludedStatement {
-  return validate(node, BlockIncludedStatementValidators);
+function isBlockIncludingStatement(
+  node: Node,
+): node is BlockIncludingStatement {
+  return validate(node, BlockIncludingStatementValidators);
 }
 
 function isNotInElsePartIfStatement(
