@@ -96,3 +96,20 @@ class Test{
 
   a = 2;
 }
+
+outer:
+for(let i=0; i<4; i++){
+  break outer;
+}
+
+console.log(1);
+
+outer:
+while(1){
+  break outer;
+}
+
+outer:
+if(1){
+  break outer;
+}

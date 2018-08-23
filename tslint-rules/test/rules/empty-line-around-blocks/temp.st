@@ -105,6 +105,26 @@ class Test{
   ~~~~~~ [empty-line-around-statement]
 }
 
+outer:
+for(let i=0; i<4; i++){
+  break outer;
+}
+console.log(1);
+~~~~~~~~~~~~~~~ [empty-line-around-statement]
+outer:
+~~~~~~
+while(1){
+~~~~~~~~~
+  break outer;
+~~~~~~~~~~~~~~
+}
+~ [empty-line-around-statement]
+
+outer:
+if(1){
+  break outer;
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.
 ===================================================================================
 if(1) {}
@@ -204,4 +224,21 @@ class Test{
   arrowProp = () => {};
 
   a = 2;
+}
+
+outer:
+for(let i=0; i<4; i++){
+  break outer;
+}
+
+console.log(1);
+
+outer:
+while(1){
+  break outer;
+}
+
+outer:
+if(1){
+  break outer;
 }

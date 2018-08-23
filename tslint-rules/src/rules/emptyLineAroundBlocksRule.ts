@@ -20,6 +20,7 @@ import {
   isFunctionDeclaration,
   isIfStatement,
   isInterfaceDeclaration,
+  isLabeledStatement,
   isMethodDeclaration,
   isModuleBlock,
   isModuleDeclaration,
@@ -40,6 +41,7 @@ import {
   FunctionDeclaration,
   IfStatement,
   InterfaceDeclaration,
+  LabeledStatement,
   MethodDeclaration,
   ModuleDeclaration,
   Node,
@@ -80,6 +82,7 @@ type BlockIncludingStatement =
   | ForInStatement
   | ForOfStatement
   | TryStatement
+  | LabeledStatement
   | FunctionDeclaration
   | ClassDeclaration
   | ConstructorDeclaration
@@ -98,6 +101,7 @@ const BlockIncludingStatementValidators: NodeValidator[] = [
   isForInStatement,
   isForOfStatement,
   isTryStatement,
+  isLabeledStatement,
   isFunctionDeclaration,
   isClassDeclaration,
   isConstructorDeclaration,
@@ -215,6 +219,10 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
   }
 
   private checkBlockIncludingStatement(node: BlockIncludingStatement): boolean {
+    if (isLabeledStatement(node.parent)) {
+      return true;
+    }
+
     let parentSyntaxList = getParentSyntaxList(node);
 
     if (parentSyntaxList && firstInSyntaxList(node, parentSyntaxList)) {
