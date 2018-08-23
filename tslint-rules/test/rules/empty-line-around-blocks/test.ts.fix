@@ -113,3 +113,19 @@ outer:
 if(1){
   break outer;
 }
+
+class Test{
+  constructor(name:string);
+  constructor(name:string){
+
+  }
+}
+
+class Test{
+  a = 1;
+
+  constructor(name:string);
+  constructor(name:string){
+
+  }
+}

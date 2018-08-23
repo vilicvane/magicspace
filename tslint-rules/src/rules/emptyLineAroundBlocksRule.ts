@@ -144,7 +144,9 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
   }
 
   private walkNode = (node: Node): void => {
-    if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
+    if (isConstructorDeclaration(node)) {
+      this.walkContructorDeclaration(node);
+    } else if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
       // to allow leaving no empty line between methods in ObjectLiteralExpression
       if (!isObjectLiteralExpression(node.parent)) {
         this.walkFunctionOrMethodDeclaration(node);
@@ -170,16 +172,26 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private walkBlockIncludingStatement(node: BlockIncludingStatement): void {
-    if (!this.checkBlockIncludingStatement(node)) {
-      this.failureManager.append({
-        node,
-        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-        replacement: this.buildFixer(node),
-      });
-    }
+  private walkContructorDeclaration(node: ConstructorDeclaration): void {
+    if (node.body) {
+      let firstSignature = getConstructorFirstSignature(node);
 
-    this.walkNextAffectedNode(node);
+      if (firstSignature) {
+        if (!this.checkBlockIncludingStatement(firstSignature)) {
+          this.failureManager.append({
+            node: firstSignature,
+            message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+            replacement: this.buildFixer(firstSignature),
+          });
+        }
+
+        this.walkNextAffectedNode(node);
+
+        return;
+      }
+
+      this.walkBlockIncludingStatement(node);
+    }
   }
 
   private walkFunctionOrMethodDeclaration(
@@ -204,6 +216,18 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
       this.walkBlockIncludingStatement(node);
     }
+  }
+
+  private walkBlockIncludingStatement(node: BlockIncludingStatement): void {
+    if (!this.checkBlockIncludingStatement(node)) {
+      this.failureManager.append({
+        node,
+        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+        replacement: this.buildFixer(node),
+      });
+    }
+
+    this.walkNextAffectedNode(node);
   }
 
   private checkNextAffectedNode(node: Node, lastNode: Node): boolean {
@@ -371,6 +395,34 @@ function getFirstSignature<T extends FunctionDeclaration | MethodDeclaration>(
         candidate.name.getText() === node.name.getText()
       ) {
         firstSignature = candidate as T;
+
+        continue;
+      }
+
+      break;
+    }
+
+    return firstSignature;
+  }
+
+  return undefined;
+}
+
+function getConstructorFirstSignature(
+  node: ConstructorDeclaration,
+): ConstructorDeclaration | undefined {
+  let parentSyntaxList = getParentSyntaxList(node);
+
+  if (parentSyntaxList) {
+    let position = findInSyntaxList(node, parentSyntaxList);
+
+    let firstSignature: ConstructorDeclaration | undefined;
+
+    for (let i = position - 1; i >= 0; i--) {
+      let candidate = parentSyntaxList.getChildAt(i);
+
+      if (isConstructorDeclaration(candidate) && !candidate.body) {
+        firstSignature = candidate;
 
         continue;
       }
