@@ -141,4 +141,32 @@ class Test{
   }
 }
 
+function foo(){
+  return 'hello';
+}
+
+function foo(){
+  return {
+    name: 'foo',
+    args: undefined
+  };
+}
+
+function foo(){
+  let name = 'foo';
+  return {
+  ~~~~~~~~
+    name,
+~~~~~~~~~
+    args: undefined
+~~~~~~~~~~~~~~~~~~~
+  };
+~~~~ [empty-line-around-statement]
+}
+
+function foo(){
+  let name = 'foo';
+  return 'foo';
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.
