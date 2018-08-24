@@ -292,7 +292,7 @@ module.exports = {
     'scoped-modules': true,
     'explicit-return-type': true,
     'import-path-base-url': false,
-    'no-parent-import': true,
+    'import-path-no-parent': true,
     'empty-line-around-blocks': true,
     'import-path-shallowest': true,
   },

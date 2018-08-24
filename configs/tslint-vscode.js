@@ -11,6 +11,7 @@ const PICKING_RULE_NAMES = [
   'import-path-base-url',
   'empty-line-around-blocks',
   'import-path-shallowest',
+  'import-path-no-parent',
 ];
 
 const {rules, rulesDirectory} = TSLint.Configuration.loadConfigurationFromPath(

@@ -1,6 +1,6 @@
 {
   "rules": {
-    "no-parent-import": true
+    "import-path-no-parent": true
   },
   "rulesDirectory": ["../../../bld/rules"]
 }

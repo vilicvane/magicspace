@@ -13,12 +13,16 @@ const ERROR_MESSAGE_BANNED_PARENT_IMPORT =
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new NoParentImportRule(sourceFile, Rule.metadata.ruleName, undefined),
+      new ImportPathNoParentWalker(
+        sourceFile,
+        Rule.metadata.ruleName,
+        undefined,
+      ),
     );
   }
 
   static metadata: IRuleMetadata = {
-    ruleName: 'no-parent-import',
+    ruleName: 'import-path-no-parent',
     description: '',
     optionsDescription: '',
     options: undefined,
@@ -28,7 +32,7 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
-class NoParentImportRule extends AbstractWalker<undefined> {
+class ImportPathNoParentWalker extends AbstractWalker<undefined> {
   /** 装 import 语句的容器 */
   private importExpressions: Typescript.Expression[] = [];
 

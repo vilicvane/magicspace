@@ -135,7 +135,7 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 
 这两个字段都是很必要的，请在使用之前将它们配置好
 
-### No-Parent-Import
+### import-path-no-parent
 
 这个规则能够帮助你避免循环引用
 
@@ -143,7 +143,7 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
 
 ```json
 {
-  "no-parent-import": true
+  "import-path-no-parent": true
 }
 ```
 
