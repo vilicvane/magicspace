@@ -1,3 +1,6 @@
+import * as Path from 'path';
+
+import resolve from 'resolve';
 import {
   AbstractWalker,
   IOptions,
@@ -15,7 +18,6 @@ import {
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
-import {nodeCore, nodeModules} from '../utils/match';
 import {removeQuotes} from '../utils/path';
 import {trimLeftEmptyLines} from '../utils/string';
 
@@ -28,8 +30,29 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
-  '$node-core': nodeCore,
-  '$node-modules': nodeModules,
+  '$node-core'(path) {
+    try {
+      return require.resolve(path) === path;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  '$node-modules'(modulePath, sourceFilePath) {
+    let basedir = Path.dirname(sourceFilePath);
+
+    let resolvedPath: string;
+
+    try {
+      resolvedPath = resolve.sync(modulePath, {basedir});
+    } catch (error) {
+      return false;
+    }
+
+    let relativePath = Path.relative(basedir, resolvedPath);
+
+    return /[\\/]node_modules[\\/]/.test(relativePath);
+  },
 };
 
 interface ModuleGroupConfigItem {
