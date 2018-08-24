@@ -25,10 +25,14 @@ import {
   isBinaryExpression,
   isCallExpression,
   isClassDeclaration,
+  isConstructorDeclaration,
+  isConstructorTypeNode,
   isFunctionDeclaration,
   isFunctionExpression,
+  isFunctionOrConstructorTypeNode,
   isGetAccessorDeclaration,
   isMethodDeclaration,
+  isNewExpression,
   isPropertyDeclaration,
   isReturnStatement,
   isTemplateSpan,
@@ -56,6 +60,14 @@ export const BASE_TYPE_STRING_SET = new Set([
 interface ParseOptions {
   complexTypeFixer: boolean;
 }
+
+class A {
+  constructor(func: () => void) {}
+}
+
+let a = new A(() => {});
+
+function B(a: () => void): void {}
 
 export class Rule extends Rules.TypedRule {
   private parsedOptions: ParseOptions;
@@ -227,6 +239,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
       isCallExpression(parent) ||
       // `${() => {}}`;
       isTemplateSpan(parent) ||
+      // new Foo(() => {})
+      isNewExpression(parent) ||
       // foo.bar = () => {};
       (isBinaryExpression(parent) &&
         isAssignmentKind(parent.operatorToken.kind))

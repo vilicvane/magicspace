@@ -49,3 +49,6 @@ function foo(): any {
     return () => {};
   }
 }
+
+new foo(() => {})
+

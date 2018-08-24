@@ -58,4 +58,7 @@ function foo(): any {
   }
 }
 
+new foo(() => {})
+
+
 [require-explicit-return-type]: This function requires explicit return type.
