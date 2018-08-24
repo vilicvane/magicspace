@@ -23,7 +23,7 @@ export class Rule extends Rules.AbstractRule {
     optionsDescription: '',
     options: undefined,
     type: 'maintainability',
-    hasFix: true,
+    hasFix: false,
     typescriptOnly: false,
   };
 }
