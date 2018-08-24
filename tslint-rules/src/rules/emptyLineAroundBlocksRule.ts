@@ -53,7 +53,6 @@ import {
   TryStatement,
   WhileStatement,
   forEachChild,
-  getLineAndCharacterOfPosition,
 } from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
