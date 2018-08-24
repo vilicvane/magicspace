@@ -25,11 +25,8 @@ import {
   isBinaryExpression,
   isCallExpression,
   isClassDeclaration,
-  isConstructorDeclaration,
-  isConstructorTypeNode,
   isFunctionDeclaration,
   isFunctionExpression,
-  isFunctionOrConstructorTypeNode,
   isGetAccessorDeclaration,
   isMethodDeclaration,
   isNewExpression,
@@ -60,14 +57,6 @@ export const BASE_TYPE_STRING_SET = new Set([
 interface ParseOptions {
   complexTypeFixer: boolean;
 }
-
-class A {
-  constructor(func: () => void) {}
-}
-
-let a = new A(() => {});
-
-function B(a: () => void): void {}
 
 export class Rule extends Rules.TypedRule {
   private parsedOptions: ParseOptions;
