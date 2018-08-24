@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "import-path-shallowest": true
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}

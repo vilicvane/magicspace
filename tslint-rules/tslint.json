@@ -25,7 +25,8 @@
     "scoped-modules": true,
     "explicit-return-type": true,
     "import-path-base-url": false,
-    "empty-line-around-blocks": true
+    "empty-line-around-blocks": true,
+    "import-path-shallowest": true
   },
   "rulesDirectory": ["bld/rules"]
 }

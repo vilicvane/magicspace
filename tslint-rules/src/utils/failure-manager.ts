@@ -4,7 +4,7 @@ import * as Typescript from 'typescript';
 /** 需要添加错误的项目 */
 export interface FailureItem {
   message: string;
-  node: Typescript.Node | undefined;
+  node?: Typescript.Node;
   replacement?: Replacement;
 }
 
