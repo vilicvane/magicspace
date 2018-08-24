@@ -129,3 +129,28 @@ class Test{
 
   }
 }
+
+function foo(){
+  return 'hello';
+}
+
+function foo(){
+  return {
+    name: 'foo',
+    args: undefined
+  };
+}
+
+function foo(){
+  let name = 'foo';
+
+  return {
+    name,
+    args: undefined
+  };
+}
+
+function foo(){
+  let name = 'foo';
+  return 'foo';
+}

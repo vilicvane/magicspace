@@ -26,6 +26,7 @@ import {
   isModuleDeclaration,
   isObjectLiteralExpression,
   isPropertyDeclaration,
+  isReturnStatement,
   isTryStatement,
   isWhileStatement,
 } from 'tsutils';
@@ -45,6 +46,7 @@ import {
   MethodDeclaration,
   ModuleDeclaration,
   Node,
+  ReturnStatement,
   SourceFile,
   Statement,
   SyntaxList,
@@ -68,6 +70,8 @@ interface ArrowFunctionInitializedPropertyDeclaration extends IfStatement {}
 
 interface PlainBlock extends Block {}
 
+interface MultilineReturnStatement extends ReturnStatement {}
+
 type BlockIncludingNode = BlockIncludingStatement;
 
 const BlockIncludingNodeValidators: NodeValidator[] = [
@@ -83,6 +87,7 @@ type BlockIncludingStatement =
   | ForOfStatement
   | TryStatement
   | LabeledStatement
+  | MultilineReturnStatement
   | FunctionDeclaration
   | ClassDeclaration
   | ConstructorDeclaration
@@ -102,6 +107,7 @@ const BlockIncludingStatementValidators: NodeValidator[] = [
   isForOfStatement,
   isTryStatement,
   isLabeledStatement,
+  isMultilineReturnStatement,
   isFunctionDeclaration,
   isClassDeclaration,
   isConstructorDeclaration,
@@ -311,6 +317,16 @@ function isArrowFunctionInitializedPropertyDeclaration(
 
 function isPlainBlock(node: Node): node is PlainBlock {
   if (isBlock(node) && isBlockLike(node.parent)) {
+    return true;
+  }
+
+  return false;
+}
+
+function isMultilineReturnStatement(
+  node: Node,
+): node is MultilineReturnStatement {
+  if (isReturnStatement(node) && node.getText().indexOf('\n') !== -1) {
     return true;
   }
 
