@@ -294,7 +294,7 @@ module.exports = {
     'import-path-base-url': false,
     'import-path-no-parent': true,
     'empty-line-around-blocks': true,
-    'import-path-shallowest': true,
+    'import-path-shallowest': false,
     'import-path-be-smart': true,
   },
   rulesDirectory: [getRulesDir()],
