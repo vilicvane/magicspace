@@ -1,0 +1,4 @@
+import * as bar from '../foo/bar'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path is invalid.]
+
+import * as bar from './bar'

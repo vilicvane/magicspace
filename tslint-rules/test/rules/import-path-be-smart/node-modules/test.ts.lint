@@ -1,0 +1,4 @@
+import * as resolve from '../../../../../node_modules/resolve'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path is invalid.]
+
+import * as resolve from 'resolve'
