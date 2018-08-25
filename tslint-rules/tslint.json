@@ -26,7 +26,8 @@
     "explicit-return-type": true,
     "import-path-base-url": false,
     "empty-line-around-blocks": true,
-    "import-path-shallowest": true
+    "import-path-shallowest": true,
+    "import-path-be-smart": true
   },
   "rulesDirectory": ["bld/rules"]
 }

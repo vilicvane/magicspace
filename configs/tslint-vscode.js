@@ -12,6 +12,7 @@ const PICKING_RULE_NAMES = [
   'empty-line-around-blocks',
   'import-path-shallowest',
   'import-path-no-parent',
+  'import-path-be-smart',
 ];
 
 const {rules, rulesDirectory} = TSLint.Configuration.loadConfigurationFromPath(

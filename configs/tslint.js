@@ -295,6 +295,7 @@ module.exports = {
     'import-path-no-parent': true,
     'empty-line-around-blocks': true,
     'import-path-shallowest': true,
+    'import-path-be-smart': true,
   },
   rulesDirectory: [getRulesDir()],
 };
