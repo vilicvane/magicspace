@@ -86,7 +86,7 @@ class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
 
     if (importPath !== relativePath) {
       this.failureManager.append({
-        node: expression.parent,
+        node: expression,
         message: ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
         replacement: new Replacement(
           expression.getStart(),
