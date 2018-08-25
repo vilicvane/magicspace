@@ -76,7 +76,9 @@ class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
     let sourceFilePath = Path.dirname(sourceFile.fileName);
 
     let absoluteImportPath = Path.join(sourceFilePath, importPath);
-    let relativePath = Path.relative(sourceFilePath, absoluteImportPath);
+    let relativePath = Path.relative(sourceFilePath, absoluteImportPath)
+      .split(Path.sep)
+      .join('/');
 
     if (CURRENT_RELATIVE_PATH_REGEX.test(relativePath)) {
       relativePath = `./${relativePath}`;
