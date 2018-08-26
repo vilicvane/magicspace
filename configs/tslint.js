@@ -74,21 +74,23 @@ module.exports = {
       options: ['no-public'],
     },
     'member-ordering': {
-      options: {
-        order: [
-          'instance-field',
-          'public-constructor',
-          'protected-constructor',
-          'private-constructor',
-          'public-instance-method',
-          'protected-instance-method',
-          'private-instance-method',
-          'static-field',
-          'public-static-method',
-          'protected-static-method',
-          'private-static-method',
-        ],
-      },
+      options: [
+        {
+          order: [
+            'instance-field',
+            'public-constructor',
+            'protected-constructor',
+            'private-constructor',
+            'public-instance-method',
+            'protected-instance-method',
+            'private-instance-method',
+            'static-field',
+            'public-static-method',
+            'protected-static-method',
+            'private-static-method',
+          ],
+        },
+      ],
     },
     'newline-before-return': false,
     'new-parens': true,
@@ -180,11 +182,13 @@ module.exports = {
       options: ['allow-declarations', 'allow-named-functions'],
     },
     'ordered-imports': {
-      options: {
-        'import-sources-order': 'case-insensitive',
-        'named-imports-order': 'lowercase-last',
-        'module-source-path': 'full',
-      },
+      options: [
+        {
+          'import-sources-order': 'case-insensitive',
+          'named-imports-order': 'lowercase-last',
+          'module-source-path': 'full',
+        },
+      ],
     },
     'prefer-conditional-expression': false,
     'prefer-const': false,
@@ -206,13 +210,15 @@ module.exports = {
       options: ['always'],
     },
     'space-before-function-paren': {
-      options: {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        constructor: 'never',
-        method: 'never',
-        named: 'never',
-      },
+      options: [
+        {
+          anonymous: 'always',
+          asyncArrow: 'always',
+          constructor: 'never',
+          method: 'never',
+          named: 'never',
+        },
+      ],
     },
     'space-within-parens': [true, 0],
     'strict-boolean-expressions': false,
@@ -223,10 +229,12 @@ module.exports = {
       options: ['always'],
     },
     'trailing-comma': {
-      options: {
-        multiline: 'always',
-        singleline: 'never',
-      },
+      options: [
+        {
+          multiline: 'always',
+          singleline: 'never',
+        },
+      ],
     },
     'triple-equals': {
       options: ['allow-null-check'],
@@ -234,23 +242,24 @@ module.exports = {
     // TODO:
     'type-literal-delimiter': false,
     typedef: false,
-    'typedef-whitespace': [
-      true,
-      {
-        'call-signature': 'nospace',
-        'index-signature': 'nospace',
-        parameter: 'nospace',
-        'property-declaration': 'nospace',
-        'variable-declaration': 'nospace',
-      },
-      {
-        'call-signature': 'onespace',
-        'index-signature': 'onespace',
-        parameter: 'onespace',
-        'property-declaration': 'onespace',
-        'variable-declaration': 'onespace',
-      },
-    ],
+    'typedef-whitespace': {
+      options: [
+        {
+          'call-signature': 'nospace',
+          'index-signature': 'nospace',
+          parameter: 'nospace',
+          'property-declaration': 'nospace',
+          'variable-declaration': 'nospace',
+        },
+        {
+          'call-signature': 'onespace',
+          'index-signature': 'onespace',
+          parameter: 'onespace',
+          'property-declaration': 'onespace',
+          'variable-declaration': 'onespace',
+        },
+      ],
+    },
     'unified-signatures': true,
     'use-default-type-parameter': true,
     'use-isnan': true,
@@ -276,19 +285,20 @@ module.exports = {
         'check-rest-spread',
       ],
     },
-    'import-groups': [
-      true,
-      {
-        groups: [
-          {name: 'node-core', test: '$node-core'},
-          {name: 'node-modules', test: '$node-modules', sideEffect: true},
-          {name: 'node-modules', test: '$node-modules'},
-          {name: 'project-base', test: '^[@\\w]'},
-          {name: 'upper-directory', test: '^\\.\\./'},
-        ],
-        ordered: true,
-      },
-    ],
+    'import-groups': {
+      options: [
+        {
+          groups: [
+            {name: 'node-core', test: '$node-core'},
+            {name: 'node-modules', test: '$node-modules', sideEffect: true},
+            {name: 'node-modules', test: '$node-modules'},
+            {name: 'project-base', test: '^[@\\w]'},
+            {name: 'upper-directory', test: '^\\.\\./'},
+          ],
+          ordered: true,
+        },
+      ],
+    },
     'scoped-modules': true,
     'explicit-return-type': true,
     'import-path-base-url': false,
