@@ -55,9 +55,7 @@ module.exports = {
     indent: {
       options: ['spaces'],
     },
-    'interface-name': {
-      options: ['never-prefix'],
-    },
+    'interface-name': false,
     'interface-over-type-literal': true,
     'jsdoc-format': true,
     'label-position': true,
