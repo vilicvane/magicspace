@@ -169,4 +169,44 @@ function foo(){
   return 'foo';
 }
 
+function foo(){
+    let value = 2;
+
+    switch(value){
+        case 1:
+            return {
+                a: 2,
+                b: 3,
+            };
+        case 4:
+            let a = 2;
+            return {
+            ~~~~~~~~
+                a: 2,
+~~~~~~~~~~~~~~~~~~~~~
+                b: 3,
+~~~~~~~~~~~~~~~~~~~~~
+            };
+~~~~~~~~~~~~~~ [empty-line-around-statement]
+        default:
+            return {
+                a: 2,
+                b: 3,
+            };
+    }
+
+    switch(value){
+        default:
+            let a = 1;
+            return {
+            ~~~~~~~~
+                a,
+~~~~~~~~~~~~~~~~~~
+                b: 3,
+~~~~~~~~~~~~~~~~~~~~~
+            };
+~~~~~~~~~~~~~~ [empty-line-around-statement]
+    }
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.

@@ -53,6 +53,8 @@ import {
   TryStatement,
   WhileStatement,
   forEachChild,
+  isCaseClause,
+  isDefaultClause,
 } from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
@@ -346,6 +348,8 @@ function getParentSyntaxList(node: Node): SyntaxList | undefined {
     return parent.getChildAt(1) as SyntaxList;
   } else if (isClassDeclaration(parent) || isInterfaceDeclaration(parent)) {
     return parent.getChildAt(siblingCount - 2) as SyntaxList;
+  } else if (isCaseClause(parent) || isDefaultClause(parent)) {
+    return parent.getChildAt(siblingCount - 1) as SyntaxList;
   }
 
   if (parent.getChildCount() > 0) {
