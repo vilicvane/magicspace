@@ -15,8 +15,9 @@ import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {removeQuotes} from '../utils/path';
 
 const RELATIVE_PATH_REGEX = /^(?:\.{1,2}[\\/])+/;
-const CURRENT_RELATIVE_PATH_REGEX = /^\w/;
-const ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH = 'The import path is invalid.';
+const UPPER_RELATIVE_PATH_REGEX = /^\.\.\//;
+const ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH =
+  'The import path could be smarter.';
 
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -80,7 +81,7 @@ class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
       .split(Path.sep)
       .join('/');
 
-    if (CURRENT_RELATIVE_PATH_REGEX.test(relativePath)) {
+    if (!UPPER_RELATIVE_PATH_REGEX.test(relativePath)) {
       relativePath = `./${relativePath}`;
     }
 

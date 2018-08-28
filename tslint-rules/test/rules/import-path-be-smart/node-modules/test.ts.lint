@@ -1,4 +1,4 @@
 import * as resolve from '../../../../../node_modules/resolve'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path is invalid.]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path could be smarter.]
 
 import * as resolve from 'resolve'

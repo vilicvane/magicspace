@@ -1,4 +1,8 @@
 import * as bar from '../foo/bar'
-                     ~~~~~~~~~~~~ [The import path is invalid.]
+                     ~~~~~~~~~~~~ [The import path could be smarter.]
 
 import * as bar from './bar'
+
+import foo from './@foo';
+import foo from './.foo';
+import foo from './..foo';
