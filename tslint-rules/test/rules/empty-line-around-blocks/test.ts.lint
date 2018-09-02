@@ -209,4 +209,28 @@ function foo(){
     }
 }
 
+let oneClass = class{
+  constructor(){}
+}
+
+let oneClass = class{
+  prop = 1;
+  constructor(){}
+  ~~~~~~~~~~~~~~~ [empty-line-around-statement]
+}
+
+let oneClass = class{
+  foo(): void {
+
+  }
+}
+
+let oneClass = class{
+  prop = 1;
+  foo(): void {
+  ~~~~~~~~~~~~~
+  }
+~~~ [empty-line-around-statement]
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.

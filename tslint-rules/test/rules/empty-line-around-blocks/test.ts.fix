@@ -188,3 +188,26 @@ function foo(){
             };
     }
 }
+
+let oneClass = class{
+  constructor(){}
+}
+
+let oneClass = class{
+  prop = 1;
+
+  constructor(){}
+}
+
+let oneClass = class{
+  foo(): void {
+
+  }
+}
+
+let oneClass = class{
+  prop = 1;
+
+  foo(): void {
+  }
+}

@@ -54,6 +54,7 @@ import {
   WhileStatement,
   forEachChild,
   isCaseClause,
+  isClassExpression,
   isDefaultClause,
 } from 'typescript';
 
@@ -346,7 +347,11 @@ function getParentSyntaxList(node: Node): SyntaxList | undefined {
     isObjectLiteralExpression(parent)
   ) {
     return parent.getChildAt(1) as SyntaxList;
-  } else if (isClassDeclaration(parent) || isInterfaceDeclaration(parent)) {
+  } else if (
+    isClassDeclaration(parent) ||
+    isInterfaceDeclaration(parent) ||
+    isClassExpression(parent)
+  ) {
     return parent.getChildAt(siblingCount - 2) as SyntaxList;
   } else if (isCaseClause(parent) || isDefaultClause(parent)) {
     return parent.getChildAt(siblingCount - 1) as SyntaxList;
