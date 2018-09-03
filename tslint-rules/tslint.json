@@ -14,7 +14,20 @@
     ],
     "scoped-modules": true,
     "explicit-return-type": true,
-    "import-path-convention": true
+    "import-path-convention": true,
+    "import-path-strict-hierarchy": [
+      true,
+      {
+        "rules": {
+          "core": [],
+          "utils": [],
+          "services": ["core", "utils"],
+          "service-entrances": ["services"],
+          "main": ["service-entrances"]
+        },
+        "baseUrl": "src"
+      }
+    ]
   },
   "rulesDirectory": ["bld/rules"]
 }
