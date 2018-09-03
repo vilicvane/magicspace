@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "import-path-base-url": [
+      true,
+      {
+        "baseUrl": "core",
+        "baseUrlDirSearchName": "tslint.json"
+      }
+    ]
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}

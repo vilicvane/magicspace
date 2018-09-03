@@ -1,0 +1,21 @@
+import * as Foo from '.'; // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~      [Importing from parent directory is not allowed.]
+import * as Foo from './'; // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~      [Importing from parent directory is not allowed.]
+
+import * as Foo from '..';  // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]
+import * as Foo from '../';  // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]
+
+import * as Foo from '../..'; // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]
+import * as Foo from '../../'; // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    [Importing from parent directory is not allowed.]
+
+
+import * as Foo from './foo'
+import * as Bar from '../bar'
+import * as A from '../../a'
+
+import * as B from './foo/bar/aaa'

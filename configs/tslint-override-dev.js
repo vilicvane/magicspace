@@ -1,3 +1,5 @@
 module.exports = {
-  'no-implicit-dependencies': [true, 'dev'],
+  rules: {
+    'no-implicit-dependencies': [true, 'dev'],
+  },
 };
