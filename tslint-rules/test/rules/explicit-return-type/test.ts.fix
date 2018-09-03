@@ -52,3 +52,16 @@ function foo(): any {
 
 new foo(() => {})
 
+async function foo1(): Promise<void> {}
+
+async function foo2(): Promise<number> {
+  return 1;
+}
+
+async function foo3(): Promise<string> {
+  return "string";
+}
+
+async function foo4() {
+  return new Promise<number>(resolve => {resolve(1);});
+}

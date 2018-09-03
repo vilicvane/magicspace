@@ -42,7 +42,7 @@ import {getFunctionLikeParent} from '../utils/function';
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
   'This function requires explicit return type.';
 
-export const BASE_TYPE_STRING_SET = new Set([
+export const PRIMITIVE_TYPE_STRING_SET = new Set([
   'boolean',
   'number',
   'string',
@@ -53,6 +53,8 @@ export const BASE_TYPE_STRING_SET = new Set([
   'never',
   'void',
 ]);
+
+const PROMISE_RETURN_TYPE_REGEX = /^Promise<(.+)>$/;
 
 interface ParseOptions {
   complexTypeFixer: boolean;
@@ -151,9 +153,17 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
 
     let returnTypeString = this.typeChecker.typeToString(returnType);
 
+    let primitiveReturnType = returnTypeString;
+
+    let promiseMatchResult = returnTypeString.match(PROMISE_RETURN_TYPE_REGEX);
+
+    if (isModifiedWithAsync(node) && promiseMatchResult) {
+      primitiveReturnType = promiseMatchResult[1];
+    }
+
     if (
       !this.options.complexTypeFixer &&
-      !BASE_TYPE_STRING_SET.has(returnTypeString)
+      !PRIMITIVE_TYPE_STRING_SET.has(primitiveReturnType)
     ) {
       return undefined;
     }
@@ -272,4 +282,20 @@ function isReturnTypeRelatedFunctionLikeDeclaration(
     isMethodDeclaration(node) ||
     isGetAccessorDeclaration(node)
   );
+}
+
+function isModifiedWithAsync(
+  node: ReturnTypeRelatedFunctionLikeDeclaration,
+): boolean {
+  let {modifiers} = node;
+
+  if (modifiers && modifiers.length) {
+    for (let modifier of modifiers) {
+      if (modifier.kind === SyntaxKind.AsyncKeyword) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

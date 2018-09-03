@@ -60,5 +60,28 @@ function foo(): any {
 
 new foo(() => {})
 
+async function foo1() {}
+~~~~~~~~~~~~~~~~~~~~~~~~ [require-explicit-return-type]
+
+async function foo2() {
+~~~~~~~~~~~~~~~~~~~~~~~
+  return 1;
+~~~~~~~~~~~
+}
+~ [require-explicit-return-type]
+
+async function foo3() {
+~~~~~~~~~~~~~~~~~~~~~~~
+  return "string";
+~~~~~~~~~~~~~~~~~~
+}
+~ [require-explicit-return-type]
+
+async function foo4() {
+~~~~~~~~~~~~~~~~~~~~~~~
+  return new Promise<number>(resolve => {resolve(1);});
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+}
+~ [require-explicit-return-type]
 
 [require-explicit-return-type]: This function requires explicit return type.
