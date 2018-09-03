@@ -1,0 +1,7 @@
+export * from './foo';
+export * from './@foo';
+~~~~~~~~~~~~~~~~~~~~~~~ [contains-internal]
+export * from './@bar';
+~~~~~~~~~~~~~~~~~~~~~~~ [contains-internal]
+
+[contains-internal]: This module can not be exported, because it contains internal module with prefix '@' under a parallel directory.

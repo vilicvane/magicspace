@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "import-path-be-smart": true
+  },
+  "rulesDirectory": ["../../../../bld/rules"]
+}

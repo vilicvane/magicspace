@@ -1,0 +1,67 @@
+function foo(): void {}
+let foo = (): void => {};
+let foo = {
+  bar(): void {},
+};
+
+class Foo {
+  bar(): void {}
+}
+
+let foo: Foo = () => {};
+
+let foo: Foo = {
+  bar() {},
+};
+
+let foo: Foo = {
+  bar() {},
+  pia: () => {},
+  hia: function() {},
+};
+
+let foo = {
+  bar(): void {},
+  pia: (): void => {},
+  hia: function(): void {},
+};
+
+let foo: Foo = () => true;
+let foo: Foo = () => () => true;
+let foo = (): Foo => () => {
+  return true;
+};
+
+let foo = () => (): Foo => true;
+
+foo.bar = () => {};
+bar = () => true;
+
+map(() => {});
+map(() => () => true);
+map({foo: () => () => true});
+
+`${props => true}`;
+let foo = `${props => true}`;
+
+function foo(): any {
+  if (true) {
+    return () => {};
+  }
+}
+
+new foo(() => {})
+
+async function foo1(): Promise<void> {}
+
+async function foo2(): Promise<number> {
+  return 1;
+}
+
+async function foo3(): Promise<string> {
+  return "string";
+}
+
+async function foo4() {
+  return new Promise<number>(resolve => {resolve(1);});
+}

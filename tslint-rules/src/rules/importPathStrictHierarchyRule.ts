@@ -67,6 +67,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
   ) {
     super(sourceFile, ruleName, options);
     this.sourceDirname = Path.dirname(sourceFile.fileName);
+
     if (!this.options || !this.options.baseUrl) {
       throw new Error('Option baseUrl is required');
     }
@@ -76,6 +77,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     for (let expression of findImports(sourceFile, ImportKind.AllImports)) {
       this.importExpressions.push(expression);
     }
+
     this.validate();
   }
 
@@ -92,6 +94,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       currentPath = this.pathInRule(currentPath);
       importPath = this.pathInRule(importPath);
     }
+
     if (this.options.rules[currentPath]) {
       if (
         currentPath === importPath ||
@@ -99,11 +102,13 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       ) {
         return true;
       }
+
       for (const subDir of this.options.rules[currentPath]) {
         if (this.checkPath(subDir, importPath, false)) {
           return true;
         }
       }
+
       return false;
     } else {
       return first;
@@ -128,6 +133,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
         currentDir,
         removeQuotes(expression.getText()),
       );
+
       if (!this.checkPath(currentDir, importPath)) {
         this.addFailureAtNode(
           expression.parent!,

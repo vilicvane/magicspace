@@ -1,4 +1,0 @@
-export * from '@foo'  // failure
-~~~~~~~~~~~~~~~~~~~~        [This module can not exports, because this module name start with the '@'.]
-
-export * from './bar'

@@ -1,4 +1,7 @@
+// tslint:disable:import-groups
 import * as Path from 'path';
+
+import 'source-map-support/register';
 
 import * as glob from 'glob';
 import {consoleTestResultHandler, runTest} from 'tslint/lib/test';
@@ -16,6 +19,7 @@ let allPassed = true;
 
 for (let testDir of testDirs) {
   let result = runTest(testDir);
+
   let passed = consoleTestResultHandler(result, console);
 
   if (!passed) {
