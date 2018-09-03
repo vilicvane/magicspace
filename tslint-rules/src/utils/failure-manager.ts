@@ -4,38 +4,27 @@ import * as Typescript from 'typescript';
 /** 需要添加错误的项目 */
 export interface FailureItem {
   message: string;
-  node: Typescript.Node | undefined;
-  fixer?: Replacement;
+  node?: Typescript.Node;
+  replacement?: Replacement;
 }
 
 export class FailureManager<T> {
-  private items: FailureItem[] = [];
-
   constructor(private walker: AbstractWalker<T>) {}
 
-  append(item: FailureItem): void {
-    this.items.push(item);
-  }
+  append({node, message, replacement}: FailureItem): void {
+    let walker = this.walker;
 
-  throw(): void {
-    let items = this.items;
+    if (node) {
+      walker.addFailureAtNode(node, message, replacement);
+    } else {
+      let sourceFile = walker.getSourceFile();
 
-    if (!items.length) {
-      return;
-    }
-
-    for (let {node, message, fixer} of items) {
-      if (node) {
-        this.walker.addFailureAtNode(node, message, fixer);
-      } else {
-        let sourceFile = this.walker.getSourceFile();
-        this.walker.addFailure(
-          sourceFile.getStart(),
-          sourceFile.getEnd(),
-          message,
-          fixer,
-        );
-      }
+      walker.addFailure(
+        sourceFile.getStart(),
+        sourceFile.getEnd(),
+        message,
+        replacement,
+      );
     }
   }
 }
