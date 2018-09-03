@@ -124,7 +124,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       this.failureManager.append({
         message,
         node: statement,
-        replacement: buildBannedImportsAndExportsFixer(statement),
+        replacement: type === 'export'? buildBannedImportsAndExportsFixer(statement) : undefined,
       });
     }
   }
