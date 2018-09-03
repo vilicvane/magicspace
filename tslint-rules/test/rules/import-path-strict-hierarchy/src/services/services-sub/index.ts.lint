@@ -1,0 +1,7 @@
+import test from './test/core'
+
+import test from './test'
+import test from '../test'
+import test from '../../test' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [cannot import this module according to the tslint config]
+import test from '../../core'

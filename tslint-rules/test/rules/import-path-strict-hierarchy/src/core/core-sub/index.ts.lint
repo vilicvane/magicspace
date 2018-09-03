@@ -1,0 +1,6 @@
+import test from './services'
+import test from '../services'
+import test from '../../services' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [cannot import this module according to the tslint config]
+import test from '../../test' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [cannot import this module according to the tslint config]
