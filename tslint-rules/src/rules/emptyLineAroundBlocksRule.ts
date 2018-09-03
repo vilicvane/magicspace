@@ -154,11 +154,11 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
   private walkNode = (node: Node): void => {
     if (isConstructorDeclaration(node)) {
-      this.walkConstructorDeclaration(node);
+      this.walkFunctionLikeDeclaration(node);
     } else if (isFunctionDeclaration(node) || isMethodDeclaration(node)) {
       // to allow leaving no empty line between methods in ObjectLiteralExpression
       if (!isObjectLiteralExpression(node.parent)) {
-        this.walkFunctionOrMethodDeclaration(node);
+        this.walkFunctionLikeDeclaration(node);
       }
     } else if (isBlockIncludingStatement(node)) {
       this.walkBlockIncludingStatement(node);
@@ -181,33 +181,17 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
     }
   }
 
-  private walkConstructorDeclaration(node: ConstructorDeclaration): void {
-    if (node.body) {
-      let firstSignature = getConstructorFirstSignature(node);
-
-      if (firstSignature) {
-        if (!this.checkBlockIncludingStatement(firstSignature)) {
-          this.failureManager.append({
-            node: firstSignature,
-            message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-            replacement: this.buildFixer(firstSignature),
-          });
-        }
-
-        this.walkNextAffectedNode(node);
-
-        return;
-      }
-
-      this.walkBlockIncludingStatement(node);
-    }
-  }
-
-  private walkFunctionOrMethodDeclaration(
-    node: FunctionDeclaration | MethodDeclaration,
+  private walkFunctionLikeDeclaration(
+    node: FunctionDeclaration | MethodDeclaration | ConstructorDeclaration,
   ): void {
     if (node.body) {
-      let firstSignature = getFirstSignature(node);
+      let firstSignature;
+
+      if (isConstructorDeclaration(node)) {
+        firstSignature = getConstructorFirstSignature(node);
+      } else {
+        firstSignature = getFirstSignature(node);
+      }
 
       if (firstSignature) {
         if (!this.checkBlockIncludingStatement(firstSignature)) {
