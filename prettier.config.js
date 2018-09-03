@@ -1,1 +1,1 @@
-module.exports = require('vts/prettier');
+module.exports = require('@magicspace/configs/prettier');

@@ -1,6 +1,3 @@
-import * as Path from 'path';
-
-import resolve = require('resolve');
 import {
   AbstractWalker,
   IOptions,
@@ -18,7 +15,9 @@ import {
 import * as TypeScript from 'typescript';
 
 import {Dict} from '../@lang';
+import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {removeQuotes} from '../utils/path';
+import {trimLeftEmptyLines} from '../utils/string';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
@@ -28,57 +27,16 @@ const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
-const resolveWithCache = ((): ((
-  id: string,
-  basedir: string,
-) => string | undefined) => {
-  let cache = new Map<string, string | undefined>();
-
-  return (id: string, basedir: string): string | undefined => {
-    let key = `${id}\n${basedir}`;
-
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-
-    let value: string | undefined;
-
-    try {
-      value = resolve.sync(id, {basedir});
-    } catch (error) {}
-
-    cache.set(key, value);
-
-    return value;
-  };
-})();
-
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
-  '$node-core'(path) {
-    try {
-      return require.resolve(path) === path;
-    } catch (error) {
-      return false;
-    }
-  },
-  '$node-modules'(modulePath, sourceFilePath) {
-    let basedir = Path.dirname(sourceFilePath);
+  '$node-core': matchNodeCore,
 
-    let resolvedPath = resolveWithCache(modulePath, basedir);
-
-    if (!resolvedPath) {
-      return false;
-    }
-
-    let relativePath = Path.relative(basedir, resolvedPath);
-
-    return /[\\/]node_modules[\\/]/.test(relativePath);
-  },
+  '$node-modules': matchNodeModules,
 };
 
 interface ModuleGroupConfigItem {
   name: string;
   test: string;
+  sideEffect: boolean | undefined;
 }
 
 interface RawOptions {
@@ -98,15 +56,25 @@ type ModuleGroupTester = (
 
 class ModuleGroup {
   readonly name: string;
-  private tester: ModuleGroupTester;
 
-  constructor({name, test: testConfig}: ModuleGroupConfigItem) {
+  private tester: ModuleGroupTester;
+  private sideEffect: boolean | undefined;
+
+  constructor({name, test: testConfig, sideEffect}: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
+    this.sideEffect = sideEffect;
   }
 
-  test(modulePath: string, sourceFilePath: string): boolean {
-    return this.tester(modulePath, sourceFilePath);
+  match(
+    modulePath: string,
+    sideEffect: boolean,
+    sourceFilePath: string,
+  ): boolean {
+    return (
+      (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
+      this.tester(modulePath, sourceFilePath)
+    );
   }
 
   private buildTester(config: string): ModuleGroupTester {
@@ -208,19 +176,23 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let checkWithAppendModuleImport = (
       expression: TypeScript.Expression,
+      sideEffect: boolean,
     ): void => {
       this.pendingStatements.push(...pendingCache);
       pendingCache = [];
 
       if (isTextualLiteral(expression)) {
-        this.appendModuleImport(expression, sourceFile);
+        this.appendModuleImport(expression, sideEffect, sourceFile);
       }
     };
 
     for (let statement of sourceFile.statements) {
       if (isImportDeclaration(statement)) {
         if (ImportKind.ImportDeclaration) {
-          checkWithAppendModuleImport(statement.moduleSpecifier);
+          checkWithAppendModuleImport(
+            statement.moduleSpecifier,
+            !statement.importClause,
+          );
         }
       } else if (isImportEqualsDeclaration(statement)) {
         if (
@@ -229,7 +201,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
             TypeScript.SyntaxKind.ExternalModuleReference &&
           statement.moduleReference.expression !== undefined
         ) {
-          checkWithAppendModuleImport(statement.moduleReference.expression);
+          checkWithAppendModuleImport(
+            statement.moduleReference.expression,
+            false,
+          );
         }
       } else {
         pendingCache.push(statement);
@@ -241,28 +216,37 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
   private appendModuleImport(
     expression: TypeScript.LiteralExpression,
+    sideEffect: boolean,
     sourceFile: TypeScript.SourceFile,
   ): void {
     let node: TypeScript.Node = expression;
 
-    while (node.parent!.kind !== TypeScript.SyntaxKind.SourceFile) {
-      node = node.parent!;
+    while (node.parent.kind !== TypeScript.SyntaxKind.SourceFile) {
+      node = node.parent;
     }
 
     let modulePath = removeQuotes(expression.getText());
     let sourceFilePath = sourceFile.fileName;
 
+    let comments = node.getFullText();
+    comments = comments.slice(comments.indexOf('/'), comments.length);
+    let commentLine =
+      (comments.match(/\n/g) || []).length -
+      (comments.match(/\n\n/g) || []).length;
+
     let groups = this.options.groups;
 
     let index = groups.findIndex(group =>
-      group.test(modulePath, sourceFilePath),
+      group.match(modulePath, sideEffect, sourceFilePath),
     );
 
     this.moduleImportInfos.push({
       node,
       // 如果没有找到匹配的分组, 则归到 "其他" 一组, groupIndex 为 groups.length.
       groupIndex: index < 0 ? groups.length : index,
-      startLine: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line,
+      startLine:
+        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
+        commentLine,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }
@@ -351,6 +335,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
       for (let {node, message} of failureItems) {
         this.addFailureAtNode(node, message, fixer);
+
+        if (fixer) {
+          fixer = undefined;
+        }
       }
     }
   }
@@ -364,10 +352,17 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let infoGroups = groupModuleImportInfos(infos, ordered);
 
     let text = infoGroups
-      .map(group => group.map(info => info.node.getText()).join('\n'))
+      .map(group =>
+        group
+          .map(info => trimLeftEmptyLines(info.node.getFullText()))
+          .join('\n'),
+      )
       .join('\n\n');
 
-    return new Replacement(startNode.getStart(), endNode.getEnd(), text);
+    let start = startNode.getFullStart();
+    let length = endNode.getEnd() - start;
+
+    return new Replacement(start, length, text);
   }
 }
 

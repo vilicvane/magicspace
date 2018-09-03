@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import _ = require('lodash');
+import _ from 'lodash';
 import {
   AbstractWalker,
   IRuleMetadata,
@@ -10,11 +10,20 @@ import {
   Rules,
 } from 'tslint';
 import {isExportDeclaration, isImportDeclaration} from 'tsutils';
-import * as Typescript from 'typescript';
+import {
+  ExportDeclaration,
+  ImportDeclaration,
+  SourceFile,
+  isStringLiteral,
+} from 'typescript';
 
-import {Dict} from '../@lang';
 import {FailureManager} from '../utils/failure-manager';
-import {removeModuleFileExtension, removeQuotes} from '../utils/path';
+import {
+  getBaseNameWithoutExtension,
+  hasKnownModuleExtension,
+  removeModuleFileExtension,
+  removeQuotes,
+} from '../utils/path';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
   "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
@@ -23,44 +32,14 @@ const ERROR_MESSAGE_BANNED_EXPORT =
 const ERROR_MESSAGE_MISSING_EXPORTS =
   'Missing modules expected to be exported.';
 
-const INDEX_FILE_REGEX = /(?:^|[\\/])index\.((?:js|ts)x?)$/;
+const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 
-const BannedPattern = {
-  import: /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/,
-  export: /[\\/]@/,
-};
-
-type BannedPatternName = keyof typeof BannedPattern;
-
-/** 根据不同的 tag 返回不同的 fixer */
-const fixerBuilder: Dict<(...args: any[]) => Replacement> = {
-  removeNotExportFixer: node =>
-    new Replacement(node.getStart(), node.getWidth(), ''),
-  autoExportModuleFixer: (
-    sourceFile: Typescript.SourceFile,
-    exportNodesPath: string[],
-  ) =>
-    new Replacement(
-      sourceFile.getStart(),
-      sourceFile.getFullWidth(),
-      `${[
-        sourceFile.getText().trimRight(),
-        ...exportNodesPath.map(
-          value => `export * from '${removeModuleFileExtension(value)}';`,
-        ),
-      ]
-        .filter(text => !!text)
-        .join('\n')}\n`,
-    ),
-};
-
-interface NodeInfo {
-  node: Typescript.Node;
-  type: 'import' | 'export';
-}
+const BANNED_IMPORT_REGEX = /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/;
+const BANNED_EXPORT_REGEX = /[\\/]@/;
+const BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED = /^\.[\\/]@(?:.*?)[\\/]@/;
 
 export class Rule extends Rules.AbstractRule {
-  apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ScopedModuleWalker(sourceFile, Rule.metadata.ruleName, undefined),
     );
@@ -77,64 +56,93 @@ export class Rule extends Rules.AbstractRule {
   };
 }
 
+type ModuleStatement = ImportDeclaration | ExportDeclaration;
+
+type ModuleStatementInfo = ImportStatementInfo | ExportStatementInfo;
+type ModuleStatementType = ModuleStatementInfo['type'];
+
+interface ImportStatementInfo {
+  type: 'import';
+  statement: ModuleStatement;
+  specifier: string;
+}
+
+interface ExportStatementInfo {
+  type: 'export';
+  statement: ModuleStatement;
+  specifier: string;
+}
+
 class ScopedModuleWalker extends AbstractWalker<undefined> {
-  private nodeInfos: NodeInfo[] = [];
+  private infos: ModuleStatementInfo[] = [];
+
   private failureManager = new FailureManager(this);
 
-  walk(sourceFile: Typescript.SourceFile): void {
+  walk(sourceFile: SourceFile): void {
     for (let statement of sourceFile.statements) {
+      let type: ModuleStatementType;
+
       if (isImportDeclaration(statement)) {
-        this.nodeInfos.push({
-          node: statement.moduleSpecifier,
-          type: 'import',
-        });
+        type = 'import';
+      } else if (isExportDeclaration(statement)) {
+        type = 'export';
+      } else {
+        continue;
       }
 
-      if (isExportDeclaration(statement)) {
-        this.nodeInfos.push({
-          node: statement.moduleSpecifier!,
-          type: 'export',
-        });
+      let specifier = getModuleSpecifier(statement);
+
+      if (!specifier) {
+        continue;
       }
+
+      this.infos.push({
+        type,
+        statement,
+        specifier,
+      } as ModuleStatementInfo);
     }
 
     this.validate();
   }
 
-  private validateExportsAndImport(
-    message: string,
-    text: string,
-    node: Typescript.Node,
-    tag: BannedPatternName,
-  ): void {
-    if (BannedPattern[tag].test(text)) {
+  private validateImportOrExport({
+    type,
+    statement,
+    specifier,
+  }: ModuleStatementInfo): void {
+    let bannedPattern: RegExp;
+    let message: string;
+
+    if (type === 'import') {
+      bannedPattern = BANNED_IMPORT_REGEX;
+      message = ERROR_MESSAGE_BANNED_IMPORT;
+    } else {
+      bannedPattern = BANNED_EXPORT_REGEX;
+      message = ERROR_MESSAGE_BANNED_EXPORT;
+
+      let fileName = statement.getSourceFile().fileName;
+
+      let baseName = getBaseNameWithoutExtension(fileName);
+
+      if (baseName.startsWith('@')) {
+        bannedPattern = BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED;
+      }
+    }
+
+    if (bannedPattern.test(specifier)) {
       this.failureManager.append({
         message,
-        node,
-        fixer: fixerBuilder.removeNotExportFixer(node),
+        node: statement,
+        replacement:
+          type === 'export'
+            ? buildBannedImportsAndExportsFixer(statement)
+            : undefined,
       });
     }
   }
 
-  private validateExports(text: string, node: Typescript.Node): void {
-    this.validateExportsAndImport(
-      ERROR_MESSAGE_BANNED_EXPORT,
-      text,
-      node,
-      'export',
-    );
-  }
-
-  private validateImport(text: string, node: Typescript.Node): void {
-    this.validateExportsAndImport(
-      ERROR_MESSAGE_BANNED_IMPORT,
-      text,
-      node,
-      'import',
-    );
-  }
-
-  private validateIndexFile(exportIds: string[]): void {
+  private validateIndexFile(exportSpecifiers: string[]): void {
     let fileName = this.sourceFile.fileName;
 
     if (!INDEX_FILE_REGEX.test(fileName)) {
@@ -143,28 +151,48 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
 
     let dirName = Path.dirname(fileName);
 
-    let entryNames = FS.readdirSync(dirName);
+    let fileNames;
 
-    let expectedExportIds = entryNames
+    try {
+      fileNames = FS.readdirSync(dirName);
+    } catch (error) {
+      console.error(
+        `Index validation aborted due to failure of reading: ${dirName}`,
+      );
+      return;
+    }
+
+    let expectedExportSpecifiers = fileNames
       .map(
-        (entryName): string | undefined => {
-          let entryFullPath = Path.join(dirName, entryName);
-          let stats = FS.statSync(entryFullPath);
+        (fileName): string | undefined => {
+          let entryFullPath = Path.join(dirName, fileName);
+          let stats;
+
+          try {
+            stats = FS.statSync(entryFullPath);
+          } catch (error) {
+            return undefined;
+          }
+
+          let specifier: string;
 
           if (stats.isFile()) {
-            if (INDEX_FILE_REGEX.test(entryName)) {
+            if (
+              INDEX_FILE_REGEX.test(fileName) ||
+              !hasKnownModuleExtension(fileName)
+            ) {
               return undefined;
             }
 
-            let entryModuleId = `./${removeModuleFileExtension(entryName)}`;
-
-            if (BannedPattern.export.test(entryModuleId)) {
-              return undefined;
-            }
-
-            return entryModuleId;
+            specifier = `./${removeModuleFileExtension(fileName)}`;
           } else if (stats.isDirectory()) {
-            let entryNamesInFolder = FS.readdirSync(entryFullPath);
+            let entryNamesInFolder;
+
+            try {
+              entryNamesInFolder = FS.readdirSync(entryFullPath);
+            } catch (error) {
+              return undefined;
+            }
 
             let hasIndexFile = entryNamesInFolder.some(entryNameInFolder =>
               INDEX_FILE_REGEX.test(entryNameInFolder),
@@ -174,21 +202,30 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
               return undefined;
             }
 
-            return `./${entryName}`;
+            specifier = `./${fileName}`;
           } else {
             return undefined;
           }
+
+          if (BANNED_EXPORT_REGEX.test(specifier)) {
+            return undefined;
+          }
+
+          return specifier;
         },
       )
       .filter((entryName): entryName is string => !!entryName);
 
-    let missingExportIds = _.difference(expectedExportIds, exportIds);
+    let missingExportIds = _.difference(
+      expectedExportSpecifiers,
+      exportSpecifiers,
+    );
 
     if (missingExportIds.length) {
       this.failureManager.append({
         node: undefined,
         message: ERROR_MESSAGE_MISSING_EXPORTS,
-        fixer: fixerBuilder.autoExportModuleFixer(
+        replacement: buildAddMissingExportsFixer(
           this.sourceFile,
           missingExportIds,
         ),
@@ -197,28 +234,46 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
   }
 
   private validate(): void {
-    let infos = this.nodeInfos;
+    let infos = this.infos;
 
     for (let info of infos) {
-      if (info.type === 'export') {
-        this.validateExports(
-          removeQuotes(info.node.getText()),
-          info.node.parent!,
-        );
-      } else if (info.type === 'import') {
-        this.validateImport(
-          removeQuotes(info.node.getText()),
-          info.node.parent!,
-        );
-      }
+      this.validateImportOrExport(info);
     }
 
-    let exportIds = infos
+    let exportSpecifiers = infos
       .filter(info => info.type === 'export')
-      .map(info => removeQuotes(info.node.getText()));
+      .map(info => info.specifier);
 
-    this.validateIndexFile(exportIds);
-
-    this.failureManager.throw();
+    this.validateIndexFile(exportSpecifiers);
   }
+}
+
+function getModuleSpecifier({
+  moduleSpecifier,
+}: ModuleStatement): string | undefined {
+  return moduleSpecifier && isStringLiteral(moduleSpecifier)
+    ? removeQuotes(moduleSpecifier.getText())
+    : undefined;
+}
+
+function buildBannedImportsAndExportsFixer(node: ModuleStatement): Replacement {
+  return new Replacement(node.getFullStart(), node.getFullWidth(), '');
+}
+
+function buildAddMissingExportsFixer(
+  sourceFile: SourceFile,
+  exportNodesPath: string[],
+): Replacement {
+  return new Replacement(
+    sourceFile.getStart(),
+    sourceFile.getEnd(),
+    `${[
+      sourceFile.getText().trimRight(),
+      ...exportNodesPath.map(
+        value => `export * from '${removeModuleFileExtension(value)}';`,
+      ),
+    ]
+      .filter(text => !!text)
+      .join('\n')}\n`,
+  );
 }

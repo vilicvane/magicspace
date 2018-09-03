@@ -1,0 +1,12 @@
+import * as foo from'./foo/bar'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-import-index-modules]
+
+import * as foo from './foo/foo'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-import-index-modules]
+
+import * as b from './foo/a/b'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-import-index-modules]
+
+import * as foo from './foo'
+
+[no-import-index-modules]: Can not import this module that have index file in the directory where this module is located.
