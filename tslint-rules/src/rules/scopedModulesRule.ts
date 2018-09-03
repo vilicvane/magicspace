@@ -124,7 +124,10 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       this.failureManager.append({
         message,
         node: statement,
-        replacement: type === 'export'? buildBannedImportsAndExportsFixer(statement) : undefined,
+        replacement:
+          type === 'export'
+            ? buildBannedImportsAndExportsFixer(statement)
+            : undefined,
       });
     }
   }
@@ -138,13 +141,28 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
 
     let dirName = Path.dirname(fileName);
 
-    let fileNames = FS.readdirSync(dirName);
+    let fileNames;
+
+    try {
+      fileNames = FS.readdirSync(dirName);
+    } catch (error) {
+      console.error(
+        `Index validation aborted due to failure of reading: ${dirName}`,
+      );
+      return;
+    }
 
     let expectedExportSpecifiers = fileNames
       .map(
         (fileName): string | undefined => {
           let entryFullPath = Path.join(dirName, fileName);
-          let stats = FS.statSync(entryFullPath);
+          let stats;
+
+          try {
+            stats = FS.statSync(entryFullPath);
+          } catch (error) {
+            return undefined;
+          }
 
           let specifier: string;
 
@@ -158,7 +176,13 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
 
             specifier = `./${removeModuleFileExtension(fileName)}`;
           } else if (stats.isDirectory()) {
-            let entryNamesInFolder = FS.readdirSync(entryFullPath);
+            let entryNamesInFolder;
+
+            try {
+              entryNamesInFolder = FS.readdirSync(entryFullPath);
+            } catch (error) {
+              return undefined;
+            }
 
             let hasIndexFile = entryNamesInFolder.some(entryNameInFolder =>
               INDEX_FILE_REGEX.test(entryNameInFolder),
