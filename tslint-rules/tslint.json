@@ -24,6 +24,19 @@
     ],
     "scoped-modules": true,
     "explicit-return-type": true,
+    "import-path-strict-hierarchy": [
+      true,
+      {
+        "rules": {
+          "core": [],
+          "utils": [],
+          "services": ["core", "utils"],
+          "service-entrances": ["services"],
+          "main": ["service-entrances"]
+        },
+        "baseUrl": "src"
+      }
+    ],
     "import-path-base-url": false,
     "empty-line-around-blocks": true,
     "import-path-shallowest": true,
