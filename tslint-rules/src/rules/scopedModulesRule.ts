@@ -19,6 +19,7 @@ import {
 
 import {FailureManager} from '../utils/failure-manager';
 import {
+  getBaseNameWithoutExtension,
   hasKnownModuleExtension,
   removeModuleFileExtension,
   removeQuotes,
@@ -35,6 +36,7 @@ const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 
 const BANNED_IMPORT_REGEX = /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/;
 const BANNED_EXPORT_REGEX = /[\\/]@/;
+const BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED = /^\.[\\/]@(?:.*?)[\\/]@/;
 
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -118,6 +120,14 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     } else {
       bannedPattern = BANNED_EXPORT_REGEX;
       message = ERROR_MESSAGE_BANNED_EXPORT;
+
+      let fileName = statement.getSourceFile().fileName;
+
+      let baseName = getBaseNameWithoutExtension(fileName);
+
+      if (baseName.startsWith('@')) {
+        bannedPattern = BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED;
+      }
     }
 
     if (bannedPattern.test(specifier)) {
