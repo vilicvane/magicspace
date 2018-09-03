@@ -136,7 +136,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
       if (!this.checkPath(currentDir, importPath)) {
         this.addFailureAtNode(
-          expression.parent!,
+          expression.parent,
           ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,
         );
       }

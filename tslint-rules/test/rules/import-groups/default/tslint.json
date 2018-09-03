@@ -11,5 +11,5 @@
       }
     ]
   },
-  "rulesDirectory": ["../../../bld/rules"]
+  "rulesDirectory": ["../../../../bld/rules"]
 }

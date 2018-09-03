@@ -1,0 +1,12 @@
+import * as fs from 'fs'
+// comment
+import * as path from 'path'
+// comment
+import * as tslint from 'tslint'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Expecting an empty line between different import groups.]
+// comment
+import * as tslint from 'typescript'
+
+//comment
+import resolve from 'resolve'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Unexpected empty line within the same import group.]
