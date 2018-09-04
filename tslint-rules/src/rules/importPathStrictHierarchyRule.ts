@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import * as _ from 'lodash';
+import {Dict} from 'tslang';
 import {
   AbstractWalker,
   IOptions,
@@ -11,11 +12,15 @@ import {
 import {ImportKind, findImports} from 'tsutils';
 import {Expression, SourceFile} from 'typescript';
 
-import {Dict} from '../@lang';
-import {removeQuotes, searchProjectRootDir} from '../utils/path';
+import {
+  getBaseNameWithoutExtension,
+  removeQuotes,
+  searchProjectRootDir,
+} from '../utils/path';
 
 interface RuleOptions {
   baseUrl: string;
+  searchName: string;
   rules: Dict<string[] | undefined>;
 }
 
@@ -53,6 +58,9 @@ export class Rule extends Rules.AbstractRule {
         baseUrl: {
           type: 'string',
         },
+        searchName: {
+          type: 'string',
+        },
         rules: {
           additionalProperties: {
             items: {
@@ -83,7 +91,10 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     this.sourceDir = Path.dirname(sourceFile.fileName);
 
     this.baseUrlDir = Path.join(
-      searchProjectRootDir(this.sourceDir, 'tsconfig.json'),
+      searchProjectRootDir(
+        this.sourceDir,
+        this.options.searchName || 'tsconfig.json',
+      ),
       options.baseUrl,
     );
   }
@@ -113,7 +124,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
     let allowedFolderNames = ruleDict[checkingFolderName];
 
-    if (allowedFolderNames) {
+    if (allowedFolderNames && specifierFirstPart !== '..') {
       if (allowedFolderNames.includes(specifierFirstPart)) {
         return true;
       }
@@ -132,6 +143,14 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
   private validate(): void {
     let currentDir = Path.dirname(this.sourceFile.fileName);
+    let fileName = getBaseNameWithoutExtension(
+      Path.basename(this.sourceFile.fileName),
+    );
+    let fakeDir = '';
+
+    if (currentDir === this.baseUrlDir) {
+      fakeDir = Path.join(currentDir, fileName);
+    }
 
     for (let expression of this.importExpressions) {
       let importPath = Path.join(
@@ -140,7 +159,9 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       );
 
       let specifierFirstPart = this.getFirstPartInRelativePath(importPath);
-      let checkingFolderName = this.getFirstPartInRelativePath(currentDir);
+      let checkingFolderName = this.getFirstPartInRelativePath(
+        fakeDir || currentDir,
+      );
 
       if (!this.checkPath(specifierFirstPart, checkingFolderName)) {
         this.addFailureAtNode(

@@ -10,7 +10,8 @@
           "service-entrances": ["services"],
           "main": ["service-entrances"]
         },
-        "baseUrl": "src"
+        "baseUrl": "src",
+        "searchName": "tslint.json"
       }
     ]
   },

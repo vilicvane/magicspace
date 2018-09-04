@@ -1801,6 +1801,10 @@ trim-off-newlines@^1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/trim-off-newlines/download/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
 
+tslang@^0.1.9:
+  version "0.1.9"
+  resolved "http://registry.npm.taobao.org/tslang/download/tslang-0.1.9.tgz#2ba1a65124849d66267f03cae65f440d1ea5df32"
+
 tslib@^1.8.0, tslib@^1.8.1:
   version "1.9.3"
   resolved "http://registry.npm.taobao.org/tslib/download/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
