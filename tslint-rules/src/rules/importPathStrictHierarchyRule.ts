@@ -1,4 +1,3 @@
-import * as FS from 'fs';
 import * as Path from 'path';
 
 import * as _ from 'lodash';
@@ -10,17 +9,18 @@ import {
   Rules,
 } from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
-import * as TypeScript from 'typescript';
+import {Expression, SourceFile} from 'typescript';
 
-import {removeQuotes} from '../utils/path';
+import {Dict} from '../@lang';
+import {removeQuotes, searchProjectRootDir} from '../utils/path';
 
 interface RuleOptions {
   baseUrl: string;
-  rules: {[dirName: string]: string[]};
+  rules: Dict<string[] | undefined>;
 }
 
 const ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT =
-  'cannot import this module according to the tslint config';
+  'Cannot import this module according to the tslint config';
 
 export class Rule extends Rules.AbstractRule {
   private parsedOptions: RuleOptions;
@@ -28,9 +28,13 @@ export class Rule extends Rules.AbstractRule {
   constructor(options: IOptions) {
     super(options);
     this.parsedOptions = options.ruleArguments[0];
+
+    if (!this.parsedOptions || !this.parsedOptions.baseUrl) {
+      throw new Error('Option baseUrl is required');
+    }
   }
 
-  apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportPathStrictHierarchyWalker(
         sourceFile,
@@ -45,35 +49,46 @@ export class Rule extends Rules.AbstractRule {
     description: '',
     optionsDescription: '',
     options: {
-      // to update
       properties: {
-        ['string']: 'array',
+        baseUrl: {
+          type: 'string',
+        },
+        rules: {
+          additionalProperties: {
+            items: {
+              type: 'string',
+            },
+            type: 'array',
+          },
+          type: 'object',
+        },
       },
+      type: 'object',
     },
     type: 'maintainability',
-    hasFix: true,
+    hasFix: false,
     typescriptOnly: false,
   };
 }
 
 class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
-  private importExpressions: TypeScript.Expression[] = [];
-  private sourceDirname: string;
+  private importExpressions: Expression[] = [];
 
-  constructor(
-    sourceFile: TypeScript.SourceFile,
-    ruleName: string,
-    options: RuleOptions,
-  ) {
+  private sourceDir: string;
+  private baseUrlDir: string;
+
+  constructor(sourceFile: SourceFile, ruleName: string, options: RuleOptions) {
     super(sourceFile, ruleName, options);
-    this.sourceDirname = Path.dirname(sourceFile.fileName);
 
-    if (!this.options || !this.options.baseUrl) {
-      throw new Error('Option baseUrl is required');
-    }
+    this.sourceDir = Path.dirname(sourceFile.fileName);
+
+    this.baseUrlDir = Path.join(
+      searchProjectRootDir(this.sourceDir, 'tsconfig.json'),
+      options.baseUrl,
+    );
   }
 
-  walk(sourceFile: TypeScript.SourceFile): void {
+  walk(sourceFile: SourceFile): void {
     for (let expression of findImports(sourceFile, ImportKind.AllImports)) {
       this.importExpressions.push(expression);
     }
@@ -81,30 +96,30 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     this.validate();
   }
 
-  pathInRule(path: string): any {
-    return Path.relative(this.getBaseUrl(), path).split(Path.sep)[0];
+  getFirstPartInRelativePath(path: string): any {
+    return Path.relative(this.baseUrlDir, path).split(Path.sep)[0];
   }
 
   private checkPath(
-    currentPath: string,
-    importPath: string,
+    specifierFirstPart: string,
+    checkingFolderName: string,
     first = true,
   ): boolean {
-    if (first) {
-      currentPath = this.pathInRule(currentPath);
-      importPath = this.pathInRule(importPath);
+    if (specifierFirstPart === checkingFolderName) {
+      return true;
     }
 
-    if (this.options.rules[currentPath]) {
-      if (
-        currentPath === importPath ||
-        this.options.rules[currentPath].includes(importPath)
-      ) {
+    let {rules: ruleDict} = this.options;
+
+    let allowedFolderNames = ruleDict[checkingFolderName];
+
+    if (allowedFolderNames) {
+      if (allowedFolderNames.includes(specifierFirstPart)) {
         return true;
       }
 
-      for (const subDir of this.options.rules[currentPath]) {
-        if (this.checkPath(subDir, importPath, false)) {
+      for (let folderName of allowedFolderNames) {
+        if (this.checkPath(specifierFirstPart, folderName, false)) {
           return true;
         }
       }
@@ -115,62 +130,24 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     }
   }
 
-  private getBaseUrl(): string {
-    let rootPath = findProjectRootPath(this.sourceDirname);
-
-    if (!rootPath) {
-      throw new Error('can not find tslint.json');
-    }
-
-    return Path.join(rootPath, this.options.baseUrl);
-  }
-
   private validate(): void {
-    const {importExpressions} = this;
-    const currentDir = Path.dirname(this.sourceFile.fileName);
-    importExpressions.forEach(expression => {
-      const importPath = Path.join(
+    let currentDir = Path.dirname(this.sourceFile.fileName);
+
+    for (let expression of this.importExpressions) {
+      let importPath = Path.join(
         currentDir,
         removeQuotes(expression.getText()),
       );
 
-      if (!this.checkPath(currentDir, importPath)) {
+      let specifierFirstPart = this.getFirstPartInRelativePath(importPath);
+      let checkingFolderName = this.getFirstPartInRelativePath(currentDir);
+
+      if (!this.checkPath(specifierFirstPart, checkingFolderName)) {
         this.addFailureAtNode(
           expression.parent,
           ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,
         );
       }
-    });
+    }
   }
 }
-
-let findProjectRootPath = ((): ((
-  currentPath: string,
-  baseUrlDirSearchName?: string,
-) => string | undefined) => {
-  let rootPathCache: string | undefined;
-
-  return function inner(
-    currentPath: string,
-    baseUrlDirSearchName = 'tslint.json',
-  ): string | undefined {
-    if (rootPathCache) {
-      return rootPathCache;
-    }
-
-    try {
-      let files = FS.readdirSync(currentPath);
-
-      if (_.includes(files, baseUrlDirSearchName)) {
-        rootPathCache = currentPath;
-        return currentPath;
-      } else {
-        return inner(Path.join(currentPath, '..'), baseUrlDirSearchName);
-      }
-    } catch (e) {
-      throw new Error(
-        `can not find such 'baseUrlDirSearchName' that ${baseUrlDirSearchName}`,
-      );
-    }
-  };
-})();

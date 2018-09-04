@@ -2,4 +2,4 @@ import {test} from '../core'
 import {test} from '../services'
 import {test} from '../core/core-sub'
 import {test} from '../not-exist' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]

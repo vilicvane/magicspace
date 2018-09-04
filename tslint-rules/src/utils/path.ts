@@ -1,3 +1,4 @@
+import * as FS from 'fs';
 import * as Path from 'path';
 
 const KNOWN_MODULE_EXTENSION_REGEX = /\.(?:jsx?|tsx?)$/i;
@@ -17,4 +18,26 @@ export function hasKnownModuleExtension(fileName: string): boolean {
 
 export function getBaseNameWithoutExtension(fileName: string): string {
   return Path.basename(fileName, Path.extname(fileName));
+}
+
+export function searchProjectRootDir(from: string, searchName: string): string {
+  let nextDir = from;
+
+  while (true) {
+    let currentDir = nextDir;
+
+    let searchPath = Path.join(currentDir, searchName);
+
+    if (FS.existsSync(searchPath)) {
+      return currentDir;
+    }
+
+    nextDir = Path.dirname(currentDir);
+
+    if (nextDir === currentDir) {
+      throw new Error(
+        `Cannot find base url directory by search name "${searchName}"`,
+      );
+    }
+  }
 }
