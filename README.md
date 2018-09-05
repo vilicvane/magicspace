@@ -158,3 +158,9 @@ baseUrlDirSearchName 字段是为了描述处于项目根目录的文件
   "empty-line-around-blocks": true
 }
 ```
+
+## Build
+
+### TypeScript JSON Schema
+
+https://github.com/YousefED/typescript-json-schema

@@ -1,3 +1,4 @@
+import {Dict} from 'tslang';
 import {
   AbstractWalker,
   IOptions,
@@ -14,7 +15,6 @@ import {
 } from 'tsutils';
 import * as TypeScript from 'typescript';
 
-import {Dict} from '../@lang';
 import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {removeQuotes} from '../utils/path';
 import {trimLeftEmptyLines} from '../utils/string';
