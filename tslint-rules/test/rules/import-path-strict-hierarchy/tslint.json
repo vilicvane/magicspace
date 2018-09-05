@@ -11,7 +11,7 @@
           "main": ["service-entrances"]
         },
         "baseUrl": "src",
-        "searchName": "tslint.json"
+        "baseUrlDirSearchName": "tslint.json"
       }
     ]
   },

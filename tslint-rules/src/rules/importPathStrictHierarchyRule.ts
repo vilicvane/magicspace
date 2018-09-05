@@ -20,7 +20,7 @@ import {
 
 interface RuleOptions {
   baseUrl: string;
-  searchName: string;
+  baseUrlDirSearchName: string;
   rules: Dict<string[] | undefined>;
 }
 
@@ -88,12 +88,12 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
   constructor(sourceFile: SourceFile, ruleName: string, options: RuleOptions) {
     super(sourceFile, ruleName, options);
 
-    this.sourceDir = Path.dirname(sourceFile.fileName);
+    this.sourceDir = Path.normalize(Path.dirname(sourceFile.fileName));
 
     this.baseUrlDir = Path.join(
       searchProjectRootDir(
         this.sourceDir,
-        this.options.searchName || 'tsconfig.json',
+        this.options.baseUrlDirSearchName || 'tsconfig.json',
       ),
       options.baseUrl,
     );
@@ -113,24 +113,24 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
   private checkPath(
     specifierFirstPart: string,
-    checkingFolderName: string,
+    checkingFirstPart: string,
     first = true,
   ): boolean {
-    if (specifierFirstPart === checkingFolderName) {
+    if (specifierFirstPart === checkingFirstPart) {
       return true;
     }
 
     let {rules: ruleDict} = this.options;
 
-    let allowedFolderNames = ruleDict[checkingFolderName];
+    let allowedNames = ruleDict[checkingFirstPart];
 
-    if (allowedFolderNames && specifierFirstPart !== '..') {
-      if (allowedFolderNames.includes(specifierFirstPart)) {
+    if (allowedNames && specifierFirstPart !== '..') {
+      if (allowedNames.includes(specifierFirstPart)) {
         return true;
       }
 
-      for (let folderName of allowedFolderNames) {
-        if (this.checkPath(specifierFirstPart, folderName, false)) {
+      for (let name of allowedNames) {
+        if (this.checkPath(specifierFirstPart, name, false)) {
           return true;
         }
       }
@@ -142,15 +142,14 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
   }
 
   private validate(): void {
-    let currentDir = Path.dirname(this.sourceFile.fileName);
-    let fileName = getBaseNameWithoutExtension(
-      Path.basename(this.sourceFile.fileName),
-    );
-    let fakeDir = '';
+    let fileName = Path.normalize(this.sourceFile.fileName);
 
-    if (currentDir === this.baseUrlDir) {
-      fakeDir = Path.join(currentDir, fileName);
-    }
+    let currentDir = Path.dirname(fileName);
+
+    let checkingPath =
+      currentDir === this.baseUrlDir
+        ? Path.join(currentDir, getBaseNameWithoutExtension(fileName))
+        : currentDir;
 
     for (let expression of this.importExpressions) {
       let importPath = Path.join(
@@ -159,11 +158,9 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       );
 
       let specifierFirstPart = this.getFirstPartInRelativePath(importPath);
-      let checkingFolderName = this.getFirstPartInRelativePath(
-        fakeDir || currentDir,
-      );
+      let checkingFirstPart = this.getFirstPartInRelativePath(checkingPath);
 
-      if (!this.checkPath(specifierFirstPart, checkingFolderName)) {
+      if (!this.checkPath(specifierFirstPart, checkingFirstPart)) {
         this.addFailureAtNode(
           expression.parent,
           ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,
