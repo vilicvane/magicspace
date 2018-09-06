@@ -233,4 +233,32 @@ let oneClass = class{
 ~~~ [empty-line-around-statement]
 }
 
+class Test {
+  get name() {
+    return "test";
+  }
+  get age() {
+  ~~~~~~~~~~~
+    return 1;
+~~~~~~~~~~~~~
+  }
+~~~ [empty-line-around-statement]
+}
+
+class Test{
+  name = '';
+  get name() {
+  ~~~~~~~~~~~~
+    return "test";
+~~~~~~~~~~~~~~~~~~
+  }
+~~~ [empty-line-around-statement]
+  set name(name: string){
+  ~~~~~~~~~~~~~~~~~~~~~~~
+    this.name = name;
+~~~~~~~~~~~~~~~~~~~~~
+  }
+~~~ [empty-line-around-statement]
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.

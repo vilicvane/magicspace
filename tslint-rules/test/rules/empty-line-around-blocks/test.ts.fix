@@ -211,3 +211,25 @@ let oneClass = class{
   foo(): void {
   }
 }
+
+class Test {
+  get name() {
+    return "test";
+  }
+
+  get age() {
+    return 1;
+  }
+}
+
+class Test{
+  name = '';
+
+  get name() {
+    return "test";
+  }
+
+  set name(name: string){
+    this.name = name;
+  }
+}

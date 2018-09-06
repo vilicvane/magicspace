@@ -18,6 +18,7 @@ import {
   isForOfStatement,
   isForStatement,
   isFunctionDeclaration,
+  isGetAccessorDeclaration,
   isIfStatement,
   isInterfaceDeclaration,
   isLabeledStatement,
@@ -27,6 +28,7 @@ import {
   isObjectLiteralExpression,
   isPropertyDeclaration,
   isReturnStatement,
+  isSetAccessorDeclaration,
   isTryStatement,
   isWhileStatement,
 } from 'tsutils';
@@ -40,6 +42,7 @@ import {
   ForOfStatement,
   ForStatement,
   FunctionDeclaration,
+  GetAccessorDeclaration,
   IfStatement,
   InterfaceDeclaration,
   LabeledStatement,
@@ -47,6 +50,7 @@ import {
   ModuleDeclaration,
   Node,
   ReturnStatement,
+  SetAccessorDeclaration,
   SourceFile,
   Statement,
   SyntaxList,
@@ -94,6 +98,8 @@ type BlockIncludingStatement =
   | FunctionDeclaration
   | ClassDeclaration
   | ConstructorDeclaration
+  | GetAccessorDeclaration
+  | SetAccessorDeclaration
   | MethodDeclaration
   | InterfaceDeclaration
   | EnumDeclaration
@@ -114,6 +120,8 @@ const BlockIncludingStatementValidators: NodeValidator[] = [
   isFunctionDeclaration,
   isClassDeclaration,
   isConstructorDeclaration,
+  isGetAccessorDeclaration,
+  isSetAccessorDeclaration,
   isMethodDeclaration,
   isInterfaceDeclaration,
   isEnumDeclaration,
