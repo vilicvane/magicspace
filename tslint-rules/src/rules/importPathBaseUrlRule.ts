@@ -18,6 +18,7 @@ import {
   hasKnownModuleExtension,
   removeModuleFileExtension,
   removeQuotes,
+  searchProjectRootDir,
 } from '../utils/path';
 
 const RELATIVE_PATH_REGEX = /^(?:\.{1,2}[\\/])+/;
@@ -96,7 +97,7 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
 
     this.sourceDir = Path.dirname(sourceFile.fileName);
 
-    let baseUrlDir = (this.baseUrlDir = searchBaseUrlDir(
+    let baseUrlDir = (this.baseUrlDir = searchProjectRootDir(
       this.sourceDir,
       options.baseUrlDirSearchName || 'tsconfig.json',
     ));
@@ -220,28 +221,6 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
           replacement,
         });
       }
-    }
-  }
-}
-
-function searchBaseUrlDir(from: string, searchName: string): string {
-  let nextDir = from;
-
-  while (true) {
-    let currentDir = nextDir;
-
-    let searchPath = Path.join(currentDir, searchName);
-
-    if (FS.existsSync(searchPath)) {
-      return currentDir;
-    }
-
-    nextDir = Path.dirname(currentDir);
-
-    if (nextDir === currentDir) {
-      throw new Error(
-        `Cannot find base url directory by search name "${searchName}"`,
-      );
     }
   }
 }
