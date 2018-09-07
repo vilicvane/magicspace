@@ -149,7 +149,8 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
       return undefined;
     }
 
-    let returnType = nodeType.getCallSignatures()[0].getReturnType();
+    let callSignatures = nodeType.getCallSignatures()[0];
+    let returnType = callSignatures ? callSignatures.getReturnType() : nodeType;
 
     let returnTypeString = this.typeChecker.typeToString(returnType);
 
