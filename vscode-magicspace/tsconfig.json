@@ -1,4 +1,5 @@
 {
   "extends": "../configs/tsconfig.json",
-  "exclude": ["node_modules", ".vscode-test"]
+  "exclude": ["node_modules", ".vscode-test"],
+  "include": ["src/**/*"]
 }
