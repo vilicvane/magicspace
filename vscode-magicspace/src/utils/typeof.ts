@@ -1,4 +1,10 @@
-type CompareString = 'Object' | 'Function' | 'Array' | 'Boolean' | 'Number';
+type CompareString =
+  | 'Object'
+  | 'Function'
+  | 'Array'
+  | 'Boolean'
+  | 'Number'
+  | 'String';
 
 export function XTypeof<T>(
   target: any,
