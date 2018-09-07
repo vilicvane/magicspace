@@ -1325,6 +1325,10 @@ tslint@^5.8.0:
     tslib "^1.8.0"
     tsutils "^2.27.2"
 
+tsutil@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/tsutil/-/tsutil-6.1.1.tgz#9e02961ddcd652d2f6506304b13d84cf032cb3df"
+
 tsutils@^2.27.2:
   version "2.29.0"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.29.0.tgz#32b488501467acbedd4b85498673a0812aca0b99"
@@ -1434,7 +1438,7 @@ vinyl@^2.0.1, vinyl@^2.0.2:
     remove-trailing-separator "^1.0.1"
     replace-ext "^1.0.0"
 
-vscode@^1.1.6:
+vscode@^1.1.21:
   version "1.1.21"
   resolved "https://registry.yarnpkg.com/vscode/-/vscode-1.1.21.tgz#1c8253d6238aefb4112d6e58cf975ad25313dafc"
   dependencies:
