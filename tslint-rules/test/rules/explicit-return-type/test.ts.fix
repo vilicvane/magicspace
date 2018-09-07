@@ -6,6 +6,11 @@ let foo = {
 
 class Foo {
   bar(): void {}
+
+  _age = 1
+  get age(): number{
+    return this._age;
+  }
 }
 
 let foo: Foo = () => {};

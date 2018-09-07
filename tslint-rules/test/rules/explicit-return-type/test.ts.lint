@@ -10,6 +10,14 @@ let foo = {
 class Foo {
   bar() {}
   ~~~~~~~~ [require-explicit-return-type]
+
+  _age = 1
+  get age(){
+  ~~~~~~~~~~
+    return this._age;
+~~~~~~~~~~~~~~~~~~~~~
+  }
+~~~ [This function requires explicit return type.]
 }
 
 let foo: Foo = () => {};
