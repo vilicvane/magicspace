@@ -1,7 +1,6 @@
 {
-  "extends": "../configs/tsconfig.json",
+  "extends": "../node_modules/@magicspace/configs/tsconfig.json",
   "compilerOptions": {
-    "lib": ["dom", "esnext"],
     "rootDir": "src",
     "outDir": "bld"
   },
