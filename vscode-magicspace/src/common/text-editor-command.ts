@@ -19,7 +19,7 @@ export abstract class TextEditorCommand implements Disposable {
         commands.registerTextEditorCommand(
           command,
           (textEditor: TextEditor, edit: TextEditorEdit, ...args: any[]) =>
-            this.execute(textEditor, edit, ...args),
+            this.execute(textEditor, edit, args),
         ),
       );
     }
@@ -34,6 +34,6 @@ export abstract class TextEditorCommand implements Disposable {
   abstract execute(
     textEditor: TextEditor,
     edit: TextEditorEdit,
-    ...args: any[]
+    args: any[],
   ): void;
 }
