@@ -3,7 +3,10 @@ import {ScriptTarget, SyntaxKind, createSourceFile} from 'typescript';
 
 import {TextEditor, TextEditorEdit} from 'vscode';
 
+import {parseComment} from '../utils';
+
 import {Commands} from './commands';
+import {MagicSpaceComment} from './magicspace-comment';
 import {TextEditorCommand} from './text-editor-command';
 
 export abstract class MultipleCommentCommands extends TextEditorCommand {
@@ -12,8 +15,6 @@ export abstract class MultipleCommentCommands extends TextEditorCommand {
   }
 
   execute(textEditor: TextEditor, edit: TextEditorEdit, args: any[]): void {
-    this.executeOfComment(textEditor, edit, args);
-
     let editorDocument = textEditor.document;
     let sourceFile = createSourceFile(
       editorDocument.fileName,
@@ -25,17 +26,16 @@ export abstract class MultipleCommentCommands extends TextEditorCommand {
     forEachComment(sourceFile, (fullText, {kind, pos, end}) => {
       let text = fullText.slice(pos, end);
 
-      if (kind !== SyntaxKind.SingleLineCommentTrivia) {
-        this.forEachMultipleComment(text);
+      if (kind !== SyntaxKind.SingleLineCommentTrivia && /^\/\*\$/.test(text)) {
+        this.executeOfComment(parseComment(text), textEditor, edit, args);
       }
     });
   }
 
   abstract executeOfComment(
+    comment: MagicSpaceComment,
     textEditor: TextEditor,
     edit: TextEditorEdit,
     ...args: any[]
   ): void;
-
-  abstract forEachMultipleComment(comment: string): void;
 }
