@@ -16,7 +16,8 @@
     "packages": [
       "tslint-rules",
       "configs",
-      "vscode-magicspace"
+      "vscode-magicspace/client",
+      "vscode-magicspace/server"
     ]
   }
 }

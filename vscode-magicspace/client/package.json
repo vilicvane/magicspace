@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:magicspace.insert"
+    "onCommand:magicspace.insert",
+    "onCommand:sayHello"
   ],
   "main": "./bld/extension",
   "contributes": {
@@ -19,6 +20,10 @@
       {
         "command": "magicspace.insert",
         "title": "magicspace insert"
+      },
+      {
+        "command": "sayHello",
+        "title": "sayHello"
       }
     ]
   },
@@ -32,7 +37,8 @@
   "dependencies": {
     "tsutils": "^2.28.0",
     "typescript": "^3.0.1",
-    "vscode": "^1.1.21"
+    "vscode": "^1.1.21",
+    "vscode-languageclient": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^10.5.2"
