@@ -1,6 +1,8 @@
 import {Dict} from '../@types';
 import {MagicSpaceComment} from '../common';
 
+import {toCamelCase} from './convert-string';
+
 function extractConfig(commentParts: string[]) {
   let configs: string[][] = [];
   let currentIndex = -1;
@@ -26,7 +28,8 @@ function extractConfig(commentParts: string[]) {
   return configs.map(config => config.join(''));
 }
 
-export function scanner(commentParts: string[]): MagicSpaceComment {
+export function parse(comment: string): MagicSpaceComment {
+  let commentParts = comment.split('\n');
   commentParts = commentParts.slice(2, commentParts.length - 2);
   let scanResult: Dict<string>[] = [];
 
@@ -36,10 +39,9 @@ export function scanner(commentParts: string[]): MagicSpaceComment {
 
       scanResult.push(
         JSON.parse(
-          `{"${configName.slice(1, configName.length)}"${part.slice(
-            configName.length,
-            part.length,
-          )}}`,
+          `{"${toCamelCase(
+            configName.slice(1, configName.length).split('-'),
+          )}"${part.slice(configName.length, part.length)}}`,
         ),
       );
     } else {
