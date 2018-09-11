@@ -1,6 +1,6 @@
-interface ConvertedString {
-  camelCase: string;
-  hyphenated: string;
+export interface ConvertedString {
+  'name.CamelCase': string;
+  'name.hyphenated': string;
 }
 
 interface TemplateData {
@@ -12,9 +12,22 @@ export function evaluatedStringTemplate(
   templateData: TemplateData,
 ) {
   return template.replace(
-    /\$\{(*.?)\}/,
+    /\$\{(.*?)\}/g,
     (_match: string, key: string) => templateData[key.trim()],
   );
+}
+
+export function toCamelCase(targetStringParts: string[]) {
+  return targetStringParts
+    .map(
+      (part, index) =>
+        index
+          ? Array.from(part)
+              .map((char, index) => (index ? char : char.toUpperCase()))
+              .join('')
+          : part,
+    )
+    .join('');
 }
 
 export function convertString(targetString: string): ConvertedString {
@@ -29,19 +42,10 @@ export function convertString(targetString: string): ConvertedString {
   if (targetString !== '') {
     let targetStringParts = targetString.split(' ');
 
-    camelCase = targetStringParts
-      .map(
-        (part, index) =>
-          index
-            ? Array.from(part)
-                .map((char, index) => (index ? char : char.toUpperCase()))
-                .join('')
-            : part,
-      )
-      .join('');
+    camelCase = toCamelCase(targetStringParts);
 
     hyphenated = targetStringParts.join('-');
   }
 
-  return {camelCase, hyphenated};
+  return {'name.CamelCase': camelCase, 'name.hyphenated': hyphenated};
 }
