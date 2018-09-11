@@ -1,11 +1,9 @@
-import {ExtensionContext, commands, window} from 'vscode';
+import {ExtensionContext} from 'vscode';
+
+import {InsertCommand} from './commands';
 
 export function activate(context: ExtensionContext): void {
-  context.subscriptions.push(
-    commands.registerCommand('sayHello', () =>
-      window.showInformationMessage('hello'),
-    ),
-  );
+  context.subscriptions.push(new InsertCommand());
 }
 
 export function deactivate(): void {}
