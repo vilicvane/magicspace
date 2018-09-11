@@ -1,7 +1,7 @@
 export interface MagicSpaceComment {
   name: string;
   insert: {
-    match: RegExp;
+    match: string;
     content: string;
   };
   commentBlock: string;
