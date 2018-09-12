@@ -41,3 +41,31 @@ export function searchProjectRootDir(from: string, searchName: string): string {
     }
   }
 }
+
+export function getInBaseURLOfModulePath(
+  path: string,
+  baseURL: string,
+  sourcefileName: string,
+  baseURLDirSearchName: string,
+): {ok: boolean; parsedModulePath: string} {
+  let modulePath = path;
+
+  if (/^\.{1,2}[\\/]/.test(path)) {
+    return {ok: false, parsedModulePath: ''};
+  }
+
+  let rootPath = searchProjectRootDir(sourcefileName, baseURLDirSearchName);
+
+  modulePath = Path.join(rootPath, baseURL, modulePath);
+
+  if (!Path.isAbsolute(modulePath)) {
+    modulePath = Path.resolve(modulePath);
+  }
+
+  let baseURLOfAbsolute = Path.join(rootPath, baseURL);
+
+  return {
+    ok: !/^\.{2}\/{0,1}?/.test(Path.relative(baseURLOfAbsolute, modulePath)),
+    parsedModulePath: modulePath,
+  };
+}
