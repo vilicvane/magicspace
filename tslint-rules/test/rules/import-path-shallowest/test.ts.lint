@@ -9,4 +9,7 @@ import * as b from './foo/a/b'
 
 import * as foo from './foo'
 
+import * as parse from 'parse'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-import-index-modules]
+
 [no-import-index-modules]: Can not import this module that have index file in the directory where this module is located.

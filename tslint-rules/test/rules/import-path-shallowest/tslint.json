@@ -1,6 +1,12 @@
 {
   "rules": {
-    "import-path-shallowest": true
+    "import-path-shallowest": [
+      true,
+      {
+        "baseURL": "core",
+        "baseURLDirSearchName": "tslint.json"
+      }
+    ]
   },
   "rulesDirectory": ["../../../bld/rules"]
 }
