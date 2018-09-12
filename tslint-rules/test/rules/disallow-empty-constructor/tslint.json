@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "disallow-empty-constructor": true
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}

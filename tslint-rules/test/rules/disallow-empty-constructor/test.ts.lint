@@ -1,0 +1,51 @@
+class Foo {
+  constructor() { }
+  ~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+}
+
+class Foo {
+  public constructor() { }
+  ~~~~~~~~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+}
+
+class Foo{
+  constructor(name:string) { }
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+}
+
+class Foo {
+  private constructor() { }
+}
+
+class Foo {
+  protected constructor() { }
+}
+
+class Foo {
+  constructor(private bar:string) { }
+
+  bar():void{}
+}
+
+class Foo {
+  constructor(protected bar:string) { }
+}
+
+class Foo{
+  constructor(public bar:string) { }
+}
+
+class Foo{
+  constructor(public bar:string, age:number) { }
+}
+
+class Foo{
+  constructor() {
+    console.info('bar')
+    let a = 1
+    let b = 1
+  }
+}
+
+[disallow-empty-constructor]: The constructor cannot be empty
+
