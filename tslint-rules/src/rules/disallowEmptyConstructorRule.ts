@@ -21,10 +21,8 @@ const ERROR_MESSAGE_CONSTRUCTOR_EMPTY = 'The constructor cannot be empty';
 
 class DisallowEmptyConstructorWalker extends RuleWalker {
   visitConstructorDeclaration(node: ConstructorDeclaration): void {
-    let {modifiers} = node;
-
     if (
-      this.isAllowConstructorModifierKeyWord(modifiers) ||
+      this.isAllowConstructorModifierKeyWord(node.modifiers) ||
       this.isAllowConstructorBody(node.body) ||
       this.isAllowArgumentsModifierKeyWord(node.parameters)
     ) {
