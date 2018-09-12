@@ -3,8 +3,8 @@
     "import-path-shallowest": [
       true,
       {
-        "baseURL": "core",
-        "baseURLDirSearchName": "tslint.json"
+        "baseUrl": "core",
+        "baseUrlDirSearchName": "tslint.json"
       }
     ]
   },
