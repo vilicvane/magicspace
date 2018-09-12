@@ -2,23 +2,46 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import * as _ from 'lodash';
-import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
+import {
+  AbstractWalker,
+  IOptions,
+  IRuleMetadata,
+  RuleFailure,
+  Rules,
+} from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
-import {removeModuleFileExtension, removeQuotes} from '../utils/path';
+import {
+  getInBaseURLOfModulePath,
+  removeModuleFileExtension,
+  removeQuotes,
+} from '../utils/path';
 
 const ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES =
   'Can not import this module that have index file in the directory where this module is located.';
 
+interface ParsedOptions {
+  baseUrl: string;
+  baseUrlDirSearchName: string;
+}
+
 export class Rule extends Rules.AbstractRule {
+  private parsedOptions: ParsedOptions;
+
+  constructor(options: IOptions) {
+    super(options);
+
+    this.parsedOptions = options.ruleArguments[0];
+  }
+
   apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportPathShallowestWalker(
         sourceFile,
         Rule.metadata.ruleName,
-        undefined,
+        this.parsedOptions,
       ),
     );
   }
@@ -28,14 +51,23 @@ export class Rule extends Rules.AbstractRule {
     description:
       'Validate import expression of path that directory module path whether module under the path or not',
     optionsDescription: '',
-    options: undefined,
+    options: {
+      properties: {
+        baseUrl: {
+          type: 'string',
+        },
+        baseUrlDirSearchName: {
+          type: 'string',
+        },
+      },
+    },
     type: 'maintainability',
     hasFix: true,
     typescriptOnly: false,
   };
 }
 
-class ImportPathShallowestWalker extends AbstractWalker<undefined> {
+class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
   private failureManager = new FailureManager(this);
 
   walk(sourceFile: SourceFile): void {
@@ -46,7 +78,26 @@ class ImportPathShallowestWalker extends AbstractWalker<undefined> {
     sourceFile: SourceFile,
     expression: LiteralExpression,
   ): void {
-    let basePath = Path.dirname(removeQuotes(expression.getText()));
+    let modulePath = removeQuotes(expression.getText());
+
+    if (this.options && !this.options.baseUrl) {
+      throw new Error('Please check baseUrl field is exist');
+    }
+
+    if (this.options) {
+      let {ok, parsedModulePath} = getInBaseURLOfModulePath(
+        modulePath,
+        this.options.baseUrl,
+        this.sourceFile.fileName,
+        this.options.baseUrlDirSearchName || 'tsconfig.json',
+      );
+
+      if (ok) {
+        modulePath = parsedModulePath;
+      }
+    }
+
+    let basePath = Path.dirname(modulePath);
 
     if (Path.isAbsolute(basePath)) {
       basePath = Path.relative(Path.dirname(sourceFile.fileName), basePath);
@@ -63,7 +114,6 @@ class ImportPathShallowestWalker extends AbstractWalker<undefined> {
   private isIndexFile(pathname: string): boolean {
     let extName = Path.extname(pathname);
     let baseName = removeModuleFileExtension(Path.basename(pathname));
-    // console.log(extName, baseName);
     return baseName === 'index' && /\.(ts|js)$/.test(extName);
   }
 
