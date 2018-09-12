@@ -304,6 +304,7 @@ module.exports = {
     'empty-line-around-blocks': true,
     'import-path-shallowest': false,
     'import-path-be-smart': true,
+    'disallow-empty-constructor': true,
   },
   rulesDirectory: [getRulesDir()],
 };
