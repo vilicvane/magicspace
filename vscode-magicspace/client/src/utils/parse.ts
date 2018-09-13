@@ -3,11 +3,11 @@ import {MagicSpaceComment} from '../common';
 
 import {toCamelCase} from './convert-string';
 
-function extractConfig(commentParts: string[]) {
+function extractConfig(commentParts: string[]): string[] {
   let configs: string[][] = [];
   let currentIndex = -1;
 
-  let forward = (part: string) => {
+  let forward = (part: string): void => {
     configs.push([part]);
     currentIndex++;
   };
