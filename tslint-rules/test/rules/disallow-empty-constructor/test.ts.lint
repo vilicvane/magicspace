@@ -1,16 +1,16 @@
 class Foo {
   constructor() { }
-  ~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+  ~~~~~~~~~~~~~~~~~ [no-empty-constructor]
 }
 
 class Foo {
   public constructor() { }
-  ~~~~~~~~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+  ~~~~~~~~~~~~~~~~~~~~~~~~ [no-empty-constructor]
 }
 
 class Foo{
   constructor(name:string) { }
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [disallow-empty-constructor]
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-empty-constructor]
 }
 
 class Foo {
@@ -47,5 +47,5 @@ class Foo{
   }
 }
 
-[disallow-empty-constructor]: The constructor cannot be empty
+[no-empty-constructor]: The constructor cannot be empty
 

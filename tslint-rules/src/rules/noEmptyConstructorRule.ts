@@ -12,14 +12,14 @@ import {
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
-      new DisallowEmptyConstructorWalker(sourceFile, this.getOptions()),
+      new NoEmptyConstructorWalker(sourceFile, this.getOptions()),
     );
   }
 }
 
 const ERROR_MESSAGE_CONSTRUCTOR_EMPTY = 'The constructor cannot be empty';
 
-class DisallowEmptyConstructorWalker extends RuleWalker {
+class NoEmptyConstructorWalker extends RuleWalker {
   visitConstructorDeclaration(node: ConstructorDeclaration): void {
     if (
       this.isAllowConstructorModifierKeyWord(node.modifiers) ||

@@ -41,7 +41,7 @@
     "empty-line-around-blocks": true,
     "import-path-shallowest": true,
     "import-path-be-smart": true,
-    "disallow-empty-constructor": true
+    "no-empty-constructor": true
   },
   "rulesDirectory": ["bld/rules"]
 }
