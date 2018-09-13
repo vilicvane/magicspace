@@ -1,5 +1,5 @@
 import * as FS from 'fs';
-import * as Path from 'path';
+import * as path from 'path';
 
 import * as _ from 'lodash';
 import {
@@ -19,6 +19,7 @@ import {
   removeQuotes,
 } from '../utils/path';
 
+const Path = path.posix;
 const ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES =
   'Can not import this module that have index file in the directory where this module is located.';
 
