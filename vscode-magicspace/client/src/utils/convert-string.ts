@@ -24,7 +24,11 @@ export function toCamelCase(
   return targetStringParts
     .map(
       (part, index) =>
-        (form === 'upper' ? index + 1 : index) ? part[0].toUpperCase() : part,
+        (form === 'upper'
+        ? index + 1
+        : index)
+          ? part[0].toUpperCase() + part.slice(1)
+          : part,
     )
     .join('');
 }
