@@ -10,18 +10,23 @@ interface TemplateData {
 export function evaluatedStringTemplate(
   template: string,
   templateData: TemplateData,
-) {
+): string {
   return template.replace(
     /\$\{(.*?)\}/g,
     (_match: string, key: string) => templateData[key.trim()],
   );
 }
 
-export function toCamelCase(targetStringParts: string[]) {
+export function toCamelCase(
+  targetStringParts: string[],
+  form: 'upper' | 'lower' = 'upper',
+): string {
   return targetStringParts
     .map(
       (part, index) =>
-        index
+        (form === 'upper'
+        ? index + 1
+        : index)
           ? Array.from(part)
               .map((char, index) => (index ? char : char.toUpperCase()))
               .join('')
