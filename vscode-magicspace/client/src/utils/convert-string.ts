@@ -24,13 +24,7 @@ export function toCamelCase(
   return targetStringParts
     .map(
       (part, index) =>
-        (form === 'upper'
-        ? index + 1
-        : index)
-          ? Array.from(part)
-              .map((char, index) => (index ? char : char.toUpperCase()))
-              .join('')
-          : part,
+        (form === 'upper' ? index + 1 : index) ? part[0].toUpperCase() : part,
     )
     .join('');
 }
