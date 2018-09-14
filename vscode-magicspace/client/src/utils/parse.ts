@@ -41,6 +41,7 @@ export function parse(comment: string): MagicSpaceComment {
         JSON.parse(
           `{"${toCamelCase(
             configName.slice(1, configName.length).split('-'),
+            'lower',
           )}"${part.slice(configName.length, part.length)}}`,
         ),
       );
