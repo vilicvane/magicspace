@@ -12,15 +12,31 @@ import {
 } from '../utils';
 
 export class InsertCommand extends MultipleCommentCommands {
-  private static readonly ERROR_MESSAGE_NAME_UNDEFINED =
-    'Name can not be empty in the input box';
-  private static readonly ERROR_MESSAGE_NAME_EMPTY =
-    'Name can not be empty string in the input box';
-
   private convertResult: ConvertedString | undefined;
 
   constructor() {
     super(Commands.InsertCommand);
+  }
+
+  async executeOfComment(
+    sourceFileContent: string,
+    comment: MagicSpaceComment,
+    textEditor: TextEditor,
+  ): Promise<void> {
+    await this.insertTemplate(comment, textEditor);
+
+    let {position, ok} = this.indexOf(
+      sourceFileContent,
+      new RegExp(comment.insert.match),
+    );
+
+    // 是否匹配成功
+    if (!ok) {
+      window.showInformationMessage('Match fail');
+      return;
+    }
+
+    this.addType(sourceFileContent, comment, textEditor, position);
   }
 
   private nameChecker(name: string | undefined): name is string {
@@ -48,7 +64,14 @@ export class InsertCommand extends MultipleCommentCommands {
       return;
     }
 
-    let convertResult = convertString(name);
+    let convertResult;
+
+    try {
+      convertResult = convertString(name);
+    } catch (e) {
+      return;
+    }
+
     this.convertResult = convertResult;
 
     let commentWallName = evaluatedStringTemplate(
@@ -106,13 +129,18 @@ export class InsertCommand extends MultipleCommentCommands {
     comment: MagicSpaceComment,
     textEditor: TextEditor,
     position: SelectPosition,
-  ) {
+  ): void {
     let targetLine = sourceFileContent.split('\n')[position.line];
     let [defineType, ...assignType] = targetLine.split('=');
 
     // TODO
     let assignTypeString = assignType.join('').replace(/never/, '');
-    window.showInformationMessage(targetLine.length.toString());
+    let hasSemicolon: boolean =
+      assignTypeString.charAt(assignTypeString.length - 1) === ';';
+    assignTypeString = hasSemicolon
+      ? assignTypeString.slice(0, assignTypeString.length - 1)
+      : assignTypeString;
+
     textEditor.edit(builder =>
       builder.replace(
         new Range(
@@ -122,37 +150,20 @@ export class InsertCommand extends MultipleCommentCommands {
         [
           defineType,
           [
+            assignTypeString,
             evaluatedStringTemplate(
               comment.insert.content,
               this.convertResult!,
             ),
-            assignTypeString,
+            hasSemicolon ? ';' : '',
           ].join(''),
         ].join('='),
       ),
     );
-
-    console.info(assignType);
   }
 
-  async executeOfComment(
-    sourceFileContent: string,
-    comment: MagicSpaceComment,
-    textEditor: TextEditor,
-  ): Promise<void> {
-    await this.insertTemplate(comment, textEditor);
-
-    let {position, ok} = this.indexOf(
-      sourceFileContent,
-      new RegExp(comment.insert.match),
-    );
-
-    // 是否匹配成功
-    if (!ok) {
-      window.showInformationMessage('Match fail');
-      return;
-    }
-
-    this.addType(sourceFileContent, comment, textEditor, position);
-  }
+  private static readonly ERROR_MESSAGE_NAME_UNDEFINED =
+    'Name can not be empty in the input box';
+  private static readonly ERROR_MESSAGE_NAME_EMPTY =
+    'Name can not be empty string in the input box';
 }
