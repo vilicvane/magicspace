@@ -1,9 +1,9 @@
 {
   "name": "vscode-magicspace",
-  "displayName": "vscode-magicspace",
+  "displayName": "magicspace",
   "description": "",
   "version": "0.0.1",
-  "publisher": "magicspace",
+  "publisher": "mf",
   "engines": {
     "vscode": "^1.25.0"
   },
@@ -40,9 +40,14 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile:client": "tsc -p ./client",
+    "compile:server": "tsc -p ./server",
+    "watch:client": "tsc -watch -p ./client",
+    "watch:server": "tsc -watch -p ./server",
+    "compile": "npm run compile:client && npm run compile:server",
+    "watch": "npm run watch:client && npm run watch:server",
     "postinstall": "node ../node_modules/vscode/bin/install",
-    "test": "npm run compile && node ../node_modules/vscode/bin/test"
+    "test": "npm run compile && node ../node_modules/vscode/bin/test",
+    "publish": "vsce publish"
   }
 }
