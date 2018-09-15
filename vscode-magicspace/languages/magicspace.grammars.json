@@ -1,0 +1,19 @@
+{
+  "fileTypes": ["ts", "tsx"],
+  "injectionSelector": "comment",
+  "patterns": [
+    {
+      "match": "^@name:",
+      "name": "keyword.ts"
+    },
+    {
+      "match": "^@insert:",
+      "name": "keyword.ts"
+    },
+    {
+      "match": "^\\$comment-block:",
+      "name": "keyword.ts"
+    }
+  ],
+  "scopeName": "magicspace"
+}

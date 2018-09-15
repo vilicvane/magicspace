@@ -1,0 +1,8 @@
+.vscode/**
+.vscode-test/**
+bld/test/**
+bld/**/*.map
+src/**
+.gitignore
+tsconfig.json
+tslint.json

@@ -1,0 +1,21 @@
+{
+  "Insert magicspace comment": {
+    "prefix": "insert magicspace comment",
+    "body": [
+      "/*$",
+      "",
+      "@name: \"task-change\"",
+      "@insert: {",
+      "  \"match\": \"^type TaskChange =[^]*?(?:never)?(?=;)\",",
+      "  \"content\": \"|Task${name.CamelCase}Change\"",
+      "}",
+      "",
+      "\\$comment-block: \"task:${name.hyphenated}\"",
+      "",
+      "interface Task${name.CamelCase}Change {}",
+      "",
+      "*/"
+    ],
+    "description": "insert magicspace comment"
+  }
+}
