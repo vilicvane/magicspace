@@ -12,8 +12,6 @@ import {
 } from '../utils';
 
 export class InsertCommand extends MultipleCommentCommands {
-  private convertResult: ConvertedString | undefined;
-
   constructor() {
     super(Commands.InsertCommand);
   }
@@ -23,8 +21,6 @@ export class InsertCommand extends MultipleCommentCommands {
     comment: MagicSpaceComment,
     textEditor: TextEditor,
   ): Promise<void> {
-    await this.insertTemplate(comment, textEditor);
-
     let {position, ok} = this.indexOf(
       sourceFileContent,
       new RegExp(comment.insert.match),
@@ -36,7 +32,57 @@ export class InsertCommand extends MultipleCommentCommands {
       return;
     }
 
-    this.addType(sourceFileContent, comment, textEditor, position);
+    let convertResult = await this.parseTextOfInputBox();
+
+    if (!convertResult) {
+      return;
+    }
+
+    await this.addType(
+      sourceFileContent,
+      comment,
+      textEditor,
+      position,
+      convertResult,
+    );
+
+    await this.insertTemplate(comment, textEditor, convertResult);
+  }
+
+  async addType(
+    sourceFileContent: string,
+    comment: MagicSpaceComment,
+    textEditor: TextEditor,
+    position: SelectPosition,
+    convertResult: ConvertedString,
+  ): Promise<void> {
+    let targetLine = sourceFileContent.split('\n')[position.line];
+    let [defineType, ...assignType] = targetLine.split('=');
+
+    // TODO
+    let assignTypeString = assignType.join('').replace(/never/, '');
+    let hasSemicolon: boolean =
+      assignTypeString.charAt(assignTypeString.length - 1) === ';';
+    assignTypeString = hasSemicolon
+      ? assignTypeString.slice(0, assignTypeString.length - 1)
+      : assignTypeString;
+
+    await textEditor.edit(builder =>
+      builder.replace(
+        new Range(
+          new Position(position.line, 0),
+          new Position(position.line, targetLine.length),
+        ),
+        [
+          defineType,
+          [
+            assignTypeString,
+            evaluatedStringTemplate(comment.insert.content, convertResult),
+            hasSemicolon ? ';' : '',
+          ].join(''),
+        ].join('='),
+      ),
+    );
   }
 
   private nameChecker(name: string | undefined): name is string {
@@ -51,29 +97,26 @@ export class InsertCommand extends MultipleCommentCommands {
     return true;
   }
 
-  /** 插入模版 */
-  private async insertTemplate(
-    comment: MagicSpaceComment,
-    textEditor: TextEditor,
-  ): Promise<void> {
+  private async parseTextOfInputBox(): Promise<ConvertedString | undefined> {
     let name = await window.showInputBox({
       placeHolder: 'Please input value that name of template',
     });
 
     if (!this.nameChecker(name)) {
-      return;
+      return undefined;
     }
 
-    let convertResult;
+    let convertResult = convertString(name);
 
-    try {
-      convertResult = convertString(name);
-    } catch (e) {
-      return;
-    }
+    return convertResult;
+  }
 
-    this.convertResult = convertResult;
-
+  /** 插入模版 */
+  private async insertTemplate(
+    comment: MagicSpaceComment,
+    textEditor: TextEditor,
+    convertResult: ConvertedString,
+  ): Promise<void> {
     let commentWallName = evaluatedStringTemplate(
       comment.commentBlock,
       convertResult,
@@ -105,13 +148,12 @@ export class InsertCommand extends MultipleCommentCommands {
   private indexOf(
     sourceFileContent: string,
     regex: RegExp,
-  ): {position: SelectPosition; ok: boolean} {
+  ): {
+    position: SelectPosition;
+    ok: boolean;
+  } {
     let contentParts = sourceFileContent.split('\n');
-    let line: number = -1;
-    contentParts.find((code, index) => {
-      line = index;
-      return regex.test(code);
-    });
+    let line = contentParts.findIndex(code => regex.test(code));
 
     let ok = line < 0 ? false : true;
 
@@ -122,44 +164,6 @@ export class InsertCommand extends MultipleCommentCommands {
       },
       ok,
     };
-  }
-
-  private addType(
-    sourceFileContent: string,
-    comment: MagicSpaceComment,
-    textEditor: TextEditor,
-    position: SelectPosition,
-  ): void {
-    let targetLine = sourceFileContent.split('\n')[position.line];
-    let [defineType, ...assignType] = targetLine.split('=');
-
-    // TODO
-    let assignTypeString = assignType.join('').replace(/never/, '');
-    let hasSemicolon: boolean =
-      assignTypeString.charAt(assignTypeString.length - 1) === ';';
-    assignTypeString = hasSemicolon
-      ? assignTypeString.slice(0, assignTypeString.length - 1)
-      : assignTypeString;
-
-    textEditor.edit(builder =>
-      builder.replace(
-        new Range(
-          new Position(position.line, 0),
-          new Position(position.line, targetLine.length),
-        ),
-        [
-          defineType,
-          [
-            assignTypeString,
-            evaluatedStringTemplate(
-              comment.insert.content,
-              this.convertResult!,
-            ),
-            hasSemicolon ? ';' : '',
-          ].join(''),
-        ].join('='),
-      ),
-    );
   }
 
   private static readonly ERROR_MESSAGE_NAME_UNDEFINED =
