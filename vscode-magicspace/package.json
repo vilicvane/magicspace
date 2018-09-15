@@ -15,6 +15,22 @@
   ],
   "main": "./client/bld/extension",
   "contributes": {
+    "snippets": [
+      {
+        "language": "typescript",
+        "path": "./languages/magicspace.snippets.json"
+      }
+    ],
+    "grammars": [
+      {
+        "injectTo": [
+          "source.ts",
+          "source.tsx"
+        ],
+        "scopeName": "magicspace",
+        "path": "./languages/magicspace.grammars.json"
+      }
+    ],
     "commands": [
       {
         "command": "magicspace.insert",
