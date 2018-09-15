@@ -12,6 +12,7 @@ connection.onInitialize(_params => {
   return {
     capabilities: {
       textDocumentSync: textDocuments.syncKind,
+      hoverProvider: true,
     },
   };
 });
