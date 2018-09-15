@@ -22,6 +22,7 @@ export abstract class MultipleCommentCommands extends TextEditorCommand {
 
   execute(textEditor: TextEditor, edit: TextEditorEdit, args: any[]): void {
     let selectPosition = textEditor.selection.start;
+
     this.selectPosition = {
       line: selectPosition.line,
       character: selectPosition.character,
@@ -44,7 +45,7 @@ export abstract class MultipleCommentCommands extends TextEditorCommand {
         try {
           let parsedComment = parse(text);
           this.executeOfComment(
-            editorDocument.getText(),
+            editorDocument.getText().slice(0, pos),
             parsedComment,
             textEditor,
             edit,
