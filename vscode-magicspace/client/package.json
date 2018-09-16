@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "vscode": "^1.25.0"
+  },
+  "scripts": {
+    "update-vscode": "node ../node_modules/vscode/bin/install",
+    "postinstall": "node ../node_modules/vscode/bin/install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "tsutils": "^2.28.0",
     "typescript": "^3.0.1",

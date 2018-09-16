@@ -1,8 +1,8 @@
 {
-  "name": "vscode-magicspace",
+  "name": "magicspace",
   "displayName": "magicspace",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.15",
   "publisher": "mf",
   "engines": {
     "vscode": "^1.25.0"
@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:magicspace.insert"
+    "onCommand:magicspace.insert",
+    "onCommand:magicspace.sayHello"
   ],
   "main": "./client/bld/extension",
   "contributes": {
@@ -35,6 +36,10 @@
       {
         "command": "magicspace.insert",
         "title": "magicspace insert"
+      },
+      {
+        "command": "magicspace.sayHello",
+        "title": "magicspace sayHello"
       }
     ]
   },
