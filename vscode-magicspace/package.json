@@ -2,7 +2,7 @@
   "name": "vscode-magicspace",
   "displayName": "magicspace",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "mf",
   "engines": {
     "vscode": "^1.25.0"
@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:typescript"
+    "onCommand:magicspace.insert"
   ],
   "main": "./client/bld/extension",
   "contributes": {
