@@ -14,6 +14,10 @@ function extractConfig(commentParts: string[]): string[] {
 
   // 向注释里提取配置
   for (let part of commentParts) {
+    if (part.trim() === '') {
+      continue;
+    }
+
     if (/^@/.test(part)) {
       forward(part);
     } else if (/^\$/.test(part)) {
@@ -25,12 +29,11 @@ function extractConfig(commentParts: string[]): string[] {
     }
   }
 
-  return configs.map(config => config.join(''));
+  return configs.map(config => config.join('\n'));
 }
 
 export function parse(comment: string): MagicSpaceComment {
-  let commentParts = comment.split('\n');
-  commentParts = commentParts.slice(2, commentParts.length - 2);
+  let commentParts = comment.slice(3, comment.length - 2).split('\n');
   let scanResult: Dict<string>[] = [];
 
   for (let part of extractConfig(commentParts)) {
