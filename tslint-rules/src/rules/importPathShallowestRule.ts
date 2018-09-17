@@ -1,5 +1,6 @@
 import * as FS from 'fs';
-import * as path from 'path';
+import * as Path from 'path';
+import POSIXPath = Path.posix;
 
 import * as _ from 'lodash';
 import {
@@ -19,7 +20,6 @@ import {
   removeQuotes,
 } from '../utils/path';
 
-const Path = path.posix;
 const ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES =
   'Can not import this module that have index file in the directory where this module is located.';
 
@@ -101,7 +101,10 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     let basePath = Path.dirname(modulePath);
 
     if (Path.isAbsolute(basePath)) {
-      basePath = Path.relative(Path.dirname(sourceFile.fileName), basePath);
+      basePath = POSIXPath.relative(
+        Path.dirname(sourceFile.fileName),
+        basePath,
+      );
     }
 
     if (this.validateIsDirectoryModule(sourceFile, basePath)) {
@@ -130,7 +133,7 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
 
     try {
       files = FS.readdirSync(
-        Path.join(Path.dirname(sourceFile.fileName), basePath),
+        POSIXPath.join(Path.dirname(sourceFile.fileName), basePath),
       );
     } catch (e) {
       return false;
