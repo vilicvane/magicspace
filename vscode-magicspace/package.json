@@ -11,8 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:magicspace.insert",
-    "onCommand:magicspace.sayHello"
+    "onLanguage:typescript"
   ],
   "main": "./client/bld/extension",
   "contributes": {
