@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "watch-your-path": true
+  },
+  "rulesDirectory": ["../../../bld/rules"]
+}

@@ -1,0 +1,6 @@
+path.join('foo','bar');
+~~~~~~~~~~~~~~~~~~~~~~ [watch-your-path]
+
+foo()
+
+[watch-your-path]: This method is platform independent.
