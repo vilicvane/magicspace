@@ -92,18 +92,18 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     }
 
     if (this.options && this.options.baseUrl) {
-      if (this.options) {
-        let {ok, parsedModulePath} = getInBaseURLOfModulePath(
-          modulePath,
-          this.options.baseUrl,
-          this.sourceFile.fileName,
-          this.options.baseUrlDirSearchName || 'tsconfig.json',
-        );
+      let {ok, parsedModulePath} = getInBaseURLOfModulePath(
+        modulePath,
+        this.options.baseUrl,
+        this.sourceFile.fileName,
+        this.options.baseUrlDirSearchName || 'tsconfig.json',
+      );
 
-        if (ok) {
-          modulePath = parsedModulePath;
-        }
+      if (ok) {
+        modulePath = parsedModulePath;
       }
+    } else if (/^[^\/\.]+/.test(modulePath)) {
+      return;
     }
 
     let basePath = Path.dirname(modulePath);
