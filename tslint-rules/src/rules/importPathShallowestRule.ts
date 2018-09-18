@@ -14,6 +14,7 @@ import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
 import {FailureManager} from '../utils/failure-manager';
+import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {
   getInBaseURLOfModulePath,
   removeModuleFileExtension,
@@ -81,20 +82,27 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
   ): void {
     let modulePath = removeQuotes(expression.getText());
 
-    if (this.options && !this.options.baseUrl) {
-      throw new Error('Please check baseUrl field is exist');
+    if (
+      matchNodeModules(modulePath, sourceFile.fileName) ||
+      matchNodeCore(modulePath) ||
+      this.isDirectParentModule(modulePath) ||
+      this.isCurrentModule(modulePath)
+    ) {
+      return;
     }
 
-    if (this.options) {
-      let {ok, parsedModulePath} = getInBaseURLOfModulePath(
-        modulePath,
-        this.options.baseUrl,
-        this.sourceFile.fileName,
-        this.options.baseUrlDirSearchName || 'tsconfig.json',
-      );
+    if (this.options && this.options.baseUrl) {
+      if (this.options) {
+        let {ok, parsedModulePath} = getInBaseURLOfModulePath(
+          modulePath,
+          this.options.baseUrl,
+          this.sourceFile.fileName,
+          this.options.baseUrlDirSearchName || 'tsconfig.json',
+        );
 
-      if (ok) {
-        modulePath = parsedModulePath;
+        if (ok) {
+          modulePath = parsedModulePath;
+        }
       }
     }
 
@@ -157,5 +165,15 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     for (let expression of findImports(sourceFile, ImportKind.AllImports)) {
       this.validate(sourceFile, expression);
     }
+  }
+
+  private isDirectParentModule(modulePath: string): boolean {
+    return /^(?:\.{2}\/((?:\.{2})\/)*[^\/]+|\.{1}\/((?:\.{2})\/)+[^\/]+)$/.test(
+      modulePath,
+    );
+  }
+
+  private isCurrentModule(modulePath: string): boolean {
+    return /^\.{1}\/[^\/]+$/.test(modulePath);
   }
 }
