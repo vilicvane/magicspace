@@ -65,7 +65,7 @@ export function getInBaseURLOfModulePath(
   let baseURLOfAbsolute = Path.join(rootPath, baseURL);
 
   return {
-    ok: !/^\.{2}\/{0,1}?/.test(Path.relative(baseURLOfAbsolute, modulePath)),
+    ok: !/^\.{2}\/?/.test(Path.relative(baseURLOfAbsolute, modulePath)),
     parsedModulePath: modulePath,
   };
 }
