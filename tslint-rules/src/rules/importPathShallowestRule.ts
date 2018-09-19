@@ -133,6 +133,10 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     sourceFile: SourceFile,
     basePath: string,
   ): boolean {
+    if (/^\.{1,2}$/.test(basePath)) {
+      return false;
+    }
+
     let files: string[];
 
     if (basePath === '') {
@@ -157,7 +161,8 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
         return false;
       }
 
-      return this.validateIsDirectoryModule(sourceFile, nextBasePath.shift()!);
+      nextBasePath.pop();
+      return this.validateIsDirectoryModule(sourceFile, nextBasePath.join('/'));
     }
   }
 
