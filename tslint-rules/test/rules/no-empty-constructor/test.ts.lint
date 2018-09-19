@@ -10,7 +10,6 @@ class Foo {
 
 class Foo{
   constructor(name:string) { }
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [no-empty-constructor]
 }
 
 class Foo {
@@ -37,6 +36,10 @@ class Foo{
 
 class Foo{
   constructor(public bar:string, age:number) { }
+}
+
+class Foo{
+  constructor(name:string){ }
 }
 
 class Foo{
