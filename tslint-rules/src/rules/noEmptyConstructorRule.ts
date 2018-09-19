@@ -35,10 +35,8 @@ class NoEmptyConstructorWalker extends RuleWalker {
   private isAllowArgumentsModifierKeyWord(
     parameters: NodeArray<ParameterDeclaration>,
   ): boolean {
-    for (let parameter of parameters) {
-      if (parameter.modifiers) {
-        return true;
-      }
+    if (parameters.length) {
+      return true;
     }
 
     return false;
