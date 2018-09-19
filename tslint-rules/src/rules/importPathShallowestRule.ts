@@ -133,7 +133,7 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     sourceFile: SourceFile,
     basePath: string,
   ): boolean {
-    if (/^\.{1,2}$/.test(basePath)) {
+    if (/^\.{2}(?:\/\.{2})*$/.test(basePath)) {
       return false;
     }
 
