@@ -52,7 +52,8 @@ export class Rule extends Rules.AbstractRule {
     ruleName: 'import-path-shallowest',
     description:
       'Validate import expression of path that directory module path whether module under the path or not',
-    optionsDescription: '',
+    optionsDescription:
+      'You can config baseUrl for check import path in baseUrl',
     options: {
       properties: {
         baseUrl: {
