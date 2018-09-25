@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "import-groups": [
+      true,
+      {
+        "groups": [
+          {
+            "name": "node-core",
+            "test": "$node-core"
+          },
+          {
+            "name": "node-modules",
+            "test": "$node-modules",
+            "sideEffect": true
+          },
+          {
+            "name": "node-modules",
+            "test": "$node-modules"
+          },
+          {
+            "name": "project-base",
+            "priority": 1,
+            "test": "^[@\\w]",
+            "baseUrl": "core"
+          },
+          {
+            "name": "upper-directory",
+            "test": "^\\.\\./"
+          }
+        ],
+        "ordered": true
+      }
+    ]
+  },
+  "rulesDirectory": ["../../../../bld/rules"]
+}
