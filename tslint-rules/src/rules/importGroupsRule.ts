@@ -1,7 +1,3 @@
-import * as FS from 'fs';
-import * as Path from 'path';
-
-import * as _ from 'lodash';
 import {Dict} from 'tslang';
 import {
   AbstractWalker,
@@ -20,7 +16,7 @@ import {
 import * as TypeScript from 'typescript';
 
 import {matchNodeCore, matchNodeModules} from '../utils/match';
-import {removeQuotes, searchProjectRootDir} from '../utils/path';
+import {removeQuotes} from '../utils/path';
 import {trimLeftEmptyLines} from '../utils/string';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
@@ -33,6 +29,7 @@ const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core': matchNodeCore,
+
   '$node-modules': matchNodeModules,
 };
 
@@ -40,9 +37,6 @@ interface ModuleGroupConfigItem {
   name: string;
   test: string;
   sideEffect: boolean | undefined;
-  priority: number | undefined;
-  baseUrl: string | undefined;
-  baseUrlDirSearchName: string | undefined;
 }
 
 interface RawOptions {
@@ -62,27 +56,14 @@ type ModuleGroupTester = (
 
 class ModuleGroup {
   readonly name: string;
-  readonly priority: number;
 
   private tester: ModuleGroupTester;
   private sideEffect: boolean | undefined;
-  private baseUrlDirSearchName: string;
-  private baseUrl: string | undefined;
 
-  constructor({
-    name,
-    test: testConfig,
-    sideEffect,
-    priority,
-    baseUrl,
-    baseUrlDirSearchName,
-  }: ModuleGroupConfigItem) {
+  constructor({name, test: testConfig, sideEffect}: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
     this.sideEffect = sideEffect;
-    this.priority = priority || 0;
-    this.baseUrlDirSearchName = baseUrlDirSearchName || 'tsconfig.json';
-    this.baseUrl = baseUrl;
   }
 
   match(
@@ -90,25 +71,6 @@ class ModuleGroup {
     sideEffect: boolean,
     sourceFilePath: string,
   ): boolean {
-    if (this.baseUrl) {
-      let isExistInBaseUrl = FS.existsSync(
-        Path.posix.join(
-          searchProjectRootDir(
-            Path.dirname(sourceFilePath),
-            this.baseUrlDirSearchName,
-          ),
-          this.baseUrl,
-          modulePath,
-        ),
-      );
-
-      if (isExistInBaseUrl) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
     return (
       (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
       this.tester(modulePath, sourceFilePath)
@@ -274,22 +236,9 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     let groups = this.options.groups;
 
-    let orderedGroups = _.orderBy(groups, group => group.priority, 'desc');
-    let offset: {[index: string]: number} = {};
-    let moduleGroup = orderedGroups.find(group => {
-      if (offset[group.name] + 1) {
-        offset[group.name]++;
-      } else {
-        offset[group.name] = 0;
-      }
-
-      return group.match(modulePath, sideEffect, sourceFilePath);
-    });
-
-    let groupName = moduleGroup ? moduleGroup.name : -1;
-
-    let index =
-      groups.findIndex(group => group.name === groupName) + offset[groupName];
+    let index = groups.findIndex(group =>
+      group.match(modulePath, sideEffect, sourceFilePath),
+    );
 
     this.moduleImportInfos.push({
       node,
