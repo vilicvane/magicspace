@@ -16,7 +16,7 @@ import {LiteralExpression, SourceFile} from 'typescript';
 import {FailureManager} from '../utils/failure-manager';
 import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {
-  getInBaseURLOfModulePath,
+  getInBaseUrlOfModulePath,
   removeModuleFileExtension,
   removeQuotes,
 } from '../utils/path';
@@ -93,7 +93,7 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
     }
 
     if (this.options && this.options.baseUrl) {
-      let {ok, parsedModulePath} = getInBaseURLOfModulePath(
+      let {ok, parsedModulePath} = getInBaseUrlOfModulePath(
         modulePath,
         this.options.baseUrl,
         this.sourceFile.fileName,
