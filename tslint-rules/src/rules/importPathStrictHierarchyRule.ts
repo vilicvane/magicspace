@@ -15,6 +15,8 @@ import {Expression, SourceFile} from 'typescript';
 
 import {
   getBaseNameWithoutExtension,
+  hasKnownModuleExtension,
+  removeModuleFileExtension,
   removeQuotes,
   searchProjectRootDir,
 } from '../utils/path';
@@ -85,6 +87,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
   private sourceDir: string;
   private baseUrlDir: string;
+  private baseUrlNameSet: Set<string>;
 
   constructor(sourceFile: SourceFile, ruleName: string, options: RuleOptions) {
     super(sourceFile, ruleName, options);
@@ -98,6 +101,23 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       ),
       options.baseUrl,
     );
+
+    let baseUrlNames = FS.readdirSync(this.baseUrlDir).reduce(
+      (names, entryName) => {
+        let entryPath = Path.join(this.baseUrlDir, entryName);
+
+        if (FS.statSync(entryPath).isDirectory()) {
+          return [...names, entryName];
+        } else if (hasKnownModuleExtension(entryName)) {
+          return [...names, entryName, removeModuleFileExtension(entryName)];
+        }
+
+        return names;
+      },
+      [] as string[],
+    );
+
+    this.baseUrlNameSet = new Set(baseUrlNames);
   }
 
   walk(sourceFile: SourceFile): void {
@@ -116,8 +136,12 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     specifierFirstPart: string,
     checkingFirstPart: string,
     first = true,
+    isNoneRelative?: boolean,
   ): boolean {
-    if (specifierFirstPart === checkingFirstPart) {
+    if (
+      specifierFirstPart === checkingFirstPart ||
+      (isNoneRelative && !this.baseUrlNameSet.has(specifierFirstPart))
+    ) {
       return true;
     }
 
@@ -153,6 +177,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
         : currentDir;
 
     for (let expression of this.importExpressions) {
+      let isNoneRelative = false;
       let relativeImportPath = removeQuotes(expression.getText());
       let absoluteImportPath;
 
@@ -160,10 +185,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
         absoluteImportPath = Path.join(currentDir, relativeImportPath);
       } else {
         absoluteImportPath = Path.join(this.baseUrlDir, relativeImportPath);
-
-        if (!FS.existsSync(absoluteImportPath)) {
-          continue;
-        }
+        isNoneRelative = true;
       }
 
       let specifierFirstPart = this.getFirstPartInRelativePath(
@@ -171,7 +193,14 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       );
       let checkingFirstPart = this.getFirstPartInRelativePath(checkingPath);
 
-      if (!this.checkPath(specifierFirstPart, checkingFirstPart)) {
+      if (
+        !this.checkPath(
+          specifierFirstPart,
+          checkingFirstPart,
+          true,
+          isNoneRelative,
+        )
+      ) {
         this.addFailureAtNode(
           expression.parent,
           ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,

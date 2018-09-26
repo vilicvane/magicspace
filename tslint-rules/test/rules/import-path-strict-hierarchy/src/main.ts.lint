@@ -9,3 +9,6 @@ import utils from 'utils'
 
 import * as test from './file-test' // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+
+import {App} from 'views/app' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
