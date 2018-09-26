@@ -5,9 +5,6 @@ import react from 'react'
 import core from 'others' // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
 
-import utils from 'util' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
-
 import utils from 'utils'
 
 import * as test from './file-test' // failure
