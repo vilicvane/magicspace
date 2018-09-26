@@ -1,3 +1,4 @@
+import * as FS from 'fs';
 import * as Path from 'path';
 
 import * as _ from 'lodash';
@@ -152,12 +153,22 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
         : currentDir;
 
     for (let expression of this.importExpressions) {
-      let importPath = Path.join(
-        currentDir,
-        removeQuotes(expression.getText()),
-      );
+      let relativeImportPath = removeQuotes(expression.getText());
+      let absoluteImportPath;
 
-      let specifierFirstPart = this.getFirstPartInRelativePath(importPath);
+      if (relativeImportPath.startsWith('.')) {
+        absoluteImportPath = Path.join(currentDir, relativeImportPath);
+      } else {
+        absoluteImportPath = Path.join(this.baseUrlDir, relativeImportPath);
+
+        if (!FS.existsSync(absoluteImportPath)) {
+          continue;
+        }
+      }
+
+      let specifierFirstPart = this.getFirstPartInRelativePath(
+        absoluteImportPath,
+      );
       let checkingFirstPart = this.getFirstPartInRelativePath(checkingPath);
 
       if (!this.checkPath(specifierFirstPart, checkingFirstPart)) {
