@@ -16,7 +16,7 @@ import {
 import * as TypeScript from 'typescript';
 
 import {matchNodeCore, matchNodeModules} from '../utils/match';
-import {removeQuotes} from '../utils/path';
+import {removeQuotes, searchProjectRootDir} from '../utils/path';
 import {trimLeftEmptyLines} from '../utils/string';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
@@ -364,6 +364,14 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     return new Replacement(start, length, text);
   }
+}
+
+function getProjectRootDir(from: string, searchName: string): string {
+  let projectRootDir: string | undefined;
+
+  return (
+    projectRootDir || (projectRootDir = searchProjectRootDir(from, searchName))
+  );
 }
 
 function groupModuleImportInfos(
