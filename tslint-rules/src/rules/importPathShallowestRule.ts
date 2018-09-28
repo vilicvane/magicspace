@@ -140,7 +140,7 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
 
     let files: string[];
 
-    if (basePath === '') {
+    if (basePath === '' || basePath === '.') {
       return false;
     }
 
