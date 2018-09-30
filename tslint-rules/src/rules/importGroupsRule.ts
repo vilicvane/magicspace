@@ -89,25 +89,6 @@ class ModuleGroup {
     baseUrlDirSearchName: string,
     baseUrl: string,
   ): boolean {
-    // if (baseUrl) {
-    //   let isExistInBaseUrl = FS.existsSync(
-    //     Path.posix.join(
-    //       searchProjectRootDir(
-    //         Path.dirname(sourceFilePath),
-    //         baseUrlDirSearchName,
-    //       ),
-    //       baseUrl,
-    //       modulePath,
-    //     ),
-    //   );
-
-    //   if (isExistInBaseUrl) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-
     return (
       this.base ===
         FS.existsSync(
