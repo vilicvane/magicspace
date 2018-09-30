@@ -74,12 +74,12 @@ class ModuleGroup {
     name,
     test: testConfig,
     sideEffect,
-    base,
+    base = false,
   }: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
     this.sideEffect = sideEffect;
-    this.base = !!base;
+    this.base = base;
   }
 
   match(
@@ -89,18 +89,16 @@ class ModuleGroup {
     baseUrlDirSearchName: string,
     baseUrl: string,
   ): boolean {
+    let isModuleExistInBaseUrl = FS.existsSync(
+      Path.join(
+        getProjectRootDir(Path.dirname(sourceFilePath), baseUrlDirSearchName),
+        baseUrl,
+        modulePath,
+      ),
+    );
+
     return (
-      this.base ===
-        FS.existsSync(
-          Path.posix.join(
-            searchProjectRootDir(
-              Path.dirname(sourceFilePath),
-              baseUrlDirSearchName,
-            ),
-            baseUrl,
-            modulePath,
-          ),
-        ) &&
+      this.base === isModuleExistInBaseUrl &&
       (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
       this.tester(modulePath, sourceFilePath)
     );
