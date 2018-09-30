@@ -1,3 +1,7 @@
+import * as FS from 'fs';
+import * as Path from 'path';
+
+import * as _ from 'lodash';
 import {Dict} from 'tslang';
 import {
   AbstractWalker,
@@ -36,17 +40,22 @@ const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
 interface ModuleGroupConfigItem {
   name: string;
   test: string;
-  sideEffect: boolean | undefined;
+  sideEffect?: boolean;
+  base?: boolean;
 }
 
 interface RawOptions {
   groups: ModuleGroupConfigItem[];
   ordered?: boolean;
+  baseUrl: string;
+  baseUrlDirSearchName?: string;
 }
 
 interface ParsedOptions {
   groups: ModuleGroup[];
   ordered: boolean;
+  baseUrl: string;
+  baseUrlDirSearchName: string;
 }
 
 type ModuleGroupTester = (
@@ -59,19 +68,58 @@ class ModuleGroup {
 
   private tester: ModuleGroupTester;
   private sideEffect: boolean | undefined;
+  private base: boolean;
 
-  constructor({name, test: testConfig, sideEffect}: ModuleGroupConfigItem) {
+  constructor({
+    name,
+    test: testConfig,
+    sideEffect,
+    base,
+  }: ModuleGroupConfigItem) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
     this.sideEffect = sideEffect;
+    this.base = !!base;
   }
 
   match(
     modulePath: string,
     sideEffect: boolean,
     sourceFilePath: string,
+    baseUrlDirSearchName: string,
+    baseUrl: string,
   ): boolean {
+    // if (baseUrl) {
+    //   let isExistInBaseUrl = FS.existsSync(
+    //     Path.posix.join(
+    //       searchProjectRootDir(
+    //         Path.dirname(sourceFilePath),
+    //         baseUrlDirSearchName,
+    //       ),
+    //       baseUrl,
+    //       modulePath,
+    //     ),
+    //   );
+
+    //   if (isExistInBaseUrl) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // }
+
     return (
+      this.base ===
+        FS.existsSync(
+          Path.posix.join(
+            searchProjectRootDir(
+              Path.dirname(sourceFilePath),
+              baseUrlDirSearchName,
+            ),
+            baseUrl,
+            modulePath,
+          ),
+        ) &&
       (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
       this.tester(modulePath, sourceFilePath)
     );
@@ -95,12 +143,18 @@ export class Rule extends Rules.AbstractRule {
   constructor(options: IOptions) {
     super(options);
 
-    let {groups: groupConfigItems, ordered} = options
-      .ruleArguments[0] as RawOptions;
+    let {
+      groups: groupConfigItems,
+      ordered,
+      baseUrl,
+      baseUrlDirSearchName = 'tsconfig.json',
+    } = options.ruleArguments[0] as RawOptions;
 
     this.parsedOptions = {
       groups: groupConfigItems.map(item => new ModuleGroup(item)),
       ordered: !!ordered,
+      baseUrl,
+      baseUrlDirSearchName,
     };
   }
 
@@ -235,10 +289,17 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
       (comments.match(/\n\n/g) || []).length;
 
     let groups = this.options.groups;
-
     let index = groups.findIndex(group =>
-      group.match(modulePath, sideEffect, sourceFilePath),
+      group.match(
+        modulePath,
+        sideEffect,
+        sourceFilePath,
+        this.options.baseUrlDirSearchName,
+        this.options.baseUrl,
+      ),
     );
+
+    console.info([modulePath, index]);
 
     this.moduleImportInfos.push({
       node,
@@ -366,13 +427,12 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   }
 }
 
-function getProjectRootDir(from: string, searchName: string): string {
+let getProjectRootDir = ((): ((from: string, searchName: string) => string) => {
   let projectRootDir: string | undefined;
 
-  return (
-    projectRootDir || (projectRootDir = searchProjectRootDir(from, searchName))
-  );
-}
+  return (from: string, searchName: string) =>
+    projectRootDir || searchProjectRootDir(from, searchName);
+})();
 
 function groupModuleImportInfos(
   infos: ModuleImportInfo[],
