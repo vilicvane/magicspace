@@ -20,7 +20,11 @@ import {
 import * as TypeScript from 'typescript';
 
 import {matchNodeCore, matchNodeModules} from '../utils/match';
-import {removeQuotes, searchProjectRootDir} from '../utils/path';
+import {
+  removeModuleFileExtension,
+  removeQuotes,
+  searchProjectRootDir,
+} from '../utils/path';
 import {trimLeftEmptyLines} from '../utils/string';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
@@ -33,7 +37,6 @@ const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
 
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
   '$node-core': matchNodeCore,
-
   '$node-modules': matchNodeModules,
 };
 
@@ -86,15 +89,12 @@ class ModuleGroup {
     modulePath: string,
     sideEffect: boolean,
     sourceFilePath: string,
-    baseUrlDirSearchName: string,
+    baseUrlDir: string,
     baseUrl: string,
   ): boolean {
-    let isModuleExistInBaseUrl = FS.existsSync(
-      Path.join(
-        getProjectRootDir(Path.dirname(sourceFilePath), baseUrlDirSearchName),
-        baseUrl,
-        modulePath,
-      ),
+    let isModuleExistInBaseUrl = isExistInDirectory(
+      Path.join(baseUrlDir, baseUrl),
+      modulePath,
     );
 
     return (
@@ -203,6 +203,20 @@ interface ModuleImportInfo {
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   private moduleImportInfos: ModuleImportInfo[] = [];
   private pendingStatements: TypeScript.Statement[] = [];
+  private baseUrlDir: string;
+
+  constructor(
+    sourceFile: TypeScript.SourceFile,
+    ruleName: string,
+    options: ParsedOptions,
+  ) {
+    super(sourceFile, ruleName, options);
+
+    this.baseUrlDir = searchProjectRootDir(
+      Path.dirname(sourceFile.fileName),
+      options.baseUrlDirSearchName || 'tsconfig.json',
+    );
+  }
 
   walk(sourceFile: TypeScript.SourceFile): void {
     let pendingCache: TypeScript.Statement[] = [];
@@ -273,12 +287,10 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
         modulePath,
         sideEffect,
         sourceFilePath,
-        this.options.baseUrlDirSearchName,
+        this.baseUrlDir,
         this.options.baseUrl,
       ),
     );
-
-    console.info([modulePath, index]);
 
     this.moduleImportInfos.push({
       node,
@@ -406,12 +418,23 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   }
 }
 
-let getProjectRootDir = ((): ((from: string, searchName: string) => string) => {
-  let projectRootDir: string | undefined;
+function isExistInDirectory(directory: string, modulePath: string): boolean {
+  if (/^\.\.?/.test(modulePath)) {
+    return false;
+  }
 
-  return (from: string, searchName: string) =>
-    projectRootDir || searchProjectRootDir(from, searchName);
-})();
+  let files;
+
+  try {
+    files = FS.readdirSync(directory).map(file =>
+      removeModuleFileExtension(file),
+    );
+  } catch (e) {
+    return false;
+  }
+
+  return _.includes(files, modulePath.replace(/(\w+)\/.*/, '$1'));
+}
 
 function groupModuleImportInfos(
   infos: ModuleImportInfo[],
