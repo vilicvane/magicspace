@@ -19,7 +19,8 @@
             "test": "$node-modules"
           }
         ],
-        "ordered": true
+        "ordered": true,
+        "baseUrl": "."
       }
     ],
     "scoped-modules": true,
