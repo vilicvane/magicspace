@@ -12,7 +12,8 @@
           },
           {"name": "node-modules", "test": "$node-modules"}
         ],
-        "ordered": true
+        "ordered": true,
+        "baseUrl": "."
       }
     ]
   },
