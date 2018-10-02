@@ -36,7 +36,7 @@ import {
   isVariableDeclaration,
 } from 'typescript';
 
-import {FailureManager, getFunctionLikeParent} from '../utils';
+import {getFunctionLikeParent} from '../utils';
 
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
   'This function requires explicit return type.';
@@ -56,7 +56,7 @@ export const PRIMITIVE_TYPE_STRING_SET = new Set([
 const PROMISE_RETURN_TYPE_REGEX = /^Promise<(.+)>$/;
 
 interface ParseOptions {
-  complexTypeFixer: boolean;
+  complexTypeFixer?: boolean;
 }
 
 export class Rule extends Rules.TypedRule {
@@ -64,7 +64,7 @@ export class Rule extends Rules.TypedRule {
 
   constructor(options: IOptions) {
     super(options);
-    this.parsedOptions = options.ruleArguments[0] || {complexTypeFixer: false};
+    this.parsedOptions = options.ruleArguments[0] || {};
   }
 
   applyWithProgram(sourceFile: SourceFile, program: Program): RuleFailure[] {
@@ -102,8 +102,6 @@ type ReturnTypeRelatedFunctionLikeDeclaration =
   | GetAccessorDeclaration;
 
 class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
-  private failureManager = new FailureManager(this);
-
   constructor(
     sourceFile: SourceFile,
     ruleName: string,
@@ -123,11 +121,11 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
         isGetAccessorDeclaration(node)
       ) {
         if (!this.checkReturnType(node)) {
-          this.failureManager.append({
+          this.addFailureAtNode(
             node,
-            message: ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
-            replacement: this.buildFixer(node),
-          });
+            ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED,
+            this.buildFixer(node),
+          );
         }
       }
 
@@ -161,8 +159,10 @@ class ExplicitReturnTypeWalker extends AbstractWalker<ParseOptions> {
       primitiveReturnType = promiseMatchResult[1];
     }
 
+    let {complexTypeFixer = false} = this.options;
+
     if (
-      !this.options.complexTypeFixer &&
+      !complexTypeFixer &&
       !PRIMITIVE_TYPE_STRING_SET.has(primitiveReturnType)
     ) {
       return undefined;

@@ -307,10 +307,10 @@ module.exports = {
     'no-empty-constructor': true,
     'import-path-strict-hierarchy': false,
   },
-  rulesDirectory: [getRulesDir()],
+  rulesDirectory: [getRulesDirName()],
 };
 
-function getRulesDir() {
+function getRulesDirName() {
   let fakeIndexFilePath = resolve.sync('@magicspace/tslint-rules/bld/rules', {
     basedir: __dirname,
     isFile(fileName) {

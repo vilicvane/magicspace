@@ -19,11 +19,10 @@ import {
 } from 'typescript';
 
 import {
-  FailureManager,
   getBaseNameWithoutExtension,
+  getModuleSpecifier,
   hasKnownModuleFileExtension,
   removeModuleFileExtension,
-  removeQuotes,
 } from '../utils';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
@@ -77,8 +76,6 @@ interface ExportStatementInfo {
 class ScopedModuleWalker extends AbstractWalker<undefined> {
   private infos: ModuleStatementInfo[] = [];
 
-  private failureManager = new FailureManager(this);
-
   walk(sourceFile: SourceFile): void {
     for (let statement of sourceFile.statements) {
       let type: ModuleStatementType;
@@ -91,7 +88,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
         continue;
       }
 
-      let specifier = getModuleSpecifier(statement);
+      let specifier = getModuleSpecifierFromStatement(statement);
 
       if (!specifier) {
         continue;
@@ -132,14 +129,13 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     }
 
     if (bannedPattern.test(specifier)) {
-      this.failureManager.append({
+      this.addFailureAtNode(
+        statement,
         message,
-        node: statement,
-        replacement:
-          type === 'export'
-            ? buildBannedImportsAndExportsFixer(statement)
-            : undefined,
-      });
+        type === 'export'
+          ? buildBannedImportsAndExportsFixer(statement)
+          : undefined,
+      );
     }
   }
 
@@ -223,14 +219,11 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     );
 
     if (missingExportIds.length) {
-      this.failureManager.append({
-        node: undefined,
-        message: ERROR_MESSAGE_MISSING_EXPORTS,
-        replacement: buildAddMissingExportsFixer(
-          this.sourceFile,
-          missingExportIds,
-        ),
-      });
+      this.addFailureAtNode(
+        this.sourceFile,
+        ERROR_MESSAGE_MISSING_EXPORTS,
+        buildAddMissingExportsFixer(this.sourceFile, missingExportIds),
+      );
     }
   }
 
@@ -249,11 +242,11 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
   }
 }
 
-function getModuleSpecifier({
+function getModuleSpecifierFromStatement({
   moduleSpecifier,
 }: ModuleStatement): string | undefined {
   return moduleSpecifier && isStringLiteral(moduleSpecifier)
-    ? removeQuotes(moduleSpecifier.getText())
+    ? getModuleSpecifier(moduleSpecifier)
     : undefined;
 }
 

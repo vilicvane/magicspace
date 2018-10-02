@@ -23,6 +23,7 @@ import {
 
 import {
   ModuleSpecifierHelper,
+  ModuleSpecifierHelperOptions,
   getModuleSpecifier,
   isRelativeModuleSpecifier,
   trimLeftEmptyLines,
@@ -53,18 +54,14 @@ interface ModuleGroupOptions {
   baseUrl?: boolean | undefined;
 }
 
-interface RawOptions {
+interface RawOptions extends ModuleSpecifierHelperOptions {
   groups: ModuleGroupOptions[];
   ordered?: boolean;
-  baseUrl?: string;
-  tsConfigSearchName?: string;
 }
 
-interface ParsedOptions {
+interface ParsedOptions extends ModuleSpecifierHelperOptions {
   groups: ModuleGroup[];
   ordered: boolean;
-  baseUrl?: string;
-  tsConfigSearchName?: string;
 }
 
 type ModuleGroupTester = (specifier: string, sourceFileName: string) => boolean;

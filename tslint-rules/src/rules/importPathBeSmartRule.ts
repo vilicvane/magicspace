@@ -11,7 +11,7 @@ import {
 import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
-import {FailureManager, getModuleSpecifier, isSubPathOf} from '../utils';
+import {getModuleSpecifier, isSubPathOf} from '../utils';
 
 const ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH =
   'The import path could be smarter.';
@@ -39,20 +39,21 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
-  private failureManager = new FailureManager<undefined>(this);
-
-  private sourceFileName = this.sourceFile.fileName;
-  private sourceDir = Path.dirname(this.sourceFileName);
-
   walk(): void {
-    let imports = findImports(this.sourceFile, ImportKind.AllImports);
+    let sourceFile = this.sourceFile;
+    let sourceDirName = Path.dirname(sourceFile.fileName);
+
+    let imports = findImports(sourceFile, ImportKind.AllImports);
 
     for (let expression of imports) {
-      this.validateImport(expression);
+      this.validateModuleSpecifier(expression, sourceDirName);
     }
   }
 
-  private validateImport(expression: LiteralExpression): void {
+  private validateModuleSpecifier(
+    expression: LiteralExpression,
+    sourceDirName: string,
+  ): void {
     let specifier = getModuleSpecifier(expression);
 
     let dotSlash = specifier.startsWith('./');
@@ -71,16 +72,14 @@ class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
           .replace(/^@types\//, '');
       }
 
-      let sourceDir = this.sourceDir;
-
-      let refPath = Path.join(sourceDir, refSpecifier);
+      let refPath = Path.join(sourceDirName, refSpecifier);
 
       // importing '../foo/bar' ('abc/foo/bar') within source file
       // 'abc/foo/test.ts', which could simply be importing './bar'.
 
-      if (isSubPathOf(sourceDir, refPath, true)) {
-        let path = Path.join(sourceDir, specifier);
-        let relativePath = Path.relative(sourceDir, path);
+      if (isSubPathOf(sourceDirName, refPath, true)) {
+        let path = Path.join(sourceDirName, specifier);
+        let relativePath = Path.relative(sourceDirName, path);
         normalizedSpecifier = format(relativePath, true);
       }
     }
@@ -89,14 +88,14 @@ class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
       return;
     }
 
-    this.failureManager.append({
-      node: expression,
-      message: ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
-      replacement: new Replacement(
+    this.addFailureAtNode(
+      expression,
+      ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
+      new Replacement(
         expression.getStart(),
         expression.getWidth(),
         `'${normalizedSpecifier}'`,
       ),
-    });
+    );
   }
 }

@@ -24,67 +24,69 @@ export interface ModuleSpecifierHelperOptions {
 }
 
 export class ModuleSpecifierHelper {
-  /** Directory of the current source file. */
-  private sourceDir: string;
-  private projectDir: string;
+  readonly sourceDirName: string;
+  readonly projectDirName: string;
 
-  private baseUrlDir: string | undefined;
+  readonly baseUrlDirName: string | undefined;
 
   constructor(
-    private sourceFileName: string,
+    readonly sourceFileName: string,
     {
       tsConfigSearchName = 'tsconfig.json',
       baseUrl,
     }: ModuleSpecifierHelperOptions = {},
   ) {
-    this.sourceDir = Path.dirname(sourceFileName);
+    this.sourceDirName = Path.dirname(sourceFileName);
 
-    this.projectDir = searchUpperDir(this.sourceDir, tsConfigSearchName);
+    this.projectDirName = searchUpperDir(
+      this.sourceDirName,
+      tsConfigSearchName,
+    );
 
     if (typeof baseUrl === 'string') {
-      this.baseUrlDir = Path.join(this.projectDir, baseUrl);
+      this.baseUrlDirName = Path.join(this.projectDirName, baseUrl);
     }
   }
 
   resolve(specifier: string): string | undefined {
     return resolve(specifier, {
       sourceFileName: this.sourceFileName,
-      baseUrlDir: this.baseUrlDir,
+      baseUrlDirName: this.baseUrlDirName,
     });
   }
 
   resolveWithCategory(specifier: string): ResolveWithCategoryResult {
     return resolveWithCategory(specifier, {
       sourceFileName: this.sourceFileName,
-      baseUrlDir: this.baseUrlDir,
+      baseUrlDirName: this.baseUrlDirName,
     });
   }
 
   build(path: string, preferBaseUrl = true): string {
     return build(path, {
       sourceFileName: this.sourceFileName,
-      baseUrlDir: preferBaseUrl ? this.baseUrlDir : undefined,
+      baseUrlDirName: preferBaseUrl ? this.baseUrlDirName : undefined,
     });
   }
 
   getRelativePathToBaseUrlDir(path: string): string {
-    return Path.relative(this.requireBaseUrlDir(), path);
+    return Path.relative(this.requireBaseUrlDirName(), path);
   }
 
   isPathWithinBaseUrlDir(path: string): boolean {
-    return isSubPathOf(path, this.requireBaseUrlDir());
+    return isSubPathOf(path, this.requireBaseUrlDirName());
   }
 
-  private requireBaseUrlDir(): string {
-    let dir = this.baseUrlDir;
+  private requireBaseUrlDirName(): string {
+    let dirName = this.baseUrlDirName;
 
-    if (!dir) {
+    if (!dirName) {
       throw new Error(
-        'Expecting `baseUrlDir` to be specified for this operation',
+        'Expecting `baseUrlDirName` to be specified for this operation',
       );
     }
 
-    return dir;
+    return dirName;
   }
 }
 

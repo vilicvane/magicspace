@@ -11,7 +11,6 @@ import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
 import {
-  FailureManager,
   ModuleSpecifierHelper,
   getFirstSegmentOfPath,
   getModuleSpecifier,
@@ -37,7 +36,7 @@ export class Rule extends Rules.AbstractRule {
     this.parsedOptions = options.ruleArguments[0];
 
     if (!this.parsedOptions || !this.parsedOptions.baseUrl) {
-      throw new Error('Option baseUrl is required');
+      throw new Error('Option `baseUrl` is required');
     }
   }
 
@@ -73,41 +72,21 @@ export class Rule extends Rules.AbstractRule {
 }
 
 export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
-  private sourceFileName: string;
-  private moduleSpecifierHelper: ModuleSpecifierHelper;
-
-  private imports: LiteralExpression[] = [];
-  private failureManager = new FailureManager(this);
-
-  constructor(sourceFile: SourceFile, ruleName: string, options: RuleOptions) {
-    super(sourceFile, ruleName, options);
-
-    this.sourceFileName = sourceFile.fileName;
-
-    this.moduleSpecifierHelper = new ModuleSpecifierHelper(
-      this.sourceFileName,
-      options,
-    );
-  }
+  private moduleSpecifierHelper = new ModuleSpecifierHelper(
+    this.sourceFile.fileName,
+    this.options,
+  );
 
   walk(): void {
     let imports = findImports(this.sourceFile, ImportKind.AllStaticImports);
 
-    for (const expression of imports) {
-      this.imports.push(expression);
-    }
-
-    this.validate();
-  }
-
-  private validate(): void {
-    for (let expression of this.imports) {
+    for (let expression of imports) {
       this.validateModuleSpecifier(expression);
     }
   }
 
   private validateModuleSpecifier(expression: LiteralExpression): void {
-    let sourceFileName = this.sourceFileName;
+    let sourceFileName = this.sourceFile.fileName;
 
     let helper = this.moduleSpecifierHelper;
 
@@ -152,11 +131,11 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
           relativeSpecifier,
         );
 
-        this.failureManager.append({
-          message: ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH,
-          node: expression,
+        this.addFailureAtNode(
+          expression,
+          ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH,
           replacement,
-        });
+        );
       }
     } else {
       if (relative) {
@@ -168,11 +147,11 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
           baseUrlSpecifier,
         );
 
-        this.failureManager.append({
-          message: ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL,
-          node: expression,
+        this.addFailureAtNode(
+          expression,
+          ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL,
           replacement,
-        });
+        );
       }
     }
   }

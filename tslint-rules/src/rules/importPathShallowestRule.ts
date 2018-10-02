@@ -12,9 +12,9 @@ import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
 import {
-  FailureManager,
   MODULE_EXTENSIONS,
   ModuleSpecifierHelper,
+  ModuleSpecifierHelperOptions,
   gentleStat,
   getModuleSpecifier,
   isSubPathOf,
@@ -23,10 +23,7 @@ import {
 const ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES =
   'Can not import this module that have index file in the directory where this module is located.';
 
-interface ParsedOptions {
-  baseUrl?: string;
-  tsConfigSearchName?: string;
-}
+interface ParsedOptions extends ModuleSpecifierHelperOptions {}
 
 export class Rule extends Rules.AbstractRule {
   private parsedOptions: ParsedOptions;
@@ -70,8 +67,6 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
-  private failureManager = new FailureManager(this);
-
   private moduleSpecifierHelper = new ModuleSpecifierHelper(
     this.sourceFile.fileName,
     this.options,
@@ -105,20 +100,22 @@ class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
       return;
     }
 
-    let parentDir = Path.dirname(path);
+    let parentDirName = Path.dirname(path);
 
-    if (hasIndexFile(parentDir)) {
-      this.failureManager.append({
-        node: expression.parent,
-        message: ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES,
-      });
+    if (!hasIndexFile(parentDirName)) {
+      return;
     }
+
+    this.addFailureAtNode(
+      expression.parent,
+      ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES,
+    );
   }
 }
 
-function hasIndexFile(dir: string): boolean {
+function hasIndexFile(dirName: string): boolean {
   let possibleIndexPaths = MODULE_EXTENSIONS.map(extension =>
-    Path.join(dir, `index${extension}`),
+    Path.join(dirName, `index${extension}`),
   );
 
   return possibleIndexPaths.some(path => {

@@ -2,16 +2,16 @@ import * as Path from 'path';
 
 import {AbstractWalker, IRuleMetadata, RuleFailure, Rules} from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
-import * as Typescript from 'typescript';
+import {LiteralExpression, SourceFile} from 'typescript';
 
-import {removeQuotes} from '../utils/path';
+import {getModuleSpecifier} from '../utils';
 
 const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{2})*[\\/]?$/;
 const ERROR_MESSAGE_BANNED_PARENT_IMPORT =
   'Importing from parent directory is not allowed.';
 
 export class Rule extends Rules.AbstractRule {
-  apply(sourceFile: Typescript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportPathNoParentWalker(
         sourceFile,
@@ -33,42 +33,38 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class ImportPathNoParentWalker extends AbstractWalker<undefined> {
-  /** 装 import 语句的容器 */
-  private importExpressions: Typescript.Expression[] = [];
+  walk(): void {
+    let sourceFile = this.sourceFile;
+    let sourceFileName = sourceFile.fileName;
+    let sourceDirName = Path.dirname(sourceFileName);
 
-  walk(sourceFile: Typescript.SourceFile): void {
-    for (let expression of findImports(
-      sourceFile,
-      ImportKind.AllStaticImports,
-    )) {
-      this.importExpressions.push(expression);
+    let imports = findImports(this.sourceFile, ImportKind.AllImports);
+
+    for (let expression of imports) {
+      this.validateModuleSpecifier(expression, sourceDirName);
     }
-
-    this.validate();
   }
 
-  private validate(): void {
-    let importExpressions = this.importExpressions;
-    let sourceDirName = Path.dirname(this.sourceFile.fileName);
+  private validateModuleSpecifier(
+    expression: LiteralExpression,
+    sourceDirName: string,
+  ): void {
+    let specifier = getModuleSpecifier(expression);
 
-    for (let expression of importExpressions) {
-      let modulePath: string = removeQuotes(expression.getText());
+    specifier = Path.isAbsolute(specifier)
+      ? Path.relative(sourceDirName, specifier)
+      : (specifier = Path.relative(
+          sourceDirName,
+          Path.join(sourceDirName, specifier),
+        ));
 
-      modulePath = Path.isAbsolute(modulePath)
-        ? Path.relative(sourceDirName, modulePath)
-        : (modulePath = Path.relative(
-            sourceDirName,
-            Path.join(sourceDirName, modulePath),
-          ));
-
-      if (!DIRECTORY_MODULE_PATH.test(modulePath) && modulePath !== '') {
-        continue;
-      }
-
-      this.addFailureAtNode(
-        expression.parent,
-        ERROR_MESSAGE_BANNED_PARENT_IMPORT,
-      );
+    if (!DIRECTORY_MODULE_PATH.test(specifier) && specifier !== '') {
+      return;
     }
+
+    this.addFailureAtNode(
+      expression.parent,
+      ERROR_MESSAGE_BANNED_PARENT_IMPORT,
+    );
   }
 }

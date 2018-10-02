@@ -3,7 +3,7 @@
     "import-path-strict-hierarchy": [
       true,
       {
-        "rules": {
+        "hierarchy": {
           "core": [],
           "utils": [],
           "services": ["core", "utils"],

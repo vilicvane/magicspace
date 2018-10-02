@@ -1,6 +1,6 @@
 import test from './services'
 import test from '../services'
 import test from '../../services' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
 import test from '../../test' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]

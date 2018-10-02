@@ -3,5 +3,5 @@ import test from './test/core'
 import test from './test'
 import test from '../test'
 import test from '../../test' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
 import test from '../../core'

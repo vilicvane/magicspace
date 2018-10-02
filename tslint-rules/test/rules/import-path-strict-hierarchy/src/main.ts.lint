@@ -3,12 +3,12 @@ import * as test from './service-entrances'
 import * as test from './service-entrances/test'
 import react from 'react'
 import core from 'others' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
 
 import utils from 'utils'
 
 import * as test from './file-test' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
 
 import {App} from 'views/app' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
