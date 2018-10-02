@@ -15,3 +15,7 @@ lerna-debug.log
 
 /test.*
 /**/*.test.*
+
+# File system
+
+.DS_Store

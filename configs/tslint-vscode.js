@@ -13,9 +13,10 @@ const PICKING_RULE_NAMES = [
   'import-path-shallowest',
   'import-path-no-parent',
   'import-path-be-smart',
+  'import-path-strict-hierarchy',
 ];
 
-const {rules, rulesDirectory} = TSLint.Configuration.loadConfigurationFromPath(
+const { rules, rulesDirectory } = TSLint.Configuration.loadConfigurationFromPath(
   CONFIG_FILE_PATH,
 );
 
@@ -28,7 +29,7 @@ function pick(ruleMap, names) {
   return names.reduce((pickedDict, name) => {
     let rule = ruleMap.get(name);
 
-    let {ruleArguments, ruleSeverity} = rule;
+    let { ruleArguments, ruleSeverity } = rule;
 
     pickedDict[name] = {
       severity: ruleSeverity,

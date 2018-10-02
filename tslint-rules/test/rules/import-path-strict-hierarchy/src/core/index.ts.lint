@@ -1,6 +1,14 @@
-import test from './service'
-import test from '../service' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+import test from './services'
+import test from '../services' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
 import test from '../utils/path' // failure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
 import * as FS from 'fs'
+
+import test from 'services/test' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+
+import test from 'services' // failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Cannot import this module according to the tslint config]
+
+import react from 'react'

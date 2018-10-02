@@ -305,6 +305,7 @@ module.exports = {
     'import-path-shallowest': true,
     'import-path-be-smart': true,
     'no-empty-constructor': true,
+    'import-path-strict-hierarchy': false,
   },
   rulesDirectory: [getRulesDir()],
 };
