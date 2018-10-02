@@ -2,7 +2,9 @@
   "name": "magicspace",
   "private": true,
   "scripts": {
-    "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org"
+    "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org",
+    "test:tslint-rules": "yarn workspace @magicspace/tslint-rules test",
+    "test": "yarn test:tslint-rules"
   },
   "devDependencies": {
     "lerna": "^2.11.0",

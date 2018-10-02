@@ -4,6 +4,12 @@ const TSLint = require('tslint');
 
 const CONFIG_FILE_PATH = Path.join(__dirname, 'tslint-prettier.js');
 
+/**
+ * When to add a new rule into this list?
+ *
+ * 1. It does not require type checker.
+ * 2. It has fixer that needs to be applied automatically when saving a file.
+ */
 const PICKING_RULE_NAMES = [
   'ordered-imports',
   'import-groups',

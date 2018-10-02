@@ -19,16 +19,20 @@
           },
           {
             "name": "project-base",
-            "priority": 1,
             "test": "^[@\\w]",
-            "baseUrl": "core"
+            "base": true
+          },
+          {
+            "name": "project-base",
+            "test": "^[@\\w]"
           },
           {
             "name": "upper-directory",
             "test": "^\\.\\./"
           }
         ],
-        "ordered": true
+        "ordered": true,
+        "baseUrl": "core"
       }
     ]
   },

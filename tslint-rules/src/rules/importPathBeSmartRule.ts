@@ -1,5 +1,6 @@
 import * as Path from 'path';
 
+import {format} from 'module-lens';
 import {
   AbstractWalker,
   IRuleMetadata,
@@ -10,12 +11,8 @@ import {
 import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
-import {matchNodeCore, matchNodeModules} from '../utils/match';
-import {removeQuotes} from '../utils/path';
+import {getModuleSpecifier, isSubPathOf} from '../utils';
 
-const RELATIVE_PATH_REGEX = /^(?:\.{1,2}[\\/])+/;
-const UPPER_RELATIVE_PATH_REGEX = /^\.\.\//;
 const ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH =
   'The import path could be smarter.';
 
@@ -42,99 +39,63 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class ImportPathBeSmartWalker extends AbstractWalker<undefined> {
-  private failureManager = new FailureManager<undefined>(this);
+  walk(): void {
+    let sourceFile = this.sourceFile;
+    let sourceDirName = Path.dirname(sourceFile.fileName);
 
-  walk(sourceFile: SourceFile): void {
-    this.forEachImportExpression(sourceFile);
-  }
+    let imports = findImports(sourceFile, ImportKind.AllImports);
 
-  private forEachImportExpression(sourceFile: SourceFile): void {
-    for (let expression of findImports(
-      sourceFile,
-      ImportKind.AllStaticImports,
-    )) {
-      let importPath = removeQuotes(expression.getText());
-
-      if (matchNodeCore(importPath)) {
-        continue;
-      } else if (RELATIVE_PATH_REGEX.test(importPath)) {
-        this.checkImportPath(sourceFile, expression);
-        this.checkNodeModuleImportPath(sourceFile, expression);
-      }
+    for (let expression of imports) {
+      this.validateModuleSpecifier(expression, sourceDirName);
     }
   }
 
-  private checkImportPath(
-    sourceFile: SourceFile,
+  private validateModuleSpecifier(
     expression: LiteralExpression,
+    sourceDirName: string,
   ): void {
-    let importPath = removeQuotes(expression.getText());
+    let specifier = getModuleSpecifier(expression);
 
-    if (Path.isAbsolute(importPath)) {
+    let dotSlash = specifier.startsWith('./');
+
+    // foo/bar/../abc -> foo/abc
+    let normalizedSpecifier = format(Path.posix.normalize(specifier), dotSlash);
+
+    let [refSpecifier, firstNonUpperSegment] = /^(?:\.\.\/)+([^/]+)/.exec(
+      specifier,
+    ) || [undefined, undefined];
+
+    if (refSpecifier) {
+      if (firstNonUpperSegment === 'node_modules') {
+        normalizedSpecifier = specifier
+          .slice(refSpecifier.length + 1)
+          .replace(/^@types\//, '');
+      }
+
+      let refPath = Path.join(sourceDirName, refSpecifier);
+
+      // importing '../foo/bar' ('abc/foo/bar') within source file
+      // 'abc/foo/test.ts', which could simply be importing './bar'.
+
+      if (isSubPathOf(sourceDirName, refPath, true)) {
+        let path = Path.join(sourceDirName, specifier);
+        let relativePath = Path.relative(sourceDirName, path);
+        normalizedSpecifier = format(relativePath, true);
+      }
+    }
+
+    if (normalizedSpecifier === specifier) {
       return;
     }
 
-    let sourceFilePath = Path.dirname(sourceFile.fileName);
-
-    let absoluteImportPath = Path.join(sourceFilePath, importPath);
-    let relativePath = Path.relative(sourceFilePath, absoluteImportPath)
-      .split(Path.sep)
-      .join('/');
-
-    if (!UPPER_RELATIVE_PATH_REGEX.test(relativePath)) {
-      relativePath = `./${relativePath}`;
-    }
-
-    if (importPath !== relativePath) {
-      this.failureManager.append({
-        node: expression,
-        message: ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
-        replacement: new Replacement(
-          expression.getStart(),
-          expression.getWidth(),
-          this.buildFixer(relativePath),
-        ),
-      });
-    }
-  }
-
-  private checkNodeModuleImportPath(
-    sourceFile: SourceFile,
-    expression: LiteralExpression,
-  ): void {
-    let importPath = removeQuotes(expression.getText());
-    let targetPath: string[] = [];
-
-    let checkNodeModulesImportPath = (path: string): void => {
-      let pathParts = path.split('/');
-      let baseName = pathParts.pop()!;
-
-      if (matchNodeModules(path, sourceFile.fileName)) {
-        targetPath.push(baseName);
-        return;
-      } else if (pathParts.length !== 1) {
-        checkNodeModulesImportPath(pathParts.join('/'));
-      }
-
-      return;
-    };
-
-    checkNodeModulesImportPath(importPath);
-
-    if (targetPath.length) {
-      this.failureManager.append({
-        node: expression.parent,
-        message: ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
-        replacement: new Replacement(
-          expression.getStart(),
-          expression.getWidth(),
-          this.buildFixer(targetPath.join('/')),
-        ),
-      });
-    }
-  }
-
-  private buildFixer(replacementStr: string): string {
-    return `'${replacementStr}'`;
+    this.addFailureAtNode(
+      expression,
+      ERROR_MESSAGE_NONSTANDARD_IMPORT_PATH,
+      new Replacement(
+        expression.getStart(),
+        expression.getWidth(),
+        `'${normalizedSpecifier}'`,
+      ),
+    );
   }
 }

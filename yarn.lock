@@ -1243,6 +1243,11 @@ lodash@^4.17.10, lodash@^4.17.4, lodash@^4.2.1, lodash@^4.3.0:
   resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
   integrity sha1-G3eTz3JZ6jj7NmHU04syYK+K5Oc=
 
+lodash@^4.17.11:
+  version "4.17.11"
+  resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
+  integrity sha1-s56mIp72B+zYniyN8SU2iRysm40=
+
 longest@^1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/longest/download/longest-1.0.1.tgz#30a0b2da38f73770e8294a0d22e6625ed77d0097"
@@ -1382,6 +1387,13 @@ modify-values@^1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/modify-values/download/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha1-s5OfpgVUZHTj4+PGPWS9Q7TuYCI=
+
+module-lens@^0.1.3:
+  version "0.1.3"
+  resolved "http://registry.npm.taobao.org/module-lens/download/module-lens-0.1.3.tgz#4f078a653fdb9987421dac1ac0cdf786ff836417"
+  integrity sha1-TweKZT/bmYdCHawawM33hv+DZBc=
+  dependencies:
+    lodash "^4.17.11"
 
 moment@^2.6.0:
   version "2.22.2"

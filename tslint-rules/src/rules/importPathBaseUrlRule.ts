@@ -1,6 +1,3 @@
-import * as FS from 'fs';
-import * as Path from 'path';
-
 import * as _ from 'lodash';
 import {
   AbstractWalker,
@@ -11,29 +8,23 @@ import {
   Rules,
 } from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
-import * as TypeScript from 'typescript';
+import {LiteralExpression, SourceFile} from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
 import {
-  hasKnownModuleExtension,
-  removeModuleFileExtension,
-  removeQuotes,
-  searchProjectRootDir,
-} from '../utils/path';
-
-const RELATIVE_PATH_REGEX = /^(?:\.{1,2}[\\/])+/;
-const PATH_PART_REGEX = /[^\\/]+/;
+  ModuleSpecifierHelper,
+  getFirstSegmentOfPath,
+  getModuleSpecifier,
+  isRelativeModuleSpecifier,
+} from '../utils';
 
 const ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL =
   'This import path must use baseUrl.';
 const ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH =
   'This import path must be a relative path.';
-const ERROR_MESSAGE_IMPORT_OUT_OF_BASE_URL_DIR =
-  'Import path is not in directory configured by baseUrl';
 
 interface RuleOptions {
   baseUrl: string;
-  baseUrlDirSearchName: string | undefined;
+  tsConfigSearchName: string | undefined;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -45,11 +36,11 @@ export class Rule extends Rules.AbstractRule {
     this.parsedOptions = options.ruleArguments[0];
 
     if (!this.parsedOptions || !this.parsedOptions.baseUrl) {
-      throw new Error('Option baseUrl is required');
+      throw new Error('Option `baseUrl` is required');
     }
   }
 
-  apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportPathBaseUrlWalker(
         sourceFile,
@@ -68,7 +59,7 @@ export class Rule extends Rules.AbstractRule {
         baseUrl: {
           type: 'string',
         },
-        baseUrlDirSearchName: {
+        tsConfigSearchName: {
           type: 'string',
           default: 'tsconfig.json',
         },
@@ -81,114 +72,58 @@ export class Rule extends Rules.AbstractRule {
 }
 
 export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
-  private sourceDir: string;
-  private baseUrlDir: string;
-  private baseUrlNameSet: Set<string>;
+  private moduleSpecifierHelper = new ModuleSpecifierHelper(
+    this.sourceFile.fileName,
+    this.options,
+  );
 
-  private imports: TypeScript.LiteralExpression[] = [];
-  private failureManager = new FailureManager(this);
+  walk(): void {
+    let imports = findImports(this.sourceFile, ImportKind.AllStaticImports);
 
-  constructor(
-    sourceFile: TypeScript.SourceFile,
-    ruleName: string,
-    options: RuleOptions,
-  ) {
-    super(sourceFile, ruleName, options);
-
-    this.sourceDir = Path.dirname(sourceFile.fileName);
-
-    let baseUrlDir = (this.baseUrlDir = searchProjectRootDir(
-      this.sourceDir,
-      options.baseUrlDirSearchName || 'tsconfig.json',
-    ));
-
-    let baseUrlNames = FS.readdirSync(baseUrlDir).reduce(
-      (names, entryName) => {
-        let entryPath = Path.join(baseUrlDir, entryName);
-
-        if (FS.statSync(entryPath).isDirectory()) {
-          return [...names, entryName];
-        } else if (hasKnownModuleExtension(entryName)) {
-          return [...names, entryName, removeModuleFileExtension(entryName)];
-        }
-
-        return names;
-      },
-      [] as string[],
-    );
-
-    this.baseUrlNameSet = new Set(baseUrlNames);
-  }
-
-  walk(sourceFile: TypeScript.SourceFile): void {
-    let imports = findImports(sourceFile, ImportKind.AllStaticImports);
-
-    for (const expression of imports) {
-      this.imports.push(expression);
-    }
-
-    this.validate();
-  }
-
-  private validate(): void {
-    for (let expression of this.imports) {
+    for (let expression of imports) {
       this.validateModuleSpecifier(expression);
     }
   }
 
-  private validateModuleSpecifier(
-    expression: TypeScript.LiteralExpression,
-  ): void {
-    let sourceDir = this.sourceDir;
-    let baseUrlDir = this.baseUrlDir;
+  private validateModuleSpecifier(expression: LiteralExpression): void {
+    let sourceFileName = this.sourceFile.fileName;
 
-    let specifier = removeQuotes(expression.getText());
-    let relative = RELATIVE_PATH_REGEX.test(specifier);
+    let helper = this.moduleSpecifierHelper;
 
-    let fullSpecifierPath: string;
-
-    if (relative) {
-      fullSpecifierPath = Path.join(sourceDir, specifier);
-    } else {
-      let specifierFirstPart = PATH_PART_REGEX.exec(specifier)![0];
-
-      if (!this.baseUrlNameSet.has(specifierFirstPart)) {
-        return;
-      }
-
-      fullSpecifierPath = Path.join(baseUrlDir, specifier);
-    }
-
-    let relativeSourceDir = Path.relative(baseUrlDir, sourceDir);
-
-    let relativeSourceDirFirstPart =
-      relativeSourceDir && PATH_PART_REGEX.exec(relativeSourceDir)![0];
-
-    // sourceDir 在 baseUrlDir 以外.
-    if (relativeSourceDirFirstPart === '..') {
+    if (!helper.isPathWithinBaseUrlDir(sourceFileName)) {
       return;
     }
 
-    let relativeSpecifierPath = Path.relative(baseUrlDir, fullSpecifierPath);
+    let specifier = getModuleSpecifier(expression);
 
-    let relativeSpecifierPathFirstPart =
-      relativeSpecifierPath && PATH_PART_REGEX.exec(relativeSpecifierPath)![0];
+    let fullSpecifierPath = helper.resolve(specifier);
 
-    // specifier 在 baseUrlDir 以外.
-    if (relativeSpecifierPathFirstPart === '..') {
-      this.failureManager.append({
-        message: ERROR_MESSAGE_IMPORT_OUT_OF_BASE_URL_DIR,
-        node: expression,
-      });
+    if (
+      !fullSpecifierPath ||
+      !helper.isPathWithinBaseUrlDir(fullSpecifierPath)
+    ) {
       return;
     }
 
-    if (relativeSourceDirFirstPart === relativeSpecifierPathFirstPart) {
+    let relative = isRelativeModuleSpecifier(specifier);
+
+    let relativeSourcePath = helper.getRelativePathToBaseUrlDir(sourceFileName);
+
+    let firstSegmentOfRelativeSourcePath = getFirstSegmentOfPath(
+      relativeSourcePath,
+    );
+
+    let relativeSpecifierPath = helper.getRelativePathToBaseUrlDir(
+      fullSpecifierPath,
+    );
+
+    let firstSegmentOfSpecifierPath = getFirstSegmentOfPath(
+      relativeSpecifierPath,
+    );
+
+    if (firstSegmentOfRelativeSourcePath === firstSegmentOfSpecifierPath) {
       if (!relative) {
-        let relativeSpecifier = `'${formatModulePath(
-          Path.relative(sourceDir, fullSpecifierPath),
-          true,
-        )}'`;
+        let relativeSpecifier = `'${helper.build(fullSpecifierPath, false)}'`;
 
         let replacement = new Replacement(
           expression.getStart(),
@@ -196,18 +131,15 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
           relativeSpecifier,
         );
 
-        this.failureManager.append({
-          message: ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH,
-          node: expression,
+        this.addFailureAtNode(
+          expression,
+          ERROR_MESSAGE_IMPORT_MUST_BE_RELATIVE_PATH,
           replacement,
-        });
+        );
       }
     } else {
       if (relative) {
-        let baseUrlSpecifier = `'${formatModulePath(
-          Path.relative(baseUrlDir, fullSpecifierPath),
-          false,
-        )}'`;
+        let baseUrlSpecifier = `'${helper.build(fullSpecifierPath, true)}'`;
 
         let replacement = new Replacement(
           expression.getStart(),
@@ -215,22 +147,12 @@ export class ImportPathBaseUrlWalker extends AbstractWalker<RuleOptions> {
           baseUrlSpecifier,
         );
 
-        this.failureManager.append({
-          message: ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL,
-          node: expression,
+        this.addFailureAtNode(
+          expression,
+          ERROR_MESSAGE_IMPORT_MUST_USE_BASE_URL,
           replacement,
-        });
+        );
       }
     }
   }
-}
-
-function formatModulePath(path: string, relative: boolean): string {
-  path = removeModuleFileExtension(path).replace(/\\/g, '/');
-
-  if (relative && !RELATIVE_PATH_REGEX.test(path)) {
-    path = `./${path}`;
-  }
-
-  return path;
 }

@@ -5,33 +5,7 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {
-  getNextStatement,
-  isArrowFunction,
-  isBlock,
-  isBlockLike,
-  isClassDeclaration,
-  isConstructorDeclaration,
-  isDoStatement,
-  isEnumDeclaration,
-  isForInStatement,
-  isForOfStatement,
-  isForStatement,
-  isFunctionDeclaration,
-  isGetAccessorDeclaration,
-  isIfStatement,
-  isInterfaceDeclaration,
-  isLabeledStatement,
-  isMethodDeclaration,
-  isModuleBlock,
-  isModuleDeclaration,
-  isObjectLiteralExpression,
-  isPropertyDeclaration,
-  isReturnStatement,
-  isSetAccessorDeclaration,
-  isTryStatement,
-  isWhileStatement,
-} from 'tsutils';
+import {getNextStatement, isBlockLike} from 'tsutils';
 import {
   Block,
   ClassDeclaration,
@@ -57,12 +31,33 @@ import {
   TryStatement,
   WhileStatement,
   forEachChild,
+  isArrowFunction,
+  isBlock,
   isCaseClause,
+  isClassDeclaration,
   isClassExpression,
+  isConstructorDeclaration,
   isDefaultClause,
+  isDoStatement,
+  isEnumDeclaration,
+  isForInStatement,
+  isForOfStatement,
+  isForStatement,
+  isFunctionDeclaration,
+  isGetAccessorDeclaration,
+  isIfStatement,
+  isInterfaceDeclaration,
+  isLabeledStatement,
+  isMethodDeclaration,
+  isModuleBlock,
+  isModuleDeclaration,
+  isObjectLiteralExpression,
+  isPropertyDeclaration,
+  isReturnStatement,
+  isSetAccessorDeclaration,
+  isTryStatement,
+  isWhileStatement,
 } from 'typescript';
-
-import {FailureManager} from '../utils/failure-manager';
 
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
   'An empty line is expected before the statement.';
@@ -154,8 +149,6 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
-  private failureManager = new FailureManager(this);
-
   walk(sourceFile: SourceFile): void {
     forEachChild(sourceFile, this.walkNode);
   }
@@ -180,11 +173,11 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
     if (nextStatement && !isBlockIncludedNode(nextStatement)) {
       if (!this.checkNextAffectedNode(nextStatement, node)) {
-        this.failureManager.append({
-          node: nextStatement,
-          message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-          replacement: this.buildFixer(nextStatement),
-        });
+        this.addFailureAtNode(
+          nextStatement,
+          ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+          this.buildFixer(nextStatement),
+        );
       }
     }
   }
@@ -203,11 +196,11 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
       if (firstSignature) {
         if (!this.checkBlockIncludingStatement(firstSignature)) {
-          this.failureManager.append({
-            node: firstSignature,
-            message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-            replacement: this.buildFixer(firstSignature),
-          });
+          this.addFailureAtNode(
+            firstSignature,
+            ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+            this.buildFixer(firstSignature),
+          );
         }
 
         this.walkNextAffectedNode(node);
@@ -221,11 +214,11 @@ class EmptyLineAroundBlocksWalker extends AbstractWalker<undefined> {
 
   private walkBlockIncludingStatement(node: BlockIncludingStatement): void {
     if (!this.checkBlockIncludingStatement(node)) {
-      this.failureManager.append({
+      this.addFailureAtNode(
         node,
-        message: ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
-        replacement: this.buildFixer(node),
-      });
+        ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED,
+        this.buildFixer(node),
+      );
     }
 
     this.walkNextAffectedNode(node);

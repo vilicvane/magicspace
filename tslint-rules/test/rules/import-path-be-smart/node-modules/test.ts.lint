@@ -1,4 +1,6 @@
 import * as resolve from '../../../../../node_modules/resolve'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path could be smarter.]
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path could be smarter.]
+import * as resolve from '../../../../../node_modules/@types/resolve';
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [The import path could be smarter.]
 
 import * as resolve from 'resolve'

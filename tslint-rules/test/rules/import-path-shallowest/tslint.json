@@ -4,7 +4,7 @@
       true,
       {
         "baseUrl": "core",
-        "baseUrlDirSearchName": "tslint.json"
+        "tsConfigSearchName": "tslint.json"
       }
     ]
   },

@@ -10,15 +10,15 @@ let pattern = process.argv[2];
 
 console.info('Testing Lint Rules:');
 
-let testDirs = glob
+let testDirNames = glob
   .sync('../../test/rules/**/tslint.json', {cwd: __dirname, absolute: true})
   .filter(path => !pattern || path.includes(pattern))
   .map(path => Path.dirname(path));
 
 let allPassed = true;
 
-for (let testDir of testDirs) {
-  let result = runTest(testDir);
+for (let testDirName of testDirNames) {
+  let result = runTest(testDirName);
 
   let passed = consoleTestResultHandler(result, console);
 

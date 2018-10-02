@@ -9,21 +9,21 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
-import {isExportDeclaration, isImportDeclaration} from 'tsutils';
 import {
   ExportDeclaration,
   ImportDeclaration,
   SourceFile,
+  isExportDeclaration,
+  isImportDeclaration,
   isStringLiteral,
 } from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
 import {
   getBaseNameWithoutExtension,
-  hasKnownModuleExtension,
+  getModuleSpecifier,
+  hasKnownModuleFileExtension,
   removeModuleFileExtension,
-  removeQuotes,
-} from '../utils/path';
+} from '../utils';
 
 const ERROR_MESSAGE_BANNED_IMPORT =
   "This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.";
@@ -36,7 +36,7 @@ const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
 
 const BANNED_IMPORT_REGEX = /^(?!(?:\.{1,2}[\\/])+@(?!.*[\\/]@)).*[\\/]@/;
 const BANNED_EXPORT_REGEX = /[\\/]@/;
-const BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED = /^\.[\\/]@(?:.*?)[\\/]@/;
+const BANNED_EXPORT_REGEX_FOR_AT_PREFIXED = /^\.[\\/]@(?:.*?)[\\/]@/;
 
 export class Rule extends Rules.AbstractRule {
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -76,8 +76,6 @@ interface ExportStatementInfo {
 class ScopedModuleWalker extends AbstractWalker<undefined> {
   private infos: ModuleStatementInfo[] = [];
 
-  private failureManager = new FailureManager(this);
-
   walk(sourceFile: SourceFile): void {
     for (let statement of sourceFile.statements) {
       let type: ModuleStatementType;
@@ -90,7 +88,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
         continue;
       }
 
-      let specifier = getModuleSpecifier(statement);
+      let specifier = getModuleSpecifierFromStatement(statement);
 
       if (!specifier) {
         continue;
@@ -126,19 +124,18 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
       let baseName = getBaseNameWithoutExtension(fileName);
 
       if (baseName.startsWith('@')) {
-        bannedPattern = BANNED_EXPORT_REGEX_FOR_AT_PREFFIXED;
+        bannedPattern = BANNED_EXPORT_REGEX_FOR_AT_PREFIXED;
       }
     }
 
     if (bannedPattern.test(specifier)) {
-      this.failureManager.append({
+      this.addFailureAtNode(
+        statement,
         message,
-        node: statement,
-        replacement:
-          type === 'export'
-            ? buildBannedImportsAndExportsFixer(statement)
-            : undefined,
-      });
+        type === 'export'
+          ? buildBannedImportsAndExportsFixer(statement)
+          : undefined,
+      );
     }
   }
 
@@ -179,7 +176,7 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
           if (stats.isFile()) {
             if (
               INDEX_FILE_REGEX.test(fileName) ||
-              !hasKnownModuleExtension(fileName)
+              !hasKnownModuleFileExtension(fileName)
             ) {
               return undefined;
             }
@@ -222,14 +219,11 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
     );
 
     if (missingExportIds.length) {
-      this.failureManager.append({
-        node: undefined,
-        message: ERROR_MESSAGE_MISSING_EXPORTS,
-        replacement: buildAddMissingExportsFixer(
-          this.sourceFile,
-          missingExportIds,
-        ),
-      });
+      this.addFailureAtNode(
+        this.sourceFile,
+        ERROR_MESSAGE_MISSING_EXPORTS,
+        buildAddMissingExportsFixer(this.sourceFile, missingExportIds),
+      );
     }
   }
 
@@ -248,11 +242,11 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
   }
 }
 
-function getModuleSpecifier({
+function getModuleSpecifierFromStatement({
   moduleSpecifier,
 }: ModuleStatement): string | undefined {
   return moduleSpecifier && isStringLiteral(moduleSpecifier)
-    ? removeQuotes(moduleSpecifier.getText())
+    ? getModuleSpecifier(moduleSpecifier)
     : undefined;
 }
 

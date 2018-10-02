@@ -10,33 +10,30 @@ import {
   Rules,
 } from 'tslint';
 import {ImportKind, findImports} from 'tsutils';
-import {Expression, SourceFile} from 'typescript';
+import {LiteralExpression, SourceFile} from 'typescript';
 
 import {
-  getBaseNameWithoutExtension,
-  removeQuotes,
-  searchProjectRootDir,
-} from '../utils/path';
+  ModuleSpecifierHelper,
+  ModuleSpecifierHelperOptions,
+  getFirstSegmentOfPath,
+  getModuleSpecifier,
+  removeModuleFileExtension,
+} from '../utils';
 
-interface RuleOptions {
-  baseUrl: string;
-  baseUrlDirSearchName: string;
-  rules: Dict<string[] | undefined>;
+interface RuleOptions extends ModuleSpecifierHelperOptions {
+  hierarchy: Dict<string[]>;
 }
 
 const ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT =
-  'Cannot import this module according to the tslint config';
+  'Importing the target module from this file is not allowed';
 
 export class Rule extends Rules.AbstractRule {
   private parsedOptions: RuleOptions;
 
   constructor(options: IOptions) {
     super(options);
-    this.parsedOptions = options.ruleArguments[0];
 
-    if (!this.parsedOptions || !this.parsedOptions.baseUrl) {
-      throw new Error('Option baseUrl is required');
-    }
+    this.parsedOptions = options.ruleArguments[0] || {};
   }
 
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -58,10 +55,10 @@ export class Rule extends Rules.AbstractRule {
         baseUrl: {
           type: 'string',
         },
-        searchName: {
+        tsConfigSearchName: {
           type: 'string',
         },
-        rules: {
+        hierarchy: {
           additionalProperties: {
             items: {
               type: 'string',
@@ -80,92 +77,131 @@ export class Rule extends Rules.AbstractRule {
 }
 
 class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
-  private importExpressions: Expression[] = [];
+  private moduleSpecifierHelper = new ModuleSpecifierHelper(
+    this.sourceFile.fileName,
+    this.options,
+  );
 
-  private sourceDir: string;
-  private baseUrlDir: string;
+  walk(): void {
+    let {hierarchy} = this.options;
 
-  constructor(sourceFile: SourceFile, ruleName: string, options: RuleOptions) {
-    super(sourceFile, ruleName, options);
+    let sourceNameToShallowlyAllowedNameSetMap = new Map<string, Set<string>>();
 
-    this.sourceDir = Path.normalize(Path.dirname(sourceFile.fileName));
-
-    this.baseUrlDir = Path.join(
-      searchProjectRootDir(
-        this.sourceDir,
-        this.options.baseUrlDirSearchName || 'tsconfig.json',
-      ),
-      options.baseUrl,
-    );
-  }
-
-  walk(sourceFile: SourceFile): void {
-    for (let expression of findImports(sourceFile, ImportKind.AllImports)) {
-      this.importExpressions.push(expression);
-    }
-
-    this.validate();
-  }
-
-  getFirstPartInRelativePath(path: string): any {
-    return Path.relative(this.baseUrlDir, path).split(Path.sep)[0];
-  }
-
-  private checkPath(
-    specifierFirstPart: string,
-    checkingFirstPart: string,
-    first = true,
-  ): boolean {
-    if (specifierFirstPart === checkingFirstPart) {
-      return true;
-    }
-
-    let {rules: ruleDict} = this.options;
-
-    let allowedNames = ruleDict[checkingFirstPart];
-
-    if (allowedNames && specifierFirstPart !== '..') {
-      if (allowedNames.includes(specifierFirstPart)) {
-        return true;
-      }
-
-      for (let name of allowedNames) {
-        if (this.checkPath(specifierFirstPart, name, false)) {
-          return true;
-        }
-      }
-
-      return false;
-    } else {
-      return first;
-    }
-  }
-
-  private validate(): void {
-    let fileName = Path.normalize(this.sourceFile.fileName);
-
-    let currentDir = Path.dirname(fileName);
-
-    let checkingPath =
-      currentDir === this.baseUrlDir
-        ? Path.join(currentDir, getBaseNameWithoutExtension(fileName))
-        : currentDir;
-
-    for (let expression of this.importExpressions) {
-      let importPath = Path.join(
-        currentDir,
-        removeQuotes(expression.getText()),
+    for (let [sourceName, allowedNames] of Object.entries(hierarchy)) {
+      sourceNameToShallowlyAllowedNameSetMap.set(
+        sourceName,
+        new Set(allowedNames),
       );
+    }
 
-      let specifierFirstPart = this.getFirstPartInRelativePath(importPath);
-      let checkingFirstPart = this.getFirstPartInRelativePath(checkingPath);
+    let imports = findImports(this.sourceFile, ImportKind.AllImports);
 
-      if (!this.checkPath(specifierFirstPart, checkingFirstPart)) {
-        this.addFailureAtNode(
-          expression.parent,
-          ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,
-        );
-      }
+    for (let expression of imports) {
+      this.validateModuleSpecifier(
+        expression,
+        sourceNameToShallowlyAllowedNameSetMap,
+      );
     }
   }
+
+  private validateModuleSpecifier(
+    expression: LiteralExpression,
+    sourceNameToShallowlyAllowedNameSetMap: Map<string, Set<string>>,
+  ): void {
+    let helper = this.moduleSpecifierHelper;
+
+    let specifier = getModuleSpecifier(expression);
+    let {path: specifierPath, category} = helper.resolveWithCategory(specifier);
+
+    if (
+      !specifierPath ||
+      (category !== 'relative' && category !== 'base-url')
+    ) {
+      return;
+    }
+
+    let projectDirName = helper.baseUrlDirName || helper.projectDirName;
+    let sourceFileName = helper.sourceFileName;
+
+    let specifierPathRelativeToProjectDir = Path.relative(
+      projectDirName,
+      specifierPath,
+    );
+    let sourceFileNameRelativeToProjectDir = Path.relative(
+      projectDirName,
+      sourceFileName,
+    );
+
+    let relativeSpecifierPathFirstSegment = getFirstSegmentOfPath(
+      specifierPathRelativeToProjectDir,
+    );
+    let relativeSourceFileNameFirstSegment = sourceFileNameRelativeToProjectDir.includes(
+      Path.sep,
+    )
+      ? getFirstSegmentOfPath(sourceFileNameRelativeToProjectDir)
+      : removeModuleFileExtension(sourceFileNameRelativeToProjectDir);
+
+    if (
+      relativeSpecifierPathFirstSegment === '..' ||
+      relativeSourceFileNameFirstSegment === '..' ||
+      relativeSpecifierPathFirstSegment === relativeSourceFileNameFirstSegment
+    ) {
+      return;
+    }
+
+    let allowedSet = getAllowedSet(
+      relativeSourceFileNameFirstSegment,
+      sourceNameToShallowlyAllowedNameSetMap,
+    );
+
+    if (allowedSet && !allowedSet.has(relativeSpecifierPathFirstSegment)) {
+      this.addFailureAtNode(
+        expression.parent,
+        ERROR_MESSAGE_BANNED_HIERARCHY_IMPORT,
+      );
+    }
+  }
+}
+
+const allowedSetCacheMap = new WeakMap<
+  Map<string, Set<string>>,
+  Map<string, Set<string> | undefined>
+>();
+
+function getAllowedSet(
+  sourceName: string,
+  sourceNameToShallowlyAllowedNameSetMap: Map<string, Set<string>>,
+): Set<string> | undefined {
+  let cache = allowedSetCacheMap.get(sourceNameToShallowlyAllowedNameSetMap);
+
+  if (cache) {
+    if (cache.has(sourceName)) {
+      return cache.get(sourceName)!;
+    }
+  } else {
+    cache = new Map();
+  }
+
+  let shallowlyAllowedNameSet = sourceNameToShallowlyAllowedNameSetMap.get(
+    sourceName,
+  );
+
+  let set: Set<string> | undefined;
+
+  if (shallowlyAllowedNameSet) {
+    set = new Set([
+      ...shallowlyAllowedNameSet,
+      ..._.flatMap(Array.from(shallowlyAllowedNameSet), name => {
+        let indirectSet = getAllowedSet(
+          name,
+          sourceNameToShallowlyAllowedNameSetMap,
+        );
+        return indirectSet ? Array.from(indirectSet) : [];
+      }),
+    ]);
+  }
+
+  cache.set(sourceName, set);
+
+  return set;
 }
