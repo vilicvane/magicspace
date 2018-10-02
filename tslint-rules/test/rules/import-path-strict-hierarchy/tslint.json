@@ -7,8 +7,8 @@
           "core": [],
           "utils": [],
           "services": ["core", "utils"],
-          "service-entrances": ["services"],
-          "main": ["service-entrances"]
+          "service-entrances": ["services", "core", "utils"],
+          "main": ["service-entrances", "services", "core", "utils"]
         },
         "baseUrl": "src",
         "tsConfigSearchName": "tslint.json"

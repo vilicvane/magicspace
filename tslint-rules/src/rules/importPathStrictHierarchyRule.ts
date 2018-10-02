@@ -106,7 +106,7 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
 
   private validateModuleSpecifier(
     expression: LiteralExpression,
-    sourceNameToShallowlyAllowedNameSetMap: Map<string, Set<string>>,
+    sourceNameToAllowedNameSetMap: Map<string, Set<string>>,
   ): void {
     let helper = this.moduleSpecifierHelper;
 
@@ -149,9 +149,8 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       return;
     }
 
-    let allowedSet = getAllowedSet(
+    let allowedSet = sourceNameToAllowedNameSetMap.get(
       relativeSourceFileNameFirstSegment,
-      sourceNameToShallowlyAllowedNameSetMap,
     );
 
     if (allowedSet && !allowedSet.has(relativeSpecifierPathFirstSegment)) {
@@ -161,47 +160,4 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
       );
     }
   }
-}
-
-const allowedSetCacheMap = new WeakMap<
-  Map<string, Set<string>>,
-  Map<string, Set<string> | undefined>
->();
-
-function getAllowedSet(
-  sourceName: string,
-  sourceNameToShallowlyAllowedNameSetMap: Map<string, Set<string>>,
-): Set<string> | undefined {
-  let cache = allowedSetCacheMap.get(sourceNameToShallowlyAllowedNameSetMap);
-
-  if (cache) {
-    if (cache.has(sourceName)) {
-      return cache.get(sourceName)!;
-    }
-  } else {
-    cache = new Map();
-  }
-
-  let shallowlyAllowedNameSet = sourceNameToShallowlyAllowedNameSetMap.get(
-    sourceName,
-  );
-
-  let set: Set<string> | undefined;
-
-  if (shallowlyAllowedNameSet) {
-    set = new Set([
-      ...shallowlyAllowedNameSet,
-      ..._.flatMap(Array.from(shallowlyAllowedNameSet), name => {
-        let indirectSet = getAllowedSet(
-          name,
-          sourceNameToShallowlyAllowedNameSetMap,
-        );
-        return indirectSet ? Array.from(indirectSet) : [];
-      }),
-    ]);
-  }
-
-  cache.set(sourceName, set);
-
-  return set;
 }
