@@ -1,6 +1,4 @@
-import * as FS from 'fs';
 import * as Path from 'path';
-import POSIXPath = Path.posix;
 
 import * as _ from 'lodash';
 import {
@@ -13,20 +11,21 @@ import {
 import {ImportKind, findImports} from 'tsutils';
 import {LiteralExpression, SourceFile} from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
-import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {
-  getInBaseUrlOfModulePath,
-  removeModuleFileExtension,
-  removeQuotes,
-} from '../utils/path';
+  FailureManager,
+  MODULE_EXTENSIONS,
+  ModuleSpecifierHelper,
+  gentleStat,
+  getModuleSpecifier,
+  isSubPathOf,
+} from '../utils';
 
 const ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES =
   'Can not import this module that have index file in the directory where this module is located.';
 
 interface ParsedOptions {
-  baseUrl: string;
-  baseUrlDirSearchName: string;
+  baseUrl?: string;
+  tsConfigSearchName?: string;
 }
 
 export class Rule extends Rules.AbstractRule {
@@ -35,7 +34,7 @@ export class Rule extends Rules.AbstractRule {
   constructor(options: IOptions) {
     super(options);
 
-    this.parsedOptions = options.ruleArguments[0];
+    this.parsedOptions = options.ruleArguments[0] || {};
   }
 
   apply(sourceFile: SourceFile): RuleFailure[] {
@@ -59,7 +58,7 @@ export class Rule extends Rules.AbstractRule {
         baseUrl: {
           type: 'string',
         },
-        baseUrlDirSearchName: {
+        tsConfigSearchName: {
           type: 'string',
         },
       },
@@ -73,113 +72,57 @@ export class Rule extends Rules.AbstractRule {
 class ImportPathShallowestWalker extends AbstractWalker<ParsedOptions> {
   private failureManager = new FailureManager(this);
 
-  walk(sourceFile: SourceFile): void {
-    this.forEachImportExpression(sourceFile);
+  private moduleSpecifierHelper = new ModuleSpecifierHelper(
+    this.sourceFile.fileName,
+    this.options,
+  );
+
+  walk(): void {
+    let imports = findImports(this.sourceFile, ImportKind.AllImports);
+
+    for (let expression of imports) {
+      this.validate(expression);
+    }
   }
 
-  private validate(
-    sourceFile: SourceFile,
-    expression: LiteralExpression,
-  ): void {
-    let modulePath = removeQuotes(expression.getText());
+  private validate(expression: LiteralExpression): void {
+    let helper = this.moduleSpecifierHelper;
+    let specifier = getModuleSpecifier(expression);
+
+    let {category, path} = helper.resolveWithCategory(specifier);
+
+    let sourceFileName = this.sourceFile.fileName;
 
     if (
-      matchNodeModules(modulePath, sourceFile.fileName) ||
-      matchNodeCore(modulePath) ||
-      this.isDirectParentModule(modulePath) ||
-      this.isCurrentModule(modulePath)
+      !path ||
+      category === 'built-in' ||
+      category === 'node-modules' ||
+      // '../..', '../../foo'
+      isSubPathOf(sourceFileName, Path.dirname(path)) ||
+      // './foo'
+      Path.relative(path, Path.dirname(sourceFileName)) === ''
     ) {
       return;
     }
 
-    if (this.options && this.options.baseUrl) {
-      let {ok, parsedModulePath} = getInBaseUrlOfModulePath(
-        modulePath,
-        this.options.baseUrl,
-        this.sourceFile.fileName,
-        this.options.baseUrlDirSearchName || 'tsconfig.json',
-      );
+    let parentDir = Path.dirname(path);
 
-      if (ok) {
-        modulePath = parsedModulePath;
-      }
-    } else if (/^[^\/\.]+/.test(modulePath)) {
-      return;
-    }
-
-    let basePath = Path.dirname(modulePath);
-
-    if (Path.isAbsolute(basePath)) {
-      basePath = POSIXPath.relative(
-        Path.dirname(sourceFile.fileName),
-        basePath,
-      );
-    }
-
-    if (this.validateIsDirectoryModule(sourceFile, basePath)) {
+    if (hasIndexFile(parentDir)) {
       this.failureManager.append({
         node: expression.parent,
         message: ERROR_MESSAGE_CAN_NOT_IMPORT_DIRECTORY_MODULES,
       });
     }
   }
+}
 
-  private isIndexFile(pathname: string): boolean {
-    let extName = Path.extname(pathname);
-    let baseName = removeModuleFileExtension(Path.basename(pathname));
-    return baseName === 'index' && /\.(ts|js)$/.test(extName);
-  }
+function hasIndexFile(dir: string): boolean {
+  let possibleIndexPaths = MODULE_EXTENSIONS.map(extension =>
+    Path.join(dir, `index${extension}`),
+  );
 
-  private validateIsDirectoryModule(
-    sourceFile: SourceFile,
-    basePath: string,
-  ): boolean {
-    if (/^\.{2}(?:\/\.{2})*$/.test(basePath)) {
-      return false;
-    }
-
-    let files: string[];
-
-    if (basePath === '') {
-      return false;
-    }
-
-    try {
-      files = FS.readdirSync(
-        POSIXPath.join(Path.dirname(sourceFile.fileName), basePath),
-      );
-    } catch (e) {
-      return false;
-    }
-
-    // 引入的模块的目录是否为一个目录模块
-    if (files.some(file => this.isIndexFile(file))) {
-      return true;
-    } else {
-      let nextBasePath = basePath.split('/');
-
-      if (nextBasePath.length === 1) {
-        return false;
-      }
-
-      nextBasePath.pop();
-      return this.validateIsDirectoryModule(sourceFile, nextBasePath.join('/'));
-    }
-  }
-
-  private forEachImportExpression(sourceFile: SourceFile): void {
-    for (let expression of findImports(sourceFile, ImportKind.AllImports)) {
-      this.validate(sourceFile, expression);
-    }
-  }
-
-  private isDirectParentModule(modulePath: string): boolean {
-    return /^(?:\.{2}\/((?:\.{2})\/)*[^\/]+|\.{1}\/((?:\.{2})\/)+[^\/]+)$/.test(
-      modulePath,
-    );
-  }
-
-  private isCurrentModule(modulePath: string): boolean {
-    return /^\.{1}\/[^\/]+$/.test(modulePath);
-  }
+  return possibleIndexPaths.some(path => {
+    let stats = gentleStat(path);
+    return !!stats && stats.isFile();
+  });
 }

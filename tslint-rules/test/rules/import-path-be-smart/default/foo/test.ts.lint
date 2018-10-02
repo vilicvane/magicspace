@@ -6,3 +6,6 @@ import * as bar from './bar'
 import foo from './@foo';
 import foo from './.foo';
 import foo from './..foo';
+
+import foo from './../foo';
+                ~~~~~~~~~~ [The import path could be smarter.]

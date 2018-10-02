@@ -15,12 +15,12 @@ import {Expression, SourceFile} from 'typescript';
 import {
   getBaseNameWithoutExtension,
   removeQuotes,
-  searchProjectRootDir,
-} from '../utils/path';
+  searchUpperDir,
+} from '../utils';
 
 interface RuleOptions {
   baseUrl: string;
-  baseUrlDirSearchName: string;
+  tsConfigSearchName: string;
   rules: Dict<string[] | undefined>;
 }
 
@@ -91,9 +91,9 @@ class ImportPathStrictHierarchyWalker extends AbstractWalker<RuleOptions> {
     this.sourceDir = Path.normalize(Path.dirname(sourceFile.fileName));
 
     this.baseUrlDir = Path.join(
-      searchProjectRootDir(
+      searchUpperDir(
         this.sourceDir,
-        this.options.baseUrlDirSearchName || 'tsconfig.json',
+        this.options.tsConfigSearchName || 'tsconfig.json',
       ),
       options.baseUrl,
     );

@@ -62,7 +62,7 @@ import {
   isDefaultClause,
 } from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
+import {FailureManager} from '../utils';
 
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
   'An empty line is expected before the statement.';

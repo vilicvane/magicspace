@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.10",
+    "module-lens": "^0.1.2",
     "resolve": "^1.8.1",
     "tslang": "^0.1.9",
     "tsutils": "^2.28.0"

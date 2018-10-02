@@ -1,26 +1,35 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-const KNOWN_MODULE_EXTENSION_REGEX = /\.(?:jsx?|tsx?)$/i;
-
 export function removeQuotes(value: string): string {
   let groups = /^(['"])(.*)\1$/.exec(value);
   return groups ? groups[2] : '';
 }
 
-export function removeModuleFileExtension(fileName: string): string {
-  return fileName.replace(/\.(?:(?:js|ts)x?|d\.ts)?$/i, '');
+export function isSubPathOf(
+  path: string,
+  parentPath: string,
+  allowExact = false,
+): boolean {
+  let relativePath = Path.relative(parentPath, path);
+
+  if (relativePath === '') {
+    return allowExact;
+  }
+
+  return !relativePath.startsWith(`..${Path.sep}`);
 }
 
-export function hasKnownModuleExtension(fileName: string): boolean {
-  return KNOWN_MODULE_EXTENSION_REGEX.test(fileName);
+export function getFirstSegmentOfPath(path: string): string {
+  let [segment] = /^[^\\/]+/.exec(path) || [''];
+  return segment;
 }
 
 export function getBaseNameWithoutExtension(fileName: string): string {
   return Path.basename(fileName, Path.extname(fileName));
 }
 
-export function searchProjectRootDir(from: string, searchName: string): string {
+export function searchUpperDir(from: string, searchName: string): string {
   let nextDir = from;
 
   while (true) {
@@ -45,8 +54,8 @@ export function searchProjectRootDir(from: string, searchName: string): string {
 export function getInBaseUrlOfModulePath(
   path: string,
   baseUrl: string,
-  sourcefileName: string,
-  baseUrlDirSearchName: string,
+  sourceFileName: string,
+  tsConfigSearchName: string,
 ): {ok: boolean; parsedModulePath: string} {
   let modulePath = path;
 
@@ -54,7 +63,7 @@ export function getInBaseUrlOfModulePath(
     return {ok: false, parsedModulePath: ''};
   }
 
-  let rootPath = searchProjectRootDir(sourcefileName, baseUrlDirSearchName);
+  let rootPath = searchUpperDir(sourceFileName, tsConfigSearchName);
   let baseUrlOfAbsolute = Path.posix.join(rootPath, baseUrl);
   modulePath = Path.posix.join(rootPath, baseUrl, modulePath);
 

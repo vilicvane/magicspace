@@ -1,7 +1,5 @@
-import * as FS from 'fs';
-import * as Path from 'path';
-
 import * as _ from 'lodash';
+import {isNodeBuiltIn, resolveWithCategory} from 'module-lens';
 import {Dict} from 'tslang';
 import {
   AbstractWalker,
@@ -11,21 +9,24 @@ import {
   RuleFailure,
   Rules,
 } from 'tslint';
+import {ImportKind, isTextualLiteral} from 'tsutils';
 import {
-  ImportKind,
+  Expression,
+  LiteralExpression,
+  Node,
+  SourceFile,
+  Statement,
+  SyntaxKind,
   isImportDeclaration,
   isImportEqualsDeclaration,
-  isTextualLiteral,
-} from 'tsutils';
-import * as TypeScript from 'typescript';
+} from 'typescript';
 
-import {matchNodeCore, matchNodeModules} from '../utils/match';
 import {
-  removeModuleFileExtension,
-  removeQuotes,
-  searchProjectRootDir,
-} from '../utils/path';
-import {trimLeftEmptyLines} from '../utils/string';
+  ModuleSpecifierHelper,
+  getModuleSpecifier,
+  isRelativeModuleSpecifier,
+  trimLeftEmptyLines,
+} from '../utils';
 
 const ERROR_MESSAGE_UNEXPECTED_EMPTY_LINE =
   'Unexpected empty line within the same import group.';
@@ -34,73 +35,71 @@ const ERROR_MESSAGE_EXPECTING_EMPTY_LINE =
 const ERROR_MESSAGE_WRONG_MODULE_GROUP_ORDER =
   'Import groups must be sorted according to given order.';
 const ERROR_MESSAGE_NOT_GROUPED = 'Imports must be grouped.';
+const ERROR_MESSAGE_UNEXPECTED_CODE_BETWEEN_IMPORTS =
+  'Unexpected code between import statements.';
 
 const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
-  '$node-core': matchNodeCore,
-  '$node-modules': matchNodeModules,
+  '$node-core': specifier => isNodeBuiltIn(specifier),
+  '$node-modules': (specifier, sourceFileName) => {
+    let result = resolveWithCategory(specifier, {sourceFileName});
+    return result.category === 'node-modules';
+  },
 };
 
-interface ModuleGroupConfigItem {
+interface ModuleGroupOptions {
   name: string;
   test: string;
-  sideEffect?: boolean;
-  base?: boolean;
+  sideEffect?: boolean | undefined;
+  baseUrl?: boolean | undefined;
 }
 
 interface RawOptions {
-  groups: ModuleGroupConfigItem[];
+  groups: ModuleGroupOptions[];
   ordered?: boolean;
-  baseUrl: string;
-  baseUrlDirSearchName?: string;
+  baseUrl?: string;
+  tsConfigSearchName?: string;
 }
 
 interface ParsedOptions {
   groups: ModuleGroup[];
   ordered: boolean;
-  baseUrl: string;
-  baseUrlDirSearchName: string;
+  baseUrl?: string;
+  tsConfigSearchName?: string;
 }
 
-type ModuleGroupTester = (
-  modulePath: string,
-  sourceFilePath: string,
-) => boolean;
+type ModuleGroupTester = (specifier: string, sourceFileName: string) => boolean;
 
 class ModuleGroup {
   readonly name: string;
 
   private tester: ModuleGroupTester;
-  private sideEffect: boolean | undefined;
-  private base: boolean;
+  private matchSideEffect: boolean | undefined;
+  private matchUsingBaseUrl: boolean | undefined;
 
   constructor({
     name,
     test: testConfig,
     sideEffect,
-    base = false,
-  }: ModuleGroupConfigItem) {
+    baseUrl,
+  }: ModuleGroupOptions) {
     this.name = name;
     this.tester = this.buildTester(testConfig);
-    this.sideEffect = sideEffect;
-    this.base = base;
+    this.matchSideEffect = sideEffect;
+    this.matchUsingBaseUrl = baseUrl;
   }
 
   match(
-    modulePath: string,
+    specifier: string,
     sideEffect: boolean,
-    sourceFilePath: string,
-    baseUrlDir: string,
-    baseUrl: string,
+    usingBaseUrl: boolean,
+    sourceFileName: string,
   ): boolean {
-    let isModuleExistInBaseUrl = isExistInDirectory(
-      Path.join(baseUrlDir, baseUrl),
-      modulePath,
-    );
-
     return (
-      this.base === isModuleExistInBaseUrl &&
-      (this.sideEffect === undefined || this.sideEffect === sideEffect) &&
-      this.tester(modulePath, sourceFilePath)
+      (this.matchSideEffect === undefined ||
+        this.matchSideEffect === sideEffect) &&
+      (this.matchUsingBaseUrl === undefined ||
+        this.matchUsingBaseUrl === usingBaseUrl) &&
+      this.tester(specifier, sourceFileName)
     );
   }
 
@@ -124,20 +123,20 @@ export class Rule extends Rules.AbstractRule {
 
     let {
       groups: groupConfigItems,
-      ordered,
+      ordered = false,
       baseUrl,
-      baseUrlDirSearchName = 'tsconfig.json',
+      tsConfigSearchName,
     } = options.ruleArguments[0] as RawOptions;
 
     this.parsedOptions = {
       groups: groupConfigItems.map(item => new ModuleGroup(item)),
-      ordered: !!ordered,
+      ordered,
       baseUrl,
-      baseUrlDirSearchName,
+      tsConfigSearchName,
     };
   }
 
-  apply(sourceFile: TypeScript.SourceFile): RuleFailure[] {
+  apply(sourceFile: SourceFile): RuleFailure[] {
     return this.applyWithWalker(
       new ImportGroupWalker(
         sourceFile,
@@ -192,7 +191,7 @@ export class Rule extends Rules.AbstractRule {
 }
 
 interface ModuleImportInfo {
-  node: TypeScript.Node;
+  node: Node;
   groupIndex: number;
   /** 节点开始行. */
   startLine: number;
@@ -202,27 +201,20 @@ interface ModuleImportInfo {
 
 class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   private moduleImportInfos: ModuleImportInfo[] = [];
-  private pendingStatements: TypeScript.Statement[] = [];
-  private baseUrlDir: string;
+  private pendingStatements: Statement[] = [];
 
-  constructor(
-    sourceFile: TypeScript.SourceFile,
-    ruleName: string,
-    options: ParsedOptions,
-  ) {
-    super(sourceFile, ruleName, options);
+  private moduleSpecifierHelper = new ModuleSpecifierHelper(
+    this.sourceFile.fileName,
+    this.options,
+  );
 
-    this.baseUrlDir = searchProjectRootDir(
-      Path.dirname(sourceFile.fileName),
-      options.baseUrlDirSearchName || 'tsconfig.json',
-    );
-  }
+  walk(): void {
+    let sourceFile = this.sourceFile;
 
-  walk(sourceFile: TypeScript.SourceFile): void {
-    let pendingCache: TypeScript.Statement[] = [];
+    let pendingCache: Statement[] = [];
 
     let checkWithAppendModuleImport = (
-      expression: TypeScript.Expression,
+      expression: Expression,
       sideEffect: boolean,
     ): void => {
       this.pendingStatements.push(...pendingCache);
@@ -245,7 +237,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
         if (
           ImportKind.ImportEquals &&
           statement.moduleReference.kind ===
-            TypeScript.SyntaxKind.ExternalModuleReference &&
+            SyntaxKind.ExternalModuleReference &&
           statement.moduleReference.expression !== undefined
         ) {
           checkWithAppendModuleImport(
@@ -262,43 +254,54 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
   }
 
   private appendModuleImport(
-    expression: TypeScript.LiteralExpression,
+    expression: LiteralExpression,
     sideEffect: boolean,
-    sourceFile: TypeScript.SourceFile,
+    sourceFile: SourceFile,
   ): void {
-    let node: TypeScript.Node = expression;
+    let node: Node = expression;
 
-    while (node.parent.kind !== TypeScript.SyntaxKind.SourceFile) {
+    while (node.parent.kind !== SyntaxKind.SourceFile) {
       node = node.parent;
     }
 
-    let modulePath = removeQuotes(expression.getText());
-    let sourceFilePath = sourceFile.fileName;
+    let specifier = getModuleSpecifier(expression);
 
-    let comments = node.getFullText();
-    comments = comments.slice(comments.indexOf('/'), comments.length);
-    let commentLine =
-      (comments.match(/\n/g) || []).length -
-      (comments.match(/\n\n/g) || []).length;
+    let sourceFileName = sourceFile.fileName;
 
-    let groups = this.options.groups;
+    let {groups, baseUrl} = this.options;
+
+    let helper = this.moduleSpecifierHelper;
+
+    let usingBaseUrl = false;
+
+    if (typeof baseUrl === 'string' && !isRelativeModuleSpecifier(specifier)) {
+      let path = helper.resolve(specifier);
+
+      if (path && helper.isPathWithinBaseUrlDir(path)) {
+        usingBaseUrl = true;
+      }
+    }
+
     let index = groups.findIndex(group =>
-      group.match(
-        modulePath,
-        sideEffect,
-        sourceFilePath,
-        this.baseUrlDir,
-        this.options.baseUrl,
-      ),
+      group.match(specifier, sideEffect, usingBaseUrl, sourceFileName),
     );
+
+    let start = node.getStart();
+    let fullStart = node.getFullStart();
+
+    let precedingText = node.getFullText().slice(0, start - fullStart);
+
+    let emptyLinesBeforeStart = (
+      precedingText.replace(/^.*\r?\n/, '').match(/^\s*$/gm) || []
+    ).length;
 
     this.moduleImportInfos.push({
       node,
       // 如果没有找到匹配的分组, 则归到 "其他" 一组, groupIndex 为 groups.length.
       groupIndex: index < 0 ? groups.length : index,
       startLine:
-        sourceFile.getLineAndCharacterOfPosition(node.getStart()).line -
-        commentLine,
+        sourceFile.getLineAndCharacterOfPosition(node.getFullStart()).line +
+        emptyLinesBeforeStart,
       endLine: sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line,
     });
   }
@@ -314,7 +317,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     let {ordered} = this.options;
 
     interface FailureItem {
-      node: TypeScript.Node;
+      node: Node;
       message: string;
     }
 
@@ -329,7 +332,7 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
     for (let expression of pendingStatements) {
       failureItems.push({
         node: expression,
-        message: 'Unexpected code between import statements.',
+        message: ERROR_MESSAGE_UNEXPECTED_CODE_BETWEEN_IMPORTS,
       });
     }
 
@@ -416,24 +419,6 @@ class ImportGroupWalker extends AbstractWalker<ParsedOptions> {
 
     return new Replacement(start, length, text);
   }
-}
-
-function isExistInDirectory(directory: string, modulePath: string): boolean {
-  if (/^\.\.?/.test(modulePath)) {
-    return false;
-  }
-
-  let files;
-
-  try {
-    files = FS.readdirSync(directory).map(file =>
-      removeModuleFileExtension(file),
-    );
-  } catch (e) {
-    return false;
-  }
-
-  return _.includes(files, modulePath.replace(/(\w+)\/.*/, '$1'));
 }
 
 function groupModuleImportInfos(

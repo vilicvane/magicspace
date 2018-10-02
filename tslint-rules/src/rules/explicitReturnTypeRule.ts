@@ -36,8 +36,7 @@ import {
   isVariableDeclaration,
 } from 'typescript';
 
-import {FailureManager} from '../utils/failure-manager';
-import {getFunctionLikeParent} from '../utils/function';
+import {FailureManager, getFunctionLikeParent} from '../utils';
 
 const ERROR_MESSAGE_EXPLICIT_RETURN_TYPE_REQUIRED =
   'This function requires explicit return type.';
