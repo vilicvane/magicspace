@@ -7,7 +7,7 @@
     "test": "yarn test:tslint-rules"
   },
   "devDependencies": {
-    "lerna": "^2.11.0",
+    "lerna": "^3.4.0",
     "prettier": "^1.13.7",
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
