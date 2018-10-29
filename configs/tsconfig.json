@@ -9,6 +9,7 @@
     "stripInternal": true,
 
     "strict": true,
+    "strictFunctionTypes": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
