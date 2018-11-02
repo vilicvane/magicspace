@@ -19,8 +19,7 @@
     "tslint-override-dev.js",
     "tslint-vscode.js",
     "prettier.js",
-    "tsconfig.json",
-    "tsconfig-browser.json"
+    "tsconfig.json"
   ],
   "dependencies": {
     "@magicspace/tslint-rules": "^0.1.41",
