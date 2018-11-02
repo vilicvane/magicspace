@@ -3,6 +3,7 @@
     "target": "es2018",
     "module": "commonjs",
     "lib": ["esnext"],
+    "types": [],
     "importHelpers": true,
     "esModuleInterop": true,
     "sourceMap": true,
