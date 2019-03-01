@@ -17,7 +17,6 @@
     "tslint.js",
     "tslint-prettier.js",
     "tslint-override-dev.js",
-    "tslint-vscode.js",
     "prettier.js",
     "tsconfig.json"
   ],

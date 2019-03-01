@@ -15,7 +15,6 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "plugins": [{"name": "tslint-language-service"}],
 
     "newLine": "LF"
   }
