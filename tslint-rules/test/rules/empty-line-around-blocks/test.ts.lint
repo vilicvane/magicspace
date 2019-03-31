@@ -261,4 +261,11 @@ class Test{
 ~~~ [empty-line-around-statement]
 }
 
+let a = 1;
+// let b = 1;
+
+class Test {
+  age = 1;
+}
+
 [empty-line-around-statement]: An empty line is expected before the statement.
