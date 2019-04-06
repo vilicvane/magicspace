@@ -240,3 +240,4 @@ let a = 1;
 class Test {
   age = 1;
 }
+
