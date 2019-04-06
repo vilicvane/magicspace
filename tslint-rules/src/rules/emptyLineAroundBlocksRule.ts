@@ -62,7 +62,9 @@ import {
 const ERROR_MESSAGE_EMPTY_LINE_AROUND_STATEMENT_REQUIRED =
   'An empty line is expected before the statement.';
 
-const REGEX_EMPTY_LINE_IN_NON_CODE = /^\s*\n\s*\n+((.|\s)*)/;
+const REGEX_LEADING_EMPTY_LINE_IN_NON_CODE = /^\s*\n\s*\n+((.|\s)*)/;
+
+const REGEX_TRAILING_EMPTY_LINE_IN_NON_CODE = /\n\s*\n+\s*$/;
 
 type NodeValidator = (node: Node) => boolean;
 
@@ -455,7 +457,9 @@ function emptyLineExistsBeforeNode(node: Node): boolean {
 
   let nonCode = node.getFullText().slice(0, nonCodeLength);
 
-  if (nonCode.match(REGEX_EMPTY_LINE_IN_NON_CODE)) {
+  if (nonCode.match(REGEX_LEADING_EMPTY_LINE_IN_NON_CODE)) {
+    return true;
+  } else if (nonCode.match(REGEX_TRAILING_EMPTY_LINE_IN_NON_CODE)) {
     return true;
   }
 
