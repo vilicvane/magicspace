@@ -233,3 +233,11 @@ class Test{
     this.name = name;
   }
 }
+
+let a = 1;
+// let b = 1;
+
+class Test {
+  age = 1;
+}
+
