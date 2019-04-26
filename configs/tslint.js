@@ -294,6 +294,8 @@ module.exports = {
             {name: 'project-base', test: '^[@\\w]'},
             {name: 'upper-directory', test: '^\\.\\./', sideEffect: true},
             {name: 'upper-directory', test: '^\\.\\./'},
+            {name: 'current-directory', test: '^\\./', sideEffect: true},
+            {name: 'current-directory', test: '^\\./'},
           ],
           ordered: true,
         },
