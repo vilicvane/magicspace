@@ -1,7 +1,0 @@
-{
-  "extends": "../node_modules/@magicspace/configs/tsconfig.json",
-  "compilerOptions": {
-    "lib": ["es2015"]
-  },
-  "include": ["languages/*.json"]
-}
