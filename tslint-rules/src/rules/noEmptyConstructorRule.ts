@@ -19,6 +19,7 @@ export class Rule extends Rules.AbstractRule {
 
 const ERROR_MESSAGE_CONSTRUCTOR_EMPTY = 'The constructor cannot be empty';
 
+// tslint:disable-next-line:deprecation
 class NoEmptyConstructorWalker extends RuleWalker {
   visitConstructorDeclaration(node: ConstructorDeclaration): void {
     if (

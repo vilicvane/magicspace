@@ -27,12 +27,12 @@
   "devDependencies": {
     "prettier": "^1.17.1",
     "resolve": "^1.11.0",
-    "tslint": "^5.16.0"
+    "tslint": "^5.17.0"
   },
   "peerDependencies": {
     "prettier": "^1.17.1",
     "tslib": "^1.9.3",
-    "tslint": "^5.16.0",
-    "tslint-language-service": "^0.9.9"
+    "tslint": "^5.17.0",
+    "typescript-tslint-plugin": "^0.4.0"
   }
 }
