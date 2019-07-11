@@ -1,0 +1,13 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.tslint": true
+  },
+  "editor.codeActionsOnSaveTimeout": 10000,
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "types": [
+      "@magicspace/templates/general/options",
+      "@magicspace/templates/typescript/options"
+    ],
+    "strict": true
+  }
+}

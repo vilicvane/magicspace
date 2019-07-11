@@ -1,0 +1,14 @@
+/// <reference path="../general/options.d.ts" />
+
+declare namespace Magicspace {
+  namespace Templates.General {
+    type LicenseName = 'MIT';
+  }
+
+  interface TemplateBundleOptions {
+    packageName: string;
+    author: string;
+    license: Templates.General.LicenseName;
+    copyrightYear: string;
+  }
+}

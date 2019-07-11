@@ -1,0 +1,16 @@
+{
+  "name": "demo",
+  "version": "0.1.0",
+  "description": "",
+  "main": "library/bld/index.js",
+  "types": "library/bld/index.d.ts",
+  "devDependencies": {
+    "prettier": "^1.18.2",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
+    "typescript-tslint-plugin": "^0.5.3"
+  },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}

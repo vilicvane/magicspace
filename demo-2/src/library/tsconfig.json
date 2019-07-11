@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "lib": ["esnext"],
+    "module": "commonjs",
+    "newLine": "LF",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "../bld/library",
+    "rootDir": ".",
+    "sourceMap": true,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "stripInternal": true,
+    "target": "es2018",
+    "types": []
+  }
+}

@@ -1,0 +1,15 @@
+export const keys = [
+  'name',
+  'version',
+  'private',
+  'description',
+  'repository',
+  'author',
+  'license',
+  'main',
+  'types',
+  'devDependencies',
+  'peerDependencies',
+  'dependencies',
+  'optionalDependencies',
+];

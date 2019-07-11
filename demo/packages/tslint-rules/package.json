@@ -1,0 +1,12 @@
+{
+  "name": "@magicspace/tslint-rules",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
+  "main": "library/bld/index.js",
+  "types": "library/bld/index.d.ts",
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
