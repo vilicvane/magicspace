@@ -15,6 +15,7 @@ interface DestinationInfo {
   propertyPath: string[];
   object: unknown;
   spread: boolean;
+  sort: string[] | boolean | undefined;
 }
 
 abstract class TemplateStructuredDestinationFile<
@@ -25,20 +26,13 @@ abstract class TemplateStructuredDestinationFile<
     DestinationInfo
   >();
 
-  private prioritizedKeys: string[] = [];
-
   constructor(path: string, readonly formatter: Formatter) {
     super(path);
   }
 
   update(
     content: unknown,
-    {
-      propertyPath,
-      spread = false,
-      mergeStrategy = 'error',
-      sort: prioritizedKeys,
-    }: TConfig,
+    {propertyPath, spread = false, mergeStrategy = 'error', sort}: TConfig,
   ): void {
     propertyPath = _.toPath(propertyPath);
 
@@ -63,6 +57,7 @@ abstract class TemplateStructuredDestinationFile<
             propertyPath,
             object: content,
             spread,
+            sort,
           };
           break;
         case 'shallow':
@@ -70,6 +65,7 @@ abstract class TemplateStructuredDestinationFile<
             propertyPath,
             object: _.assign(info.object, content),
             spread: info.spread || spread,
+            sort: _.defaultTo(info.sort, sort),
           };
           break;
         case 'deep':
@@ -77,6 +73,7 @@ abstract class TemplateStructuredDestinationFile<
             propertyPath,
             object: _.merge(info.object, content),
             spread: info.spread || spread,
+            sort: _.defaultTo(info.sort, sort),
           };
           break;
         case 'union':
@@ -89,6 +86,7 @@ abstract class TemplateStructuredDestinationFile<
             propertyPath,
             object: _.union(info.object as unknown[], content as unknown[]),
             spread: info.spread || spread,
+            sort: _.defaultTo(info.sort, sort),
           };
           break;
         case 'concat':
@@ -101,6 +99,7 @@ abstract class TemplateStructuredDestinationFile<
             propertyPath,
             object: [...(info.object as unknown[]), ...(content as unknown[])],
             spread: info.spread || spread,
+            sort: _.defaultTo(info.sort, sort),
           };
           break;
         default:
@@ -115,14 +114,11 @@ abstract class TemplateStructuredDestinationFile<
         propertyPath,
         object: content,
         spread,
+        sort,
       };
     }
 
     this.propertyPathKeyToDestinationInfoMap.set(propertyPathKey, info);
-
-    if (prioritizedKeys) {
-      this.prioritizedKeys = prioritizedKeys;
-    }
   }
 
   async flush(): Promise<void> {
@@ -133,11 +129,12 @@ abstract class TemplateStructuredDestinationFile<
       result = this.parse(structuredText);
     }
 
-    for (let {
-      propertyPath,
-      object,
-      spread,
-    } of this.propertyPathKeyToDestinationInfoMap.values()) {
+    let infos = _.sortBy(
+      Array.from(this.propertyPathKeyToDestinationInfoMap),
+      ([key]) => key,
+    ).map(([, info]) => info);
+
+    for (let {propertyPath, object, spread} of infos) {
       object = _.cloneDeepWith(object, value => {
         if (value instanceof TemplateStructuredPlaceholder) {
           return new TemplateStructuredPlaceholder(_.cloneDeep(value.value));
@@ -177,26 +174,22 @@ abstract class TemplateStructuredDestinationFile<
       }
     }
 
-    let prioritizedKeyToIndexMap = this.prioritizedKeys.reduce(
-      (map, key, index, keys) => map.set(key, keys.length - index),
-      new Map<string, number>(),
-    );
+    for (let {propertyPath, sort = true} of infos.reverse()) {
+      if (!sort) {
+        continue;
+      }
 
-    if (_.isPlainObject(result)) {
-      result = sortKeys(
-        _.mapValues(result as object, value =>
-          _.isPlainObject(value) ? sortKeys(value, {deep: true}) : value,
-        ),
-        {
-          compare(keyA: string, keyB: string) {
-            return (
-              (prioritizedKeyToIndexMap.get(keyB) || 0) -
-                (prioritizedKeyToIndexMap.get(keyA) || 0) ||
-              keyA.localeCompare(keyB)
-            );
-          },
-        },
-      );
+      if (!Array.isArray(sort)) {
+        sort = [];
+      }
+
+      if (propertyPath.length) {
+        _.update(result as object, propertyPath, object =>
+          sortKeysWithPrioritizedKeys(object, sort as string[]),
+        );
+      } else {
+        result = sortKeysWithPrioritizedKeys(result, sort);
+      }
     }
 
     let updatedStructuredText = this.stringify(result);
@@ -232,4 +225,27 @@ function placeholderAssignCustomizer(
   } else {
     return sourceValue;
   }
+}
+
+function sortKeysWithPrioritizedKeys(
+  object: unknown,
+  prioritizedKeys: string[],
+): unknown {
+  let prioritizedKeyToIndexMap = prioritizedKeys.reduce(
+    (map, key, index, keys) => map.set(key, keys.length - index),
+    new Map<string, number>(),
+  );
+
+  if (!_.isPlainObject(object)) {
+    return object;
+  }
+
+  return sortKeys(object, {
+    compare(keyA: string, keyB: string) {
+      return (
+        (prioritizedKeyToIndexMap.get(keyB) || 0) -
+          (prioritizedKeyToIndexMap.get(keyA) || 0) || keyA.localeCompare(keyB)
+      );
+    },
+  });
 }

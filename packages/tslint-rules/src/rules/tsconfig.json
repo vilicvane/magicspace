@@ -15,8 +15,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "newLine": "LF",
-    "declaration": true,
     "rootDir": ".",
-    "outDir": "../../bld/library"
+    "outDir": "../../bld/rules"
   }
 }

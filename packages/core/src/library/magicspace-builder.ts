@@ -79,7 +79,7 @@ export class MagicspaceBuilder {
   }
 
   async build(): Promise<void> {
-    let projectConfigPaths = Glob.sync('**/project.{js,ts,json}', {
+    let projectConfigPaths = Glob.sync('**/{project,*.project}.{js,ts,json}', {
       cwd: this.magicspacePath,
       absolute: true,
     });

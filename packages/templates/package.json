@@ -1,0 +1,14 @@
+{
+  "name": "@magicspace/templates",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
+  "scripts": {
+    "test": "tsc --project . && tslint --project ."
+  },
+  "dependencies": {
+    "@magicspace/core": "^0.1.0",
+    "lodash": "^4.17.14"
+  }
+}

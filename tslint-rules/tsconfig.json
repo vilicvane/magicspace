@@ -1,8 +1,0 @@
-{
-  "extends": "../node_modules/@magicspace/configs/tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "bld"
-  },
-  "include": ["src"]
-}

@@ -163,7 +163,7 @@ export interface ITemplateStructuredDestinationConfig
   propertyPath?: string | string[];
   mergeStrategy?: TemplateStructuredDestinationMergeStrategy;
   spread?: boolean;
-  sort?: string[];
+  sort?: string[] | boolean;
 }
 
 export interface TemplateJSONDestinationConfig
