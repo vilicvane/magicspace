@@ -11,8 +11,5 @@ export default source<Options>(({repository, author, license}, {}) => {
     ...(repository ? {repository} : undefined),
     ...(author ? {author} : undefined),
     ...(license ? {license} : undefined),
-    devDependencies: {
-      prettier: '^1.18.2',
-    },
   };
 });

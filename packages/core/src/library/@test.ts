@@ -10,7 +10,7 @@ TSNode.register({
   },
 });
 
-let builder = createDefaultMagicspaceBuilder('demo');
+let builder = createDefaultMagicspaceBuilder('.');
 // let builder = createDefaultMagicspaceBuilder('demo-2');
 
 builder.build().catch(console.error);

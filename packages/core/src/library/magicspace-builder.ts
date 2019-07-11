@@ -88,6 +88,8 @@ export class MagicspaceBuilder {
       this.resolveProject(projectConfigPath);
     }
 
+    let workspacePath = this.workspacePath;
+
     for (let {
       path: templateBundlePath,
       projectName,
@@ -97,6 +99,9 @@ export class MagicspaceBuilder {
     } of this.templateBundles) {
       if (typeof templateConfigs === 'function') {
         let context: TemplateConfigsCallbackContext = {
+          workspace: {
+            path: workspacePath,
+          },
           project: {
             name: projectName,
             path: projectPath,
@@ -291,9 +296,7 @@ export class MagicspaceBuilder {
       });
 
       if (!nestedTemplateBundlePath) {
-        throw new Error(
-          `Cannot resolve template bundle ${JSON.stringify(name)}`,
-        );
+        throw new Error(`Cannot resolve template bundle "${name}"`);
       }
 
       let nestedTemplateBundleConfig = requireDefault<TemplateBundleConfig>(
@@ -310,14 +313,14 @@ export class MagicspaceBuilder {
   }
 }
 
-interface TemplateFilePathContext {
+interface ResolveTemplateDestinationFilePathOptions {
   workspacePath: string;
   projectPath: string;
 }
 
 function resolveTemplateDestinationFilePath(
   filePath: string,
-  {workspacePath, projectPath}: TemplateFilePathContext,
+  {workspacePath, projectPath}: ResolveTemplateDestinationFilePathOptions,
 ): string {
   return filePath.replace(/^<(\w+)>/, (text, name) => {
     switch (name) {

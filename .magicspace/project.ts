@@ -12,4 +12,17 @@ export default project({
       },
     },
   ],
+  templates: [
+    {
+      source: {
+        type: 'inline',
+        content: undefined,
+      },
+      destination: {
+        type: 'json',
+        filePath: '<workspace>/package.json',
+        propertyPath: ['devDependencies', '@magicspace/configs'],
+      },
+    },
+  ],
 });

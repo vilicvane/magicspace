@@ -62,9 +62,23 @@ export default bundle({
         destination: {
           type: 'json',
           filePath: '<workspace>/package.json',
+          mergeStrategy: 'shallow',
           spread: true,
-          mergeStrategy: 'deep',
           sort: prioritizedPackageKeys,
+        },
+      },
+      {
+        source: {
+          type: 'json',
+          filePath: 'package.json',
+          propertyPath: ['devDependencies'],
+        },
+        destination: {
+          type: 'json',
+          filePath: '<workspace>/package.json',
+          propertyPath: ['devDependencies'],
+          mergeStrategy: 'shallow',
+          spread: true,
         },
       },
       {
@@ -77,6 +91,16 @@ export default bundle({
           filePath: '<workspace>/.prettierrc',
           spread: true,
           mergeStrategy: 'deep',
+        },
+      },
+      {
+        source: {
+          type: 'text',
+          filePath: '.prettierignore',
+        },
+        destination: {
+          type: 'text',
+          filePath: '<workspace>/.prettierignore',
         },
       },
     ];

@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 import * as FSE from 'fs-extra';
 import _ from 'lodash';
 import sortKeys from 'sort-keys';
@@ -74,6 +76,30 @@ abstract class TemplateStructuredDestinationFile<
           info = {
             propertyPath,
             object: _.merge(info.object, content),
+            spread: info.spread || spread,
+          };
+          break;
+        case 'union':
+          assert(
+            Array.isArray(info.object) && Array.isArray(content),
+            'Merge strategy "union" requires operants to be arrays',
+          );
+
+          info = {
+            propertyPath,
+            object: _.union(info.object as unknown[], content as unknown[]),
+            spread: info.spread || spread,
+          };
+          break;
+        case 'concat':
+          assert(
+            Array.isArray(info.object) && Array.isArray(content),
+            'Merge strategy "concat" requires operants to be arrays',
+          );
+
+          info = {
+            propertyPath,
+            object: [...(info.object as unknown[]), ...(content as unknown[])],
             spread: info.spread || spread,
           };
           break;

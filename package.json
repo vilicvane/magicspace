@@ -1,10 +1,13 @@
 {
   "name": "magicspace",
   "private": true,
+  "repository": "https://github.com/makeflow/magicspace.git",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
   "scripts": {
     "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org",
-    "test:tslint-rules": "yarn workspace @magicspace/tslint-rules test",
-    "test": "yarn test:tslint-rules"
+    "test": "yarn test:tslint-rules",
+    "test:tslint-rules": "yarn workspace @magicspace/tslint-rules test"
   },
   "devDependencies": {
     "lerna": "^3.15.0",
@@ -13,13 +16,11 @@
     "ts-node": "^8.3.0",
     "tslib": "^1.10.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.2",
+    "typescript": "^3.5.3",
     "typescript-tslint-plugin": "^0.5.3"
   },
   "workspaces": [
-    "packages/*",
-    "templates",
-    "tslint-rules",
-    "configs"
+    "packages/configs",
+    "packages/tslint-rules"
   ]
 }

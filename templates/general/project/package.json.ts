@@ -14,7 +14,6 @@ export default source<Options>(
       description: placeholder(''),
       ...(author ? {author} : undefined),
       ...(license ? {license} : undefined),
-      ...require('./package.json'),
     };
   },
 );

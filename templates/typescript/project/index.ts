@@ -38,15 +38,16 @@ export default bundle({
     return _.compact([
       {
         source: {
-          type: 'module',
-          filePath: 'package.json.ts',
+          type: 'json',
+          filePath: 'package.json',
+          propertyPath: ['dependencies'],
         },
         destination: {
           type: 'json',
           filePath: '<project>/package.json',
+          propertyPath: ['dependencies'],
+          mergeStrategy: 'shallow',
           spread: true,
-          mergeStrategy: 'deep',
-          sort: prioritizedPackageKeys,
         },
       },
       packageFiles
@@ -78,8 +79,8 @@ export default bundle({
                 destination: {
                   type: 'json',
                   filePath: '<project>/package.json',
+                  mergeStrategy: 'shallow',
                   spread: true,
-                  mergeStrategy: 'deep',
                 },
               }
             : undefined,

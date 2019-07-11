@@ -20,6 +20,9 @@ export interface TemplateBundleExtendConfig {
 }
 
 export interface TemplateConfigsCallbackContext {
+  workspace: {
+    path: string;
+  };
   project: {
     name: string;
     path: string;
@@ -151,13 +154,15 @@ export type TemplateStructuredDestinationMergeStrategy =
   | 'ignore'
   | 'replace'
   | 'shallow'
-  | 'deep';
+  | 'deep'
+  | 'union'
+  | 'concat';
 
 export interface ITemplateStructuredDestinationConfig
   extends ITemplateDestinationConfig {
   propertyPath?: string | string[];
-  spread?: boolean;
   mergeStrategy?: TemplateStructuredDestinationMergeStrategy;
+  spread?: boolean;
   sort?: string[];
 }
 
