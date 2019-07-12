@@ -90,13 +90,17 @@ export class MagicspaceBuilder {
 
     let workspacePath = this.workspacePath;
 
+    let templateBundles = _.sortBy(this.templateBundles, bundle =>
+      bundle.workspace ? -1 : 1,
+    );
+
     for (let {
       path: templateBundlePath,
       projectName,
       projectPath,
       templates: templateConfigs,
       options,
-    } of this.templateBundles) {
+    } of templateBundles) {
       if (typeof templateConfigs === 'function') {
         let context: TemplateConfigsCallbackContext = {
           workspace: {

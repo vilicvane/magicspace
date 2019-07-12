@@ -1,7 +1,1 @@
-## TemplateSource
-
-## TemplateSourceFile
-
-## TemplateDestination
-
-## TemplateDestinationFile
+# @magicspace/templates

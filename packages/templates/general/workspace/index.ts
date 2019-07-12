@@ -1,14 +1,15 @@
-import {bundle} from '@magicspace/core';
+import {bundle, project} from '@magicspace/core';
+import _ from 'lodash';
 
 import {keys as prioritizedPackageKeys} from '../package';
 
 export default bundle({
   workspace: true,
   templates(
-    {},
+    {project},
     {repository, author, license, copyrightYear = getCurrentFullYear()},
   ) {
-    return [
+    return _.compact([
       {
         source: {
           type: 'text',
@@ -20,24 +21,37 @@ export default bundle({
           mergeStrategy: 'append',
         },
       },
-      ...(license
-        ? ([
-            {
-              source: {
-                type: 'handlebars',
-                filePath: `licenses/${license}.hbs`,
-                options: {
-                  copyrightYear,
-                  copyrightHolder: author,
-                },
-              },
-              destination: {
-                type: 'text',
-                filePath: '<workspace>/LICENSE',
+      license
+        ? {
+            source: {
+              type: 'handlebars',
+              filePath: `licenses/${license}.hbs`,
+              options: {
+                copyrightYear,
+                copyrightHolder: author,
               },
             },
-          ] as const)
-        : []),
+            destination: {
+              type: 'text',
+              filePath: '<workspace>/LICENSE',
+            },
+          }
+        : undefined,
+      {
+        source: {
+          type: 'handlebars',
+          filePath: 'README.md.hbs',
+          placeholder: true,
+          options: {
+            heading: project.name,
+          },
+        },
+        destination: {
+          type: 'text',
+          filePath: '<workspace>/README.md',
+          mergeStrategy: 'ignore',
+        },
+      },
       {
         source: {
           type: 'json',
@@ -103,7 +117,7 @@ export default bundle({
           filePath: '<workspace>/.prettierignore',
         },
       },
-    ];
+    ]);
   },
 });
 

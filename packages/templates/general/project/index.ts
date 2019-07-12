@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import {bundle} from '@magicspace/core';
+import _ from 'lodash';
 
 import {keys as prioritizedPackageKeys} from '../package';
 
@@ -9,19 +10,38 @@ export default bundle({
     {workspace, project},
     {packageName = project.name, author, license},
   ) {
-    return [
+    let relativePath = Path.posix.relative(workspace.path, project.path);
+
+    return _.compact([
       {
         source: {
-          type: 'inline',
-          content: [Path.posix.relative(workspace.path, project.path)],
+          type: 'handlebars',
+          filePath: 'README.md.hbs',
+          placeholder: true,
+          options: {
+            heading: project.name,
+          },
         },
         destination: {
-          type: 'json',
-          filePath: '<workspace>/package.json',
-          propertyPath: ['workspaces'],
-          mergeStrategy: 'union',
+          type: 'text',
+          filePath: '<project>/README.md',
+          mergeStrategy: 'ignore',
         },
       },
+      relativePath
+        ? {
+            source: {
+              type: 'inline',
+              content: [relativePath],
+            },
+            destination: {
+              type: 'json',
+              filePath: '<workspace>/package.json',
+              propertyPath: ['workspaces'],
+              mergeStrategy: 'union',
+            },
+          }
+        : undefined,
       {
         source: {
           type: 'module',
@@ -35,10 +55,11 @@ export default bundle({
         destination: {
           type: 'json',
           filePath: '<project>/package.json',
+          mergeStrategy: 'shallow',
           spread: true,
           sort: prioritizedPackageKeys,
         },
       },
-    ];
+    ]);
   },
 });

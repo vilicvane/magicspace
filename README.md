@@ -40,8 +40,8 @@ import * as request from 'request';
 
 Import-Groups 提供了两种分组规则:
 
-1.  $node-core 对内建模块进行分组
-2.  $node-modules 对第三方模块进行分组
+1.  \$node-core 对内建模块进行分组
+2.  \$node-modules 对第三方模块进行分组
 
 配置形如：
 
