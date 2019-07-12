@@ -8,6 +8,7 @@ export const keys = [
   'author',
   'license',
   'scripts',
+  'bin',
   'main',
   'types',
   'files',

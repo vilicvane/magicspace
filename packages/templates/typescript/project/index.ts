@@ -19,6 +19,19 @@ export default bundle({
           compilerOptions: {
             declaration: true,
           },
+          templates: [
+            {
+              source: {
+                type: 'inline',
+                content: '',
+                placeholder: true,
+              },
+              destination: {
+                type: 'text',
+                filePath: '<project>/src/library/index.ts',
+              },
+            },
+          ],
         });
         break;
       case 'program':
@@ -67,6 +80,7 @@ export default bundle({
           development = false,
           packageExtension,
           compilerOptions = {},
+          templates = [],
         }): (TemplateConfig | undefined)[] => [
           packageExtension
             ? {
@@ -115,6 +129,7 @@ export default bundle({
               filePath: `<project>/src/${name}/tslint.json`,
             },
           },
+          ...templates,
         ],
       ),
     ]);

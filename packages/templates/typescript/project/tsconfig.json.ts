@@ -13,6 +13,7 @@ export default source<Options>(({compilerOptions}) => {
       types: [],
       importHelpers: true,
       esModuleInterop: true,
+      experimentalDecorators: true,
       sourceMap: true,
       stripInternal: true,
 

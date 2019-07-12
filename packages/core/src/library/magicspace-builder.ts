@@ -35,6 +35,7 @@ interface TemplateBundle {
   projectName: string;
   templates: TemplateConfig[] | TemplateConfigsCallback;
   options: object;
+  index: number;
 }
 
 export type TemplateSourceFileCreateCallback = (
@@ -70,6 +71,8 @@ export class MagicspaceBuilder {
 
   private templateBundles: TemplateBundle[] = [];
 
+  private templateBundleIndexCounter = 0;
+
   constructor(workspacePath: string) {
     this.workspacePath = Path.resolve(workspacePath);
   }
@@ -90,9 +93,10 @@ export class MagicspaceBuilder {
 
     let workspacePath = this.workspacePath;
 
-    let templateBundles = _.sortBy(this.templateBundles, bundle =>
-      bundle.workspace ? -1 : 1,
-    );
+    let templateBundles = _.sortBy(this.templateBundles, [
+      bundle => (bundle.workspace ? -1 : 1),
+      bundle => bundle.index,
+    ]);
 
     for (let {
       path: templateBundlePath,
@@ -270,6 +274,7 @@ export class MagicspaceBuilder {
         projectName,
         templates: templateConfigs,
         options: {},
+        index: 0,
       };
 
       this.templateBundles.push(templateBundle);
@@ -313,6 +318,10 @@ export class MagicspaceBuilder {
         projectName,
         projectPath,
       });
+    }
+
+    if (!templateBundle.index) {
+      templateBundle.index = ++this.templateBundleIndexCounter;
     }
   }
 }

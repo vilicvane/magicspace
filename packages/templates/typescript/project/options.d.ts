@@ -1,20 +1,25 @@
 /// <reference path="../../general/project/options.d.ts" />
 
-declare namespace Magicspace {
-  namespace Templates.TypeScript {
-    type ProjectType = 'library' | 'program' | 'none';
+import {TemplateConfig} from '@magicspace/core';
 
-    interface ProjectTarget {
-      name: string;
-      development?: boolean;
-      packageExtension?: object;
-      compilerOptions?: object;
+declare global {
+  namespace Magicspace {
+    namespace Templates.TypeScript {
+      type ProjectType = 'library' | 'program' | 'none';
+
+      interface ProjectTarget {
+        name: string;
+        development?: boolean;
+        packageExtension?: object;
+        compilerOptions?: object;
+        templates?: TemplateConfig[];
+      }
     }
-  }
 
-  interface TemplateBundleOptions {
-    packageFiles: string[];
-    projectType: Templates.TypeScript.ProjectType;
-    projectTargets: Templates.TypeScript.ProjectTarget[];
+    interface TemplateBundleOptions {
+      packageFiles: string[];
+      projectType: Templates.TypeScript.ProjectType;
+      projectTargets: Templates.TypeScript.ProjectTarget[];
+    }
   }
 }
