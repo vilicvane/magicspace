@@ -6,10 +6,11 @@
   "license": "MIT",
   "scripts": {
     "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org",
-    "test": "yarn test:tslint-rules && yarn test:core && yarn test:templates",
+    "test": "yarn test:tslint-rules && yarn test:core && yarn test:templates && yarn test:cli",
     "test:tslint-rules": "yarn workspace @magicspace/tslint-rules test",
     "test:core": "yarn workspace @magicspace/core test",
-    "test:templates": "yarn workspace @magicspace/templates test"
+    "test:templates": "yarn workspace @magicspace/templates test",
+    "test:cli": "yarn workspace magicspace test"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",

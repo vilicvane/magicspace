@@ -4,6 +4,11 @@
   "description": "",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "scripts": {
+    "build": "rimraf bld && tsc --project src/library",
+    "lint": "tslint --project src/library",
+    "test": "yarn build && yarn lint"
+  },
   "bin": {
     "magicspace": "bld/program/main.js"
   },
