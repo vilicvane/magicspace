@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/tslint-rules",
-  "version": "0.1.44",
+  "version": "0.1.45",
   "description": "Custom TSLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
