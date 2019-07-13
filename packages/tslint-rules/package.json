@@ -5,6 +5,9 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "bare-test": "node ./bld/test/runner.js",
     "build": "rimraf bld && tsc --project src/rules && tsc --project src/test",

@@ -7,6 +7,7 @@ export const keys = [
   'repository',
   'author',
   'license',
+  'publishConfig',
   'scripts',
   'bin',
   'main',

@@ -4,6 +4,9 @@
   "description": "",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rimraf bld && tsc --project src/program",
     "lint": "tslint --project src/program",
