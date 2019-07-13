@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/configs",
-  "version": "0.1.51",
+  "version": "0.1.52",
   "description": "Custom TSLint rules for MagicSpace.",
   "keywords": [
     "TypeScript",
@@ -14,7 +14,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@magicspace/tslint-rules": "^0.1.45",
+    "@magicspace/tslint-rules": "^0.1.46",
     "resolve": "^1.11.1",
     "tslint-config-prettier": "^1.18.0"
   }
