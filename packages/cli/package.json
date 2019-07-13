@@ -1,0 +1,23 @@
+{
+  "name": "magicspace",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf bld && tsc --project src/program",
+    "lint": "tslint --project src/program",
+    "test": "yarn build && yarn lint"
+  },
+  "bin": {
+    "magicspace": "bld/program/main.js"
+  },
+  "dependencies": {
+    "@magicspace/core": "^0.1.0",
+    "clime": "^0.5.10",
+    "tslib": "^1.10.0"
+  }
+}
