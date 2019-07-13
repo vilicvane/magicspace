@@ -151,7 +151,11 @@ abstract class TemplateStructuredDestinationFile<
             placeholderAssignCustomizer,
           );
 
-          result = _.set(result as object, propertyPath, property);
+          result = _.set(
+            (result as object | undefined) || {},
+            propertyPath,
+            property,
+          );
         } else {
           result = _.assignWith(result, object, placeholderAssignCustomizer);
         }
@@ -159,10 +163,18 @@ abstract class TemplateStructuredDestinationFile<
         if (propertyPath.length) {
           if (object instanceof TemplateStructuredPlaceholder) {
             if (!_.has(result, propertyPath)) {
-              result = _.set(result as object, propertyPath, object.value);
+              result = _.set(
+                (result as object | undefined) || {},
+                propertyPath,
+                object.value,
+              );
             }
           } else {
-            result = _.set(result as object, propertyPath, object);
+            result = _.set(
+              (result as object | undefined) || {},
+              propertyPath,
+              object,
+            );
           }
         } else {
           if (object instanceof TemplateStructuredPlaceholder) {

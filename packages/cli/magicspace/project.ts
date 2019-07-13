@@ -9,6 +9,21 @@ export default project({
     return [
       {
         source: {
+          type: 'json',
+          filePath: 'package.json.json',
+          propertyPath: ['devDependencies'],
+          placeholder: true,
+        },
+        destination: {
+          type: 'json',
+          filePath: '<workspace>/package.json',
+          propertyPath: ['devDependencies'],
+          mergeStrategy: 'shallow',
+          spread: true,
+        },
+      },
+      {
+        source: {
           type: 'handlebars',
           filePath: 'tsconfig.json.hbs',
           placeholder: '<workspace>/.magicspace',
