@@ -76,7 +76,7 @@ export type GeneralTemplateSourceConfig =
 
 export interface ITemplateSourceConfig {
   type: string;
-  placeholder?: boolean;
+  placeholder?: string | boolean;
   filePath: string;
   options?: object;
 }
@@ -92,7 +92,7 @@ export type TemplateSourceConfig =
 
 export interface TemplateInlineSourceConfig {
   type: 'inline';
-  placeholder?: boolean;
+  placeholder?: string | boolean;
   content: unknown;
 }
 

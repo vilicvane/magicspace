@@ -8,6 +8,7 @@
     "magicspace": "bld/program/main.js"
   },
   "dependencies": {
+    "@magicspace/core": "^0.1.0",
     "clime": "^0.5.10",
     "tslib": "^1.10.0"
   }

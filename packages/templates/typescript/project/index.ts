@@ -24,7 +24,7 @@ export default bundle({
               source: {
                 type: 'inline',
                 content: '',
-                placeholder: true,
+                placeholder: '<project>/src/library',
               },
               destination: {
                 type: 'text',

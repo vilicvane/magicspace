@@ -1,5 +1,8 @@
 import {Formatter} from './formatter';
-import {MagicspaceBuilder} from './magicspace-builder';
+import {
+  MagicspaceBuilder,
+  MagicspaceBuilderOptions,
+} from './magicspace-builder';
 import {
   TemplateBlobDestinationFile,
   TemplateBlobSourceFile,
@@ -13,8 +16,9 @@ import {
 
 export function createDefaultMagicspaceBuilder(
   workspacePath: string,
+  options?: MagicspaceBuilderOptions,
 ): MagicspaceBuilder {
-  let builder = new MagicspaceBuilder(workspacePath);
+  let builder = new MagicspaceBuilder(workspacePath, options);
 
   ////////////
   // source //

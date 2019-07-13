@@ -19,7 +19,7 @@ import {
 } from './config';
 import {ITemplateDestinationFile, ITemplateSourceFile} from './template';
 
-const MAGICSPACE_FOLDER_NAME = '.magicspace';
+const DEFAULT_MAGICSPACE_FOLDER_NAME = '.magicspace';
 
 interface BuildTemplateBundleContext {
   templateBundleOptions: object;
@@ -46,8 +46,13 @@ export type TemplateDestinationFileCreateCallback = (
   filePath: string,
 ) => ITemplateDestinationFile;
 
+export interface MagicspaceBuilderOptions {
+  magicspacePath?: string;
+}
+
 export class MagicspaceBuilder {
   readonly workspacePath: string;
+  readonly magicspacePath: string;
 
   private typeToTemplateSourceFileCreateCallbackMap = new Map<
     string,
@@ -73,12 +78,14 @@ export class MagicspaceBuilder {
 
   private templateBundleIndexCounter = 0;
 
-  constructor(workspacePath: string) {
+  constructor(
+    workspacePath: string,
+    {
+      magicspacePath = DEFAULT_MAGICSPACE_FOLDER_NAME,
+    }: MagicspaceBuilderOptions = {},
+  ) {
     this.workspacePath = Path.resolve(workspacePath);
-  }
-
-  get magicspacePath(): string {
-    return Path.join(this.workspacePath, MAGICSPACE_FOLDER_NAME);
+    this.magicspacePath = Path.resolve(this.workspacePath, magicspacePath);
   }
 
   async build(): Promise<void> {
@@ -120,7 +127,7 @@ export class MagicspaceBuilder {
       }
 
       for (let config of templateConfigs) {
-        let [content, placeholder] = this.getSourceContent(
+        let [content, placeholder = false] = this.getSourceContent(
           config.source,
           templateBundlePath,
         );
@@ -154,7 +161,7 @@ export class MagicspaceBuilder {
   private getSourceContent(
     sourceConfig: GeneralTemplateSourceConfig,
     templateBundlePath: string,
-  ): [unknown, boolean] {
+  ): [unknown, string | boolean | undefined] {
     if (
       typeof sourceConfig !== 'object' ||
       sourceConfig === null ||
@@ -164,7 +171,7 @@ export class MagicspaceBuilder {
     }
 
     if (isTemplateInlineSourceConfig(sourceConfig)) {
-      return [sourceConfig.content, !!sourceConfig.placeholder];
+      return [sourceConfig.content, sourceConfig.placeholder];
     }
 
     let filePath = Path.resolve(
@@ -188,22 +195,35 @@ export class MagicspaceBuilder {
       this.filePathToTemplateSourceFileMap.set(filePath, file);
     }
 
-    return [file.get(sourceConfig), !!sourceConfig.placeholder];
+    return [file.get(sourceConfig), sourceConfig.placeholder];
   }
 
   private updateDestinationContent(
     content: unknown,
     config: ITemplateDestinationConfig,
     projectPath: string,
-    placeholder: boolean,
+    placeholder: string | boolean,
   ): void {
     let filePath = resolveTemplateDestinationFilePath(config.filePath, {
       workspacePath: this.workspacePath,
       projectPath,
     });
 
-    if (placeholder && FSE.existsSync(filePath)) {
-      return;
+    if (placeholder !== false) {
+      let placeholderTestPath: string | undefined;
+
+      if (typeof placeholder === 'string') {
+        placeholderTestPath = resolveTemplateDestinationFilePath(placeholder, {
+          workspacePath: this.workspacePath,
+          projectPath,
+        });
+      } else {
+        placeholderTestPath = filePath;
+      }
+
+      if (FSE.existsSync(placeholderTestPath)) {
+        return;
+      }
     }
 
     let file = this.filePathToTemplateDestinationFileMap.get(filePath);
@@ -335,14 +355,26 @@ function resolveTemplateDestinationFilePath(
   filePath: string,
   {workspacePath, projectPath}: ResolveTemplateDestinationFilePathOptions,
 ): string {
-  return filePath.replace(/^<(\w+)>/, (text, name) => {
-    switch (name) {
-      case 'workspace':
+  let matched = false;
+
+  let fullFilePath = filePath.replace(
+    /^<(workspace|project)>(?=\/|$)/,
+    (_text, name) => {
+      matched = true;
+
+      if (name === 'workspace') {
         return workspacePath;
-      case 'project':
+      } else {
         return projectPath;
-      default:
-        return text;
-    }
-  });
+      }
+    },
+  );
+
+  if (!matched) {
+    throw new Error(
+      'Destination file path must be started with `<workspace>/` or `<project>/`',
+    );
+  }
+
+  return fullFilePath;
 }

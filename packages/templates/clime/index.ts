@@ -48,7 +48,7 @@ export default bundle({
         source: {
           type: 'handlebars',
           filePath: 'main.ts.hbs',
-          placeholder: true,
+          placeholder: '<project>/src/program',
           options: {
             commandName,
           },
@@ -62,7 +62,7 @@ export default bundle({
         source: {
           type: 'handlebars',
           filePath: 'commands/default.ts.hbs',
-          placeholder: true,
+          placeholder: '<project>/src/program',
         },
         destination: {
           type: 'text',
