@@ -9,8 +9,8 @@ export default project({
     return [
       {
         source: {
-          type: 'json',
-          filePath: 'package.json.json',
+          type: 'module',
+          filePath: 'package.json.ts',
           propertyPath: ['devDependencies'],
           placeholder: true,
         },
