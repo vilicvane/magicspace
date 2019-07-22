@@ -10,7 +10,9 @@ export default bundle({
     {workspace, project},
     {packageName = project.name, author, license},
   ) {
-    let relativePath = Path.posix.relative(workspace.path, project.path);
+    let relativePath = Path.relative(workspace.path, project.path)
+      .split(Path.sep)
+      .join(Path.posix.sep);
 
     return _.compact([
       {
