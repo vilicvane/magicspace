@@ -1,0 +1,38 @@
+{
+  "name": "@magicspace/eslint-plugin",
+  "version": "0.1.0",
+  "description": "Custom ESLint rules for MagicSpace.",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
+  "keywords": [
+    "eslint"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "bld/index.js",
+  "scripts": {
+    "build": "rimraf bld && tsc --project src/tsconfig-build.json",
+    "lint": "eslint src --rulesdir bld/rules --ext .ts",
+    "test:lint": "yarn build && yarn lint",
+    "bare-test": "mocha ./bld/tests/*.js",
+    "build:test": "rimraf bld && tsc --project src/tsconfig.json",
+    "test": "yarn build:test && yarn bare-test"
+  },
+  "devDependencies": {
+    "@types/eslint": "^6.1.1",
+    "@types/mocha": "^5.2.7",
+    "mocha": "^6.2.0",
+    "source-map-support": "^0.5.12",
+    "typescript": "^3.5.3"
+  },
+  "peerDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint": "^6.4.0"
+  },
+  "dependencies": {
+    "@typescript-eslint/experimental-utils": "^2.3.0"
+  }
+}

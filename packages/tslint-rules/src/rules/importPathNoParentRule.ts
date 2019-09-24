@@ -6,7 +6,7 @@ import {LiteralExpression, SourceFile} from 'typescript';
 
 import {getModuleSpecifier} from './@utils';
 
-const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{2})*[\\/]?$/;
+const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{1,2})*[\\/]?$/;
 const ERROR_MESSAGE_BANNED_PARENT_IMPORT =
   'Importing from parent directory is not allowed.';
 

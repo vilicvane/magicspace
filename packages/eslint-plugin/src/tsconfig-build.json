@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "stripInternal": true,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "newLine": "LF",
+    "rootDir": ".",
+    "outDir": "../bld",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "rules",
+    "configs",
+    "index.ts"
+  ]
+}
