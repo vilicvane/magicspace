@@ -1,5 +1,13 @@
 # @magicspace/eslint-plugin
 
+## 安装
+使用下面的命令来进行安装
+```
+yarn add @magicspace/eslint-plugin --dev
+```
+
+## 使用
+
 使用的时候需要将parserOptions.project赋值成tsconfig.json的路径，就像下面这样。
 
 ```json
@@ -12,7 +20,6 @@
   }
 };
 ```
-
 
 ## 关于规则
 

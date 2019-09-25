@@ -1,6 +1,6 @@
 import Path from 'path';
 import { RuleTester } from "./@utils/RuleTester";
-import rule = require("../rules/import-path-no-parent");
+import rule from "../rules/import-path-no-parent";
 
 const ruleTester = new RuleTester({
   parser: require.resolve("@typescript-eslint/parser"),
