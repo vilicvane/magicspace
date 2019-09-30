@@ -1,70 +1,125 @@
-import { RuleTester } from "./@utils/RuleTester";
-import rule from "../rules/import-groups";
+import FS from 'fs';
+import Path from 'path';
+
+import {rules} from '../rules';
+
+import {RuleTester} from './@utils';
 
 const ruleTester = new RuleTester({
-  parser: require.resolve("@typescript-eslint/parser"),
+  parser: require.resolve('@typescript-eslint/parser'),
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
-  }
+    sourceType: 'module',
+  },
 });
 
-ruleTester.run("import-groups", rule, {
+ruleTester.run('import-groups', rules['import-groups'], {
   valid: [
-    //     {
-    //       code: `
-    // import * as aaa from 'path';
-    //             `,
-    //       options: [
-    //         {
-    //           groups: [
-    //             { name: 'node-core', test: '$node-core' },
-    //             { name: 'node-modules', test: '$node-modules', sideEffect: true },
-    //             { name: 'node-modules', test: '$node-modules' },
-    //             { name: 'project-base', test: '^[@\\w]', sideEffect: true },
-    //             { name: 'project-base', test: '^[@\\w]' },
-    //             { name: 'upper-directory', test: '^\\.\\./', sideEffect: true },
-    //             { name: 'upper-directory', test: '^\\.\\./' },
-    //             { name: 'current-directory', test: '^\\./', sideEffect: true },
-    //             { name: 'current-directory', test: '^\\./' },
-    //           ],
-    //           ordered: true,
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       code: `
-    // import './foo';
-    //             `,
-    //       options: [
-    //       ]
-    //     },
-    //     {
-    //       code: `
-    // import aaa from './foo';
-    //             `,
-    //       options: [
-    //       ]
-    //     },
-    //     {
-    //       code: `
-    // import { aaa } from './foo';
-    //             `,
-    //       options: [
-    //       ]
-    //     },
     {
-      code: `
-import a = require('./foo');
-
-
-import a = require('./foo');
-            `,
-      options: [
-      ]
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/valid/base/test.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/valid/base/test.ts.lint',
+      ),
     },
   ],
   invalid: [
-  ]
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/side-effect/test.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/invalid/side-effect/test.ts.lint',
+      ),
+      errors: [{messageId: 'expectingEmptyLine'}],
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/group-1.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/invalid/default/group-1.ts.lint',
+      ),
+      errors: [
+        {messageId: 'unexpectedEmptyLine', line: 4},
+        {messageId: 'unexpectedCodeBetweenImports', line: 6},
+        {messageId: 'expectingEmptyLine', line: 10},
+        {messageId: 'notGrouped', line: 12},
+      ],
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/group-2.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/invalid/default/group-2.ts.lint',
+      ),
+      errors: [
+        {messageId: 'expectingEmptyLine', line: 5},
+        {messageId: 'unexpectedEmptyLine', line: 10},
+      ],
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/leading-comments.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/invalid/default/leading-comments.ts.lint',
+      ),
+      errors: [
+        {messageId: 'unexpectedEmptyLine', line: 6},
+        {messageId: 'unexpectedEmptyLine', line: 11},
+      ],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/leading-comments.ts.fix',
+        ),
+      ).toString(),
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/sort-imports.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/import-groups-test-cases/invalid/default/sort-imports.ts.lint',
+      ),
+      errors: [
+        {messageId: 'expectingEmptyLine', line: 2},
+        {messageId: 'notGrouped', line: 3},
+        {messageId: 'notGrouped', line: 4},
+      ],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/import-groups-test-cases/invalid/default/sort-imports.ts.fix',
+        ),
+      ).toString(),
+    },
+  ],
 });
-

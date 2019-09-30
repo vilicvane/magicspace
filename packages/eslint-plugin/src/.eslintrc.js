@@ -1,22 +1,16 @@
-
 module.exports = {
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module"
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
   },
-  "rules": {
-    "import-path-no-parent": "error"
+  rules: {
+    '@import-groups-rule': 'error',
   },
-  "overrides": [
+  overrides: [
     {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "rules": {
-        "explicit-return-type": "error"
-      }
-    }
-  ]
-}
+      files: ['*.ts', '*.tsx'],
+      rules: {},
+    },
+  ],
+};

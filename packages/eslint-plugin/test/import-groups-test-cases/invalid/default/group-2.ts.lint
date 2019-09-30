@@ -1,0 +1,10 @@
+import * as fs from 'fs'
+// comment
+import * as path from 'path'
+// comment
+import * as tslint from 'tslint'
+// comment
+import * as typescript from 'typescript'
+
+//comment
+import resolve from 'resolve'

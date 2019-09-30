@@ -1,0 +1,9 @@
+import * as Foo from 'core/foo';
+import * as Foo from 'core/someFunc/pia';
+
+import * as Foo from '../foo';
+import * as Foo from './pia';
+
+import * as Util from 'util';
+
+import * as Util from '../../util/yoha';

@@ -1,0 +1,4 @@
+import * as resolve from 'resolve'
+import * as resolve from 'resolve';
+
+import * as resolve from 'resolve'

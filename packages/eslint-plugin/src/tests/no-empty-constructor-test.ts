@@ -1,26 +1,104 @@
-import { RuleTester } from "./@utils/RuleTester";
-import rule from "../rules/no-empty-constructor";
+// tslint:disable-next-line: import-groups
+import {rules} from '../rules';
+
+import {RuleTester} from './@utils';
 
 const ruleTester = new RuleTester({
-  parser: require.resolve("@typescript-eslint/parser"),
+  parser: require.resolve('@typescript-eslint/parser'),
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
-  }
+    sourceType: 'module',
+  },
 });
 
-ruleTester.run("no-empty-constructor", rule, {
+ruleTester.run('no-empty-constructor', rules['no-empty-constructor'], {
   valid: [
+    {
+      code: `
+class Foo{
+  constructor(name:string) { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo {
+  private constructor() { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo {
+  protected constructor() { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo {
+  constructor(private bar:string) { }
+
+  bar():void{}
+}
+            `,
+    },
+    {
+      code: `
+class Foo {
+  constructor(protected bar:string) { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo{
+  constructor(public bar:string) { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo{
+  constructor(public bar:string, age:number) { }
+}
+            `,
+    },
+    {
+      code: `
+class Foo{
+  constructor(name:string){ }
+}
+            `,
+    },
+    {
+      code: `
+class Foo{
+  constructor() {
+    console.info('bar')
+    let a = 1
+    let b = 1
+  }
+}
+            `,
+    },
   ],
   invalid: [
     {
       code: `
-class A {
-  constructor() {}
+class Foo {
+  constructor() { }
 }
             `,
-      errors: [{ messageId: "constructorEmpty" }]
+      errors: [{messageId: 'constructorEmpty'}],
     },
-  ]
+    {
+      code: `
+class Foo {
+  public constructor() { }
+}
+            `,
+      errors: [{messageId: 'constructorEmpty'}],
+    },
+  ],
 });
-

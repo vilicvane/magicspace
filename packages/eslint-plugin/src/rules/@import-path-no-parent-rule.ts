@@ -1,0 +1,77 @@
+import * as Path from 'path';
+
+import {TSESTree} from '@typescript-eslint/experimental-utils';
+
+import {
+  ImportKind,
+  createRule,
+  findImports,
+  getModuleSpecifier,
+} from './@utils';
+const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{1,2})*[\\/]?$/;
+
+export const importPathNoParentRule = createRule({
+  name: 'import-path-no-parent',
+  meta: {
+    docs: {
+      description: ``,
+      category: 'Stylistic Issues',
+      recommended: 'error',
+    },
+    messages: {
+      bannedParentImport: `Importing from parent directory or current file is not allowed.`,
+    },
+    schema: [],
+    type: 'problem',
+  },
+  defaultOptions: [],
+
+  create(context) {
+    class ImportPathNoParentWalker {
+      walk(): void {
+        let sourceFileName = context.getFilename();
+        let sourceDirName = Path.dirname(sourceFileName);
+
+        let imports = findImports(context, ImportKind.AllImports);
+
+        for (let expression of imports) {
+          this.validateModuleSpecifier(expression, sourceDirName);
+        }
+      }
+
+      private validateModuleSpecifier(
+        expression: TSESTree.LiteralExpression,
+        sourceDirName: string,
+      ): void {
+        let specifier = getModuleSpecifier(context.getSourceCode(), expression);
+
+        specifier = Path.isAbsolute(specifier)
+          ? Path.relative(sourceDirName, specifier)
+          : (specifier = Path.relative(
+              sourceDirName,
+              Path.join(sourceDirName, specifier),
+            ));
+
+        if (
+          !DIRECTORY_MODULE_PATH.test(specifier) &&
+          specifier !== '' &&
+          Path.relative(
+            context.getFilename(),
+            Path.join(sourceDirName, specifier),
+          ) !== ''
+        ) {
+          return;
+        }
+
+        context.report({
+          node: expression.parent!,
+          messageId: 'bannedParentImport',
+        });
+      }
+    }
+
+    new ImportPathNoParentWalker().walk();
+
+    return {};
+  },
+});

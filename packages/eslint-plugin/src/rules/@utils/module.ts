@@ -1,5 +1,6 @@
 import * as Path from 'path';
 
+import {TSESLint, TSESTree} from '@typescript-eslint/experimental-utils';
 import _ from 'lodash';
 import {
   ResolveWithCategoryResult,
@@ -7,12 +8,8 @@ import {
   resolve,
   resolveWithCategory,
 } from 'module-lens';
-import {
-  TSESLint,
-  TSESTree,
-} from '@typescript-eslint/experimental-utils';
 
-import { isSubPathOf, searchUpperDir } from './path';
+import {isSubPathOf, searchUpperDir} from './path';
 
 const KNOWN_MODULE_EXTENSION_REGEX = /(?!\.d\.ts$)\.[jt]sx?$/i;
 
@@ -93,7 +90,10 @@ export class ModuleSpecifierHelper {
   }
 }
 
-export function getModuleSpecifier(sourceCode: TSESLint.SourceCode, node: TSESTree.LiteralExpression): string {
+export function getModuleSpecifier(
+  sourceCode: TSESLint.SourceCode,
+  node: TSESTree.LiteralExpression,
+): string {
   return eval(sourceCode.getText(node));
 }
 

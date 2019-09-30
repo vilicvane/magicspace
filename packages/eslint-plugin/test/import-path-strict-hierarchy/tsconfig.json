@@ -23,10 +23,5 @@
     "rootDir": ".",
     "outDir": "../bld",
     "resolveJsonModule": true
-  },
-  "include": [
-    "rules",
-    "configs",
-    "index.ts"
-  ]
+  }
 }

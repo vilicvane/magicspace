@@ -9,27 +9,38 @@
     "node": true,
     "es6": true
   },
-  "plugins": [
-    "@magicspace",
-    "@typescript-eslint",
-    "import"
-  ],
+  "plugins": ["@magicspace", "@typescript-eslint", "import"],
   "rules": {
+    "@magicspace/import-groups": [
+      "error",
+      {
+        "groups": [
+          {"name": "node-core", "test": "$node-core"},
+          {"name": "node-modules", "test": "$node-modules", "sideEffect": true},
+          {"name": "node-modules", "test": "$node-modules"},
+          {"name": "project-base", "test": "^[@\\w]", "sideEffect": true},
+          {"name": "project-base", "test": "^[@\\w]"},
+          {"name": "upper-directory", "test": "^\\.\\./", "sideEffect": true},
+          {"name": "upper-directory", "test": "^\\.\\./"},
+          {"name": "current-directory", "test": "^\\./", "sideEffect": true},
+          {"name": "current-directory", "test": "^\\./"}
+        ],
+        "ordered": true
+      }
+    ],
+    "@magicspace/scoped-modules": "error",
     "@magicspace/import-path-no-parent": "error",
-    "arrow-parens": "error",
+    "@magicspace/import-path-shallowest": "off",
+    "@magicspace/import-path-be-smart": "error",
+    "@magicspace/no-empty-constructor": "error",
+    "@magicspace/import-path-strict-hierarchy": "off",
+    "arrow-parens": ["error", "as-needed"],
     "no-sequences": "error",
     "curly": "error",
     "eol-last": "error",
     "guard-for-in": "off",
-    "indent": "off",
-    "@typescript-eslint/indent": [
-      "error"
-    ],
     "no-unused-labels": "error",
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "linebreak-style": ["error", "unix"],
     "@typescript-eslint/explicit-member-accessibility": "off",
     "new-parens": "error",
     "no-caller": "error",
@@ -39,11 +50,7 @@
     "no-console": [
       "error",
       {
-        "allow": [
-          "warn",
-          "error",
-          "info"
-        ]
+        "allow": ["warn", "error", "info"]
       }
     ],
     "no-new-wrappers": "error",
@@ -76,10 +83,7 @@
     "no-unused-expressions": "error",
     "no-var": "error",
     "@typescript-eslint/no-var-requires": "error",
-    "quote-props": [
-      "error",
-      "as-needed"
-    ],
+    "quote-props": ["error", "as-needed"],
     "object-shorthand": "error",
     "@typescript-eslint/prefer-for-of": "error",
     "prefer-template": "error",
@@ -91,26 +95,16 @@
       }
     ],
     "semi": "off",
-    "@typescript-eslint/semi": [
-      "error"
-    ],
-    "space-in-parens": [
-      "error",
-      "never"
-    ],
-    "comma-dangle": [
-      "error",
-      "always-multiline"
-    ],
+    "@typescript-eslint/semi": ["error"],
+    "space-in-parens": ["error", "never"],
+    "comma-dangle": ["error", "always-multiline"],
     "use-isnan": "error"
   },
   "overrides": [
     {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
+      "files": ["*.ts", "*.tsx"],
       "rules": {
+        "@magicspace/import-path-base-url": "off",
         "@typescript-eslint/explicit-function-return-type": [
           "error",
           {

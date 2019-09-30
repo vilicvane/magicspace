@@ -1,0 +1,12 @@
+import * as fs from 'fs'
+import * as path from 'path'
+
+import * as url from 'url' // failure
+
+const v = 'a' // failure
+
+import * as Typescript from 'typescript'
+import * as Lint from 'tslint'
+import { func } from '../lib' // failure
+
+import * as http from 'http' // failure

@@ -161,6 +161,10 @@ class ScopedModuleWalker extends AbstractWalker<undefined> {
 
     let expectedExportSpecifiers = fileNames
       .map((fileName): string | undefined => {
+        if (fileName.startsWith('.')) {
+          return undefined;
+        }
+
         let entryFullPath = Path.join(dirName, fileName);
         let stats;
 

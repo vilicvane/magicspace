@@ -1,0 +1,13 @@
+
+// hello, thank you
+
+import * as FS from 'fs';
+
+import * as Path from 'path';
+
+import foo from './foo';
+
+// ...
+import bar from './bar';
+
+// hello, thank you, thank you very much
