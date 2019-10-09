@@ -27,7 +27,7 @@ ruleTester.run('import-path-base-url', rules['import-path-base-url'], {
         __dirname,
         '../../test/import-path-base-url/invalid/outter.ts.lint',
       ),
-      errors: [{messageId: 'importMustUseBaseUrl', line: 1}],
+      errors: [{messageId: 'importMustUseBaseURL', line: 1}],
       output: FS.readFileSync(
         Path.join(
           __dirname,
@@ -49,7 +49,7 @@ ruleTester.run('import-path-base-url', rules['import-path-base-url'], {
       errors: [
         {messageId: 'importMustBeRelativePath', line: 1},
         {messageId: 'importMustBeRelativePath', line: 2},
-        {messageId: 'importMustUseBaseUrl', line: 9},
+        {messageId: 'importMustUseBaseURL', line: 9},
       ],
       output: FS.readFileSync(
         Path.join(

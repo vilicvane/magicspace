@@ -2,19 +2,25 @@ import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
 
 import {createRule} from './@utils';
 
-type Modifier = 'private' | 'protected' | 'public';
+const messages = {
+  emptyConstructor: 'The constructor cannot be empty',
+};
 
-export const noEmptyConstructorRule = createRule({
+type Accessibility = 'private' | 'protected' | 'public';
+
+type Options = [];
+
+type MessageId = keyof typeof messages;
+
+export const noEmptyConstructorRule = createRule<Options, MessageId>({
   name: 'no-empty-constructor',
   meta: {
     docs: {
-      description: ``,
+      description: '',
       category: 'Best Practices',
       recommended: 'error',
     },
-    messages: {
-      constructorEmpty: `The constructor cannot be empty.`,
-    },
+    messages,
     schema: [],
     type: 'suggestion',
   },
@@ -49,7 +55,7 @@ export const noEmptyConstructorRule = createRule({
     }
 
     function isAllowConstructorModifierKeyWord(
-      modifier: Modifier | undefined,
+      modifier: Accessibility | undefined,
     ): boolean {
       if (modifier) {
         if (modifier === 'protected' || modifier === 'private') {
@@ -71,7 +77,7 @@ export const noEmptyConstructorRule = createRule({
             return;
           }
 
-          context.report({node, messageId: 'constructorEmpty'});
+          context.report({node, messageId: 'emptyConstructor'});
         }
       },
     };

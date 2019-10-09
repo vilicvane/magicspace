@@ -13,6 +13,11 @@ import {
   isSubPathOf,
 } from './@utils';
 
+const messages = {
+  canNotImportDirectoryModules:
+    'Can not import this module that have index file in the directory where this module is located.',
+};
+
 type Options = [
   {
     baseUrl?: string;
@@ -20,19 +25,18 @@ type Options = [
   },
 ];
 
-type MessageIds = 'canNotImportDirectoryModules';
+type MessageId = keyof typeof messages;
 
-export const importPathShallowestRule = createRule<Options, MessageIds>({
+export const importPathShallowestRule = createRule<Options, MessageId>({
   name: 'import-path-shallowest',
   meta: {
     docs: {
-      description: `Validate import expression of path that directory module path whether module under the path or not`,
-      category: 'Best Practices', // TODO
+      description:
+        'Validate import expression of path that directory module path whether module under the path or not',
+      category: 'Best Practices',
       recommended: 'error',
     },
-    messages: {
-      canNotImportDirectoryModules: `Can not import this module that have index file in the directory where this module is located.`,
-    },
+    messages,
     schema: [
       {
         type: 'object',
@@ -46,7 +50,7 @@ export const importPathShallowestRule = createRule<Options, MessageIds>({
         },
       },
     ],
-    type: 'suggestion', // TODO
+    type: 'suggestion',
   },
   defaultOptions: [{}],
 
@@ -72,13 +76,6 @@ export const importPathShallowestRule = createRule<Options, MessageIds>({
         let {category, path} = helper.resolveWithCategory(specifier);
 
         let sourceFileName = context.getFilename();
-
-        if (specifier === 'parse') {
-          console.info('specifier:');
-          console.info(path);
-          console.info(category);
-          console.info('specifier:end');
-        }
 
         if (
           !path ||

@@ -12,6 +12,11 @@ import {
   removeModuleFileExtension,
 } from './@utils';
 
+const messages = {
+  bannedHierarchyImport:
+    'Importing the target module from this file is not allowed',
+};
+
 type Options = [
   {
     baseUrl: string;
@@ -19,19 +24,17 @@ type Options = [
   },
 ];
 
-type MessageIds = 'bannedHierarchyImport';
+type MessageId = keyof typeof messages;
 
-export const importPathStrictHierarchyRule = createRule<Options, MessageIds>({
+export const importPathStrictHierarchyRule = createRule<Options, MessageId>({
   name: 'import-path-strict-hierarchy',
   meta: {
     docs: {
-      description: `Check import module from baseUrl`,
+      description: 'Check import module from baseUrl',
       category: 'Best Practices',
       recommended: 'error',
     },
-    messages: {
-      bannedHierarchyImport: `Importing the target module from this file is not allowed`,
-    },
+    messages,
     schema: [
       {
         type: 'object',
@@ -59,7 +62,7 @@ export const importPathStrictHierarchyRule = createRule<Options, MessageIds>({
   defaultOptions: [
     {
       baseUrl: '.',
-      hierarchy: Object,
+      hierarchy: {},
     },
   ],
 

@@ -11,17 +11,24 @@ import {
   isSubPathOf,
 } from './@utils';
 
-export const importPathBeSmartRule = createRule({
+const messages = {
+  nonstandardImportPath: 'The import path could be smarter.',
+};
+
+type Options = [];
+
+type MessageId = keyof typeof messages;
+
+export const importPathBeSmartRule = createRule<Options, MessageId>({
   name: 'import-path-be-smart',
   meta: {
     docs: {
-      description: `Check to if import path is a shortest path and provide fixer.`,
+      description:
+        'Check to if import path is a shortest path and provide fixer.',
       category: 'Best Practices',
       recommended: 'error',
     },
-    messages: {
-      nonstandardImportPath: `The import path could be smarter.`,
-    },
+    messages,
     schema: [],
     type: 'suggestion',
     fixable: 'code',

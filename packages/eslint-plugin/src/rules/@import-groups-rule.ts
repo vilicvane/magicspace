@@ -12,6 +12,16 @@ import {
   trimLeftEmptyLines,
 } from './@utils';
 
+const messages = {
+  unexpectedEmptyLine: 'Unexpected empty line within the same import group.',
+  expectingEmptyLine:
+    'Expecting an empty line between different import groups.',
+  wrongModuleGroupOrder:
+    'Import groups must be sorted according to given order.',
+  notGrouped: 'Imports must be grouped.',
+  unexpectedCodeBetweenImports: 'Unexpected code between import statements.',
+};
+
 type Options = [
   {
     groups: {
@@ -24,29 +34,18 @@ type Options = [
   },
 ];
 
-type MessageIds =
-  | 'unexpectedEmptyLine'
-  | 'expectingEmptyLine'
-  | 'wrongModuleGroupOrder'
-  | 'notGrouped'
-  | 'unexpectedCodeBetweenImports';
+type MessageId = keyof typeof messages;
 
-export const importGroupsRule = createRule<Options, MessageIds>({
+export const importGroupsRule = createRule<Options, MessageId>({
   name: 'import-groups',
   meta: {
     type: 'suggestion',
     docs: {
-      description: `Validate that module imports are grouped as expected.`,
+      description: 'Validate that module imports are grouped as expected.',
       category: 'Stylistic Issues',
       recommended: 'error',
     },
-    messages: {
-      unexpectedEmptyLine: `Unexpected empty line within the same import group.`,
-      expectingEmptyLine: `Expecting an empty line between different import groups.`,
-      wrongModuleGroupOrder: `Import groups must be sorted according to given order.`,
-      notGrouped: `Imports must be grouped.`,
-      unexpectedCodeBetweenImports: `Unexpected code between import statements.`,
-    },
+    messages,
     fixable: 'code',
     schema: [
       {
@@ -335,7 +334,7 @@ export const importGroupsRule = createRule<Options, MessageIds>({
 
         interface FailureItem {
           node: TSESTree.Node;
-          messageId: MessageIds;
+          messageId: MessageId;
         }
 
         let failureItems: FailureItem[] = [];

@@ -90,7 +90,7 @@ class Foo {
   constructor() { }
 }
             `,
-      errors: [{messageId: 'constructorEmpty'}],
+      errors: [{messageId: 'emptyConstructor'}],
     },
     {
       code: `
@@ -98,7 +98,7 @@ class Foo {
   public constructor() { }
 }
             `,
-      errors: [{messageId: 'constructorEmpty'}],
+      errors: [{messageId: 'emptyConstructor'}],
     },
   ],
 });

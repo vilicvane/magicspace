@@ -109,7 +109,7 @@ export function findImports(
         ) {
           addIfTextualLiteral(node.moduleReference.expression);
         } else {
-          throw new Error('unexpected node');
+          throw new Error('Unexpected node');
         }
 
         break;
@@ -131,8 +131,7 @@ export function findImports(
         break;
 
       default:
-        throw new Error('unexpected node');
-        break;
+        throw new Error('Unexpected node');
     }
   }
 
@@ -246,7 +245,7 @@ class ImportFinder {
       re = /\bimport\s*[</(]/g;
     }
 
-    // const isJavaScriptFile = /\.js$/.test(this._context.getFilename());// TODO: check
+    // const isJavaScriptFile = /\.js$/.test(this._context.getFilename());
 
     for (
       let match = re.exec(this._context.getSourceCode().getText());

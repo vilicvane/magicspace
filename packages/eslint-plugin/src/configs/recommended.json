@@ -9,7 +9,7 @@
     "node": true,
     "es6": true
   },
-  "plugins": ["@magicspace", "@typescript-eslint", "import"],
+  "plugins": ["@magicspace", "@typescript-eslint", "import", "no-null"],
   "rules": {
     "@magicspace/import-groups": [
       "error",
@@ -36,21 +36,29 @@
     "@magicspace/import-path-strict-hierarchy": "off",
     "arrow-parens": ["error", "as-needed"],
     "no-sequences": "error",
+    "spaced-comment": [
+      "error",
+      "always",
+      {"markers": ["/", "!"], "exceptions": ["/"]}
+    ],
     "curly": "error",
+    "import/no-deprecated": "error",
     "eol-last": "error",
-    "guard-for-in": "off",
-    "no-unused-labels": "error",
     "linebreak-style": ["error", "unix"],
+    "max-len": [
+      "error",
+      {"code": 120, "tabWidth": 2, "ignoreTemplateLiterals": true}
+    ],
     "@typescript-eslint/explicit-member-accessibility": "off",
     "new-parens": "error",
     "no-caller": "error",
     "no-bitwise": "error",
-    "no-cond-assign": "error",
-    "no-multiple-empty-lines": "error",
+    "no-cond-assign": ["error", "always"],
+    "no-multiple-empty-lines": ["error", {"max": 1}],
     "no-console": [
       "error",
       {
-        "allow": ["warn", "error", "info"]
+        "allow": ["warn", "error", "info", "assert"]
       }
     ],
     "no-new-wrappers": "error",
@@ -59,19 +67,19 @@
     "constructor-super": "error",
     "no-duplicate-case": "error",
     "no-redeclare": "error",
-    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-floating-promises": "warn",
     "@typescript-eslint/no-for-in-array": "error",
-    "import/no-extraneous-dependencies": "error",
-    "@typescript-eslint/prefer-namespace-keyword": "error",
-    "no-template-curly-in-string": "error",
-    "no-irregular-whitespace": [
+    "import/no-extraneous-dependencies": [
       "error",
       {
-        "skipStrings": false
+        "devDependencies": false,
+        "optionalDependencies": false,
+        "peerDependencies": true
       }
     ],
-    "@typescript-eslint/no-misused-new": "error",
-    "@typescript-eslint/triple-slash-reference": "error",
+    "no-template-curly-in-string": "error",
+    "no-irregular-whitespace": ["error", {"skipStrings": false}],
+    "no-null/no-null": "error",
     "@typescript-eslint/no-require-imports": "error",
     "no-return-await": "error",
     "no-sparse-arrays": "error",
@@ -87,18 +95,15 @@
     "object-shorthand": "error",
     "@typescript-eslint/prefer-for-of": "error",
     "prefer-template": "error",
-    "quotes": [
-      "error",
-      "single",
-      {
-        "allowTemplateLiterals": true
-      }
-    ],
+    "quotes": ["error", "single", {"allowTemplateLiterals": true}],
     "semi": "off",
-    "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/semi": "error",
+    "space-before-function-paren": "off",
     "space-in-parens": ["error", "never"],
     "comma-dangle": ["error", "always-multiline"],
-    "use-isnan": "error"
+    "eqeqeq": ["error", "always", {"null": "ignore"}],
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "use-isnan": ["error", {"enforceForSwitchCase": true}]
   },
   "overrides": [
     {
@@ -115,7 +120,8 @@
         "@typescript-eslint/array-type": [
           "error",
           {
-            "default": "array"
+            "default": "array",
+            "readonly": "generic"
           }
         ],
         "@typescript-eslint/ban-types": [
@@ -139,14 +145,16 @@
         ],
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/class-name-casing": "error",
+        "@typescript-eslint/consistent-type-definitions": [
+          "error",
+          "interface"
+        ],
         "@typescript-eslint/explicit-member-accessibility": [
           "error",
-          {
-            "accessibility": "no-public"
-          }
+          {"accessibility": "no-public"}
         ],
         "@typescript-eslint/member-ordering": [
-          "error",
+          "warn",
           {
             "default": [
               "instance-field",
@@ -163,7 +171,13 @@
             ]
           }
         ],
-        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/consistent-type-assertions": "error",
+        "@typescript-eslint/prefer-namespace-keyword": "error",
+        "@typescript-eslint/no-misused-new": "error",
+        "@typescript-eslint/triple-slash-reference": [
+          "error",
+          {"path": "never", "types": "never", "lib": "never"}
+        ],
         "@typescript-eslint/no-unnecessary-qualifier": "error",
         "@typescript-eslint/no-unnecessary-type-assertion": "error",
         "@typescript-eslint/unified-signatures": "error",

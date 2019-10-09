@@ -44,11 +44,6 @@ ruleTester.run('import-path-no-parent', rules['import-path-no-parent'], {
       errors: [{messageId: 'bannedParentImport'}],
     },
     {
-      code: `import * as Foo from './foo';`,
-      filename: Path.join(__dirname, 'foo'),
-      errors: [{messageId: 'bannedParentImport'}],
-    },
-    {
       code: `import * as Foo from '${Path.join(__dirname, '.')}';`,
       filename: Path.join(__dirname, 'foo'),
       errors: [{messageId: 'bannedParentImport'}],

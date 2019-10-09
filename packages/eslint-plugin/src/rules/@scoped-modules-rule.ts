@@ -16,19 +16,27 @@ import {
   removeModuleFileExtension,
 } from './@utils';
 
-export const scopedModulesRule = createRule({
+const messages = {
+  bannedImport:
+    'This module can not be imported, because it contains internal module with prefix `@` under a parallel directory.',
+  bannedExport:
+    'This module can not be exported, because it contains internal module with prefix `@` under a parallel directory.',
+  missingExports: 'Missing modules expected to be exported.',
+};
+
+type Options = [];
+
+type MessageId = keyof typeof messages;
+
+export const scopedModulesRule = createRule<Options, MessageId>({
   name: 'scoped-modules',
   meta: {
     docs: {
-      description: ``,
+      description: '',
       category: 'Stylistic Issues',
       recommended: 'error',
     },
-    messages: {
-      bannedImport: `This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.`,
-      bannedExport: `This module can not be exported, because it contains internal module with prefix '@' under a parallel directory.`,
-      missingExports: `Missing modules expected to be exported.`,
-    },
+    messages,
     schema: [
       {
         type: 'object',

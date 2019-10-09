@@ -8,19 +8,27 @@ import {
   findImports,
   getModuleSpecifier,
 } from './@utils';
+
 const DIRECTORY_MODULE_PATH = /^\.{1,2}(?:[\\/]\.{1,2})*[\\/]?$/;
 
-export const importPathNoParentRule = createRule({
+const messages = {
+  bannedParentImport:
+    'Importing from parent directory or current file is not allowed.',
+};
+
+type Options = [];
+
+type MessageId = keyof typeof messages;
+
+export const importPathNoParentRule = createRule<Options, MessageId>({
   name: 'import-path-no-parent',
   meta: {
     docs: {
-      description: ``,
-      category: 'Stylistic Issues',
+      description: '',
+      category: 'Possible Errors',
       recommended: 'error',
     },
-    messages: {
-      bannedParentImport: `Importing from parent directory or current file is not allowed.`,
-    },
+    messages,
     schema: [],
     type: 'problem',
   },
@@ -52,14 +60,7 @@ export const importPathNoParentRule = createRule({
               Path.join(sourceDirName, specifier),
             ));
 
-        if (
-          !DIRECTORY_MODULE_PATH.test(specifier) &&
-          specifier !== '' &&
-          Path.relative(
-            context.getFilename(),
-            Path.join(sourceDirName, specifier),
-          ) !== ''
-        ) {
+        if (!DIRECTORY_MODULE_PATH.test(specifier) && specifier !== '') {
           return;
         }
 

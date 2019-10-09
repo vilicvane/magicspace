@@ -10,31 +10,29 @@ import {
   isRelativeModuleSpecifier,
 } from './@utils';
 
+const messages = {
+  importMustUseBaseURL: 'This import path must use baseUrl.',
+  importMustBeRelativePath: 'This import path must be a relative path.',
+};
+
 type Options = [
   {
     baseUrl?: string;
-    tsConfigSearchName: string;
+    tsConfigSearchName?: string;
   },
 ];
 
-type MessageIds =
-  | 'importMustUseBaseUrl'
-  | 'importMustBeRelativePath'
-  | 'unkonwnError';
+type MessageId = keyof typeof messages;
 
-export const importPathBaseUrl = createRule<Options, MessageIds>({
+export const importPathBaseUrl = createRule<Options, MessageId>({
   name: 'import-path-base-url',
   meta: {
     docs: {
-      description: `Check import module from baseUrl`,
+      description: 'Check import module from baseUrl',
       category: 'Stylistic Issues',
       recommended: 'error',
     },
-    messages: {
-      importMustUseBaseUrl: `This import path must use baseUrl.`,
-      importMustBeRelativePath: `This import path must be a relative path.`,
-      unkonwnError: `This is an unkonwn error`,
-    },
+    messages,
     schema: [
       {
         type: 'object',
@@ -127,7 +125,7 @@ export const importPathBaseUrl = createRule<Options, MessageIds>({
 
           context.report({
             node: expression,
-            messageId: 'importMustUseBaseUrl',
+            messageId: 'importMustUseBaseURL',
             fix: fixer => {
               return fixer.replaceTextRange(expression.range, baseUrlSpecifier);
             },
