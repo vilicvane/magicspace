@@ -24,7 +24,7 @@ type Options = [
 
 type MessageId = keyof typeof messages;
 
-export const importPathBaseUrl = createRule<Options, MessageId>({
+export const importPathBaseUrlRule = createRule<Options, MessageId>({
   name: 'import-path-base-url',
   meta: {
     docs: {

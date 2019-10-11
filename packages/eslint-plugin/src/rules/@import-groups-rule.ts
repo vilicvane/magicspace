@@ -94,27 +94,13 @@ export const importGroupsRule = createRule<Options, MessageId>({
 
   create(context, [options]) {
     function getFullStart(node: TSESTree.Node): number {
-      while (node.parent && node.parent.type !== AST_NODE_TYPES.Program) {
-        node = node.parent;
+      let token = context.getSourceCode().getTokenBefore(node);
+
+      if (token === null) {
+        return 0;
+      } else {
+        return token.range[1];
       }
-
-      let start = node.range[0];
-
-      let fullStart = start;
-
-      for (let i = 0; i < node.parent!.body.length; ++i) {
-        if (node.parent!.body[i] === node) {
-          if (i !== 0) {
-            fullStart = node.parent!.body[i - 1].range[1];
-          } else {
-            fullStart = 0;
-          }
-
-          break;
-        }
-      }
-
-      return fullStart;
     }
 
     const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
