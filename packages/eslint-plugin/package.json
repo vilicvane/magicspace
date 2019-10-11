@@ -13,7 +13,7 @@
   ],
   "main": "bld/index.js",
   "scripts": {
-    "bare-test": "mocha ./bld/tests/*.js",
+    "bare-test": "mocha ./bld/tests/*.js -t 5000",
     "build": "rimraf bld && tsc --project src/tsconfig.json",
     "test": "yarn build && yarn bare-test"
   },
