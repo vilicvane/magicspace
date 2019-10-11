@@ -34,6 +34,7 @@
     "@magicspace/import-path-be-smart": "error",
     "@magicspace/no-empty-constructor": "error",
     "@magicspace/import-path-strict-hierarchy": "off",
+    "@magicspace/empty-line-around-blocks": "error",
     "arrow-parens": ["error", "as-needed"],
     "no-sequences": "error",
     "spaced-comment": [
