@@ -1,8 +1,7 @@
 # @magicspace/configs
 
-- `@magicspace/configs/tslint`
-- `@magicspace/configs/tslint-prettier`
-- `@magicspace/configs/tslint-override-dev`
+- `@magicspace/configs/prettier`
+- `@magicspace/configs/tsconfig.json`
 
 ## Installation
 
@@ -12,10 +11,16 @@ yarn add @magicspace/configs --dev
 
 ## Usage
 
-`tslint.json`
+`prettier.config.js`
+
+```js
+module.exports = require('@magicspace/configs/prettier');
+```
+
+`tsconfig.json`
 
 ```json
 {
-  "extends": ["@magicspace/configs/tslint"]
+  "extends": "@magicspace/configs/tsconfig.json"
 }
 ```

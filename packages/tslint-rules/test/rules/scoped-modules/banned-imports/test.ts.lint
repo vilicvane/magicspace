@@ -1,8 +1,0 @@
-import '../banned-exports/@bar';
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [banned-import]
-import '../banned-exports/@foo';
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [banned-import]
-import './@bar';
-import './@foo';
-
-[banned-import]: This module can not be imported, because it contains internal module with prefix '@' under a parallel directory.

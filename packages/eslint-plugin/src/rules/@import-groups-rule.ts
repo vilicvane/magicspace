@@ -96,11 +96,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
     function getFullStart(node: TSESTree.Node): number {
       let token = context.getSourceCode().getTokenBefore(node);
 
-      if (token === null) {
-        return 0;
-      } else {
-        return token.range[1];
-      }
+      return token === null ? 0 : token.range[1];
     }
 
     const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
@@ -316,20 +312,15 @@ export const importGroupsRule = createRule<Options, MessageId>({
           return;
         }
 
-        let {ordered} = options;
-
         interface FailureItem {
           node: TSESTree.Node;
           messageId: MessageId;
         }
 
+        let {ordered} = options;
         let failureItems: FailureItem[] = [];
-
         let [lastInfo, ...restInfos] = infos;
-
         let fixerEnabled = !pendingStatements.length;
-        let fixEnabled = true;
-
         let appearedGroupIndexSet = new Set([lastInfo.groupIndex]);
 
         for (let expression of pendingStatements) {
@@ -395,40 +386,34 @@ export const importGroupsRule = createRule<Options, MessageId>({
                 node,
                 messageId,
                 fix: fixer => {
-                  // TODO: 根据报错信息来更改fixer
-                  if (fixEnabled) {
-                    fixEnabled = false;
-                    let {ordered = false} = options;
+                  let {ordered = false} = options;
 
-                    let startNode = infos[0].node;
-                    let endNode = infos[infos.length - 1].node;
+                  let startNode = infos[0].node;
+                  let endNode = infos[infos.length - 1].node;
 
-                    let infoGroups = groupModuleImportInfos(infos, ordered);
+                  let infoGroups = groupModuleImportInfos(infos, ordered);
 
-                    let text = infoGroups
-                      .map(group =>
-                        group
-                          .map(info =>
-                            trimLeftEmptyLines(
-                              context
-                                .getSourceCode()
-                                .getText(
-                                  info.node,
-                                  info.node.range[0] - getFullStart(info.node),
-                                ),
-                            ),
-                          )
-                          .join('\n'),
-                      )
-                      .join('\n\n');
+                  let text = infoGroups
+                    .map(group =>
+                      group
+                        .map(info =>
+                          trimLeftEmptyLines(
+                            context
+                              .getSourceCode()
+                              .getText(
+                                info.node,
+                                info.node.range[0] - getFullStart(info.node),
+                              ),
+                          ),
+                        )
+                        .join('\n'),
+                    )
+                    .join('\n\n');
 
-                    return fixer.replaceTextRange(
-                      [getFullStart(startNode), endNode.range[1]],
-                      text,
-                    );
-                  } else {
-                    return [];
-                  }
+                  return fixer.replaceTextRange(
+                    [getFullStart(startNode), endNode.range[1]],
+                    text,
+                  );
                 },
               });
             } else {

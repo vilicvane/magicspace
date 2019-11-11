@@ -1,7 +1,0 @@
-import test from './test/core'
-
-import test from './test'
-import test from '../test'
-import test from '../../test' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
-import test from '../../core'

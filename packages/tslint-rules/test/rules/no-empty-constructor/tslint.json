@@ -1,6 +1,0 @@
-{
-  "rules": {
-    "no-empty-constructor": true
-  },
-  "rulesDirectory": ["../../../bld/rules"]
-}

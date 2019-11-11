@@ -1,6 +1,6 @@
 # @magicspace/eslint-plugin
 
-- `plugin:@magicspace/recommended`
+- `plugin:@magicspace/default`
 - `plugin:@magicspace/override-dev`
 
 ## 安装
@@ -18,7 +18,7 @@ yarn add @magicspace/eslint-plugin --dev
 ```js
 module.exports = {
   extends: [
-    'plugin:@magicspace/recommended',
+    'plugin:@magicspace/default',
     'plugin:@magicspace/override-dev',
     'plugin:prettier/recommended',
   ],
@@ -41,7 +41,7 @@ module.exports = {
     "javascript",
     {
       "language": "typescript",
-      "autoFix": false
+      "autoFix": true
     }
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"

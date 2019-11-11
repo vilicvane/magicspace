@@ -63,31 +63,13 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
   create(context) {
     function getFullStart(node: TSESTree.Node): number {
-      while (node.parent && node.parent.type !== AST_NODE_TYPES.Program) {
-        node = node.parent;
-      }
+      let token = context.getSourceCode().getTokenBefore(node);
 
-      if (!node.parent) {
+      if (token === null) {
         return 0;
+      } else {
+        return token.range[1];
       }
-
-      let start = node.range[0];
-
-      let fullStart = start;
-
-      for (let i = 0; i < node.parent.body.length; ++i) {
-        if (node.parent!.body[i] === node) {
-          if (i !== 0) {
-            fullStart = node.parent!.body[i - 1].range[1];
-          } else {
-            fullStart = 0;
-          }
-
-          break;
-        }
-      }
-
-      return fullStart;
     }
 
     const INDEX_FILE_REGEX = /(?:^|[\\/])index\.(?:js|jsx|ts|tsx|d\.ts)$/i;
@@ -98,7 +80,8 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
     type ModuleStatement =
       | TSESTree.ImportDeclaration
-      | TSESTree.ExportDeclaration;
+      | TSESTree.ExportNamedDeclaration
+      | TSESTree.ExportAllDeclaration;
 
     type ModuleStatementInfo = ImportStatementInfo | ExportStatementInfo;
     type ModuleStatementType = ModuleStatementInfo['type'];
@@ -133,23 +116,12 @@ export const scopedModulesRule = createRule<Options, MessageId>({
             continue;
           }
 
-          if (
-            !statement.source ||
-            !(
-              (statement.source.type === AST_NODE_TYPES.Literal &&
-                typeof statement.source.value === 'string') ||
-              statement.source.type === AST_NODE_TYPES.TemplateLiteral
-            )
-          ) {
-            continue;
-          }
-
-          let specifier = getModuleSpecifier(
-            context.getSourceCode(),
-            statement.source,
-          )
-            .replace(/^\'/, '')
-            .replace(/\'$/, '');
+          let specifier =
+            statement.source && isStringLiteral(statement.source)
+              ? getModuleSpecifier(context.getSourceCode(), statement.source)
+                  .replace(/^\'/, '')
+                  .replace(/\'$/, '')
+              : undefined;
 
           if (!specifier) {
             continue;
@@ -180,7 +152,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
           bannedPattern = BANNED_EXPORT_REGEX;
           messageId = 'bannedExport';
 
-          let fileName = context.getFilename(); // TODO: check if it is right
+          let fileName = context.getFilename();
 
           let baseName = getBaseNameWithoutExtension(fileName);
 
@@ -309,6 +281,14 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
         this.validateIndexFile(exportSpecifiers);
       }
+    }
+
+    function isStringLiteral(node: TSESTree.Node): node is TSESTree.Literal {
+      return (
+        (node.type === AST_NODE_TYPES.Literal &&
+          typeof node.value === 'string') ||
+        node.type === AST_NODE_TYPES.TemplateLiteral
+      );
     }
 
     function buildAddMissingExportsFixer(

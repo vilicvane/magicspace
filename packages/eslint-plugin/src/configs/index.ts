@@ -1,7 +1,7 @@
-import overrideDev from './override-dev.json';
-import recommended from './recommended.json';
+import {defaultConfig} from './@default';
+import {overrideDevConfig} from './@override-dev';
 
 export const configs = {
-  'override-dev': overrideDev,
-  recommended,
+  'override-dev': overrideDevConfig,
+  default: defaultConfig,
 };

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 // comment
 import * as path from 'path'
 // comment
-import * as tslint from 'tslint'
+import * as eslint from 'eslint'
 // comment
 import * as typescript from 'typescript'
 
