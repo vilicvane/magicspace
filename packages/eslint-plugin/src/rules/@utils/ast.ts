@@ -50,7 +50,7 @@ function isDeclarationFile(
   return /\.d\.ts$/.test(context.getFilename());
 }
 
-type TextualLiteral =
+export type TextualLiteral =
   | TSESTree.Literal & {value: string}
   | TSESTree.TemplateLiteral & {quasis: {length: 1}};
 
@@ -59,6 +59,15 @@ export function isTextualLiteral(node: TSESTree.Node): node is TextualLiteral {
     (node.type === AST_NODE_TYPES.Literal && typeof node.value === 'string') ||
     (node.type === AST_NODE_TYPES.TemplateLiteral && node.quasis.length === 1)
   );
+}
+
+export function getFullStart(
+  sourceCode: TSESLint.SourceCode,
+  node: TSESTree.Node,
+): number {
+  let token = sourceCode.getTokenBefore(node);
+
+  return token === null ? 0 : token.range[1];
 }
 
 // type AssertNever<T extends never> = T;

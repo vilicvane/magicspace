@@ -76,7 +76,6 @@ ruleTester.run('scoped-modules', rules['scoped-modules'], {
         ),
       ).toString(),
     },
-
     {
       code: FS.readFileSync(
         Path.join(
@@ -99,7 +98,6 @@ ruleTester.run('scoped-modules', rules['scoped-modules'], {
         ),
       ).toString(),
     },
-
     {
       code: FS.readFileSync(
         Path.join(
@@ -138,43 +136,81 @@ ruleTester.run('scoped-modules', rules['scoped-modules'], {
         ),
       ).toString(),
     },
-    // {
-    //   code: FS.readFileSync(
-    //     Path.join(
-    //       __dirname,
-    //       '../../test/scoped-modules/export-namespace/index.ts.lint',
-    //     ),
-    //   ).toString(),
-    //   filename: Path.join(
-    //     __dirname,
-    //     '../../test/scoped-modules/export-namespace/index.ts',
-    //   ),
-    //   errors: [{messageId: 'bannedImportWhenNamespaceExists'}],
-    //   output: FS.readFileSync(
-    //     Path.join(
-    //       __dirname,
-    //       '../../test/scoped-modules/export-namespace/index.ts.fix',
-    //     ),
-    //   ).toString(),
-    // },
-    // {
-    //   code: FS.readFileSync(
-    //     Path.join(
-    //       __dirname,
-    //       '../../test/scoped-modules/export-namespace/namespace.ts',
-    //     ),
-    //   ).toString(),
-    //   filename: Path.join(
-    //     __dirname,
-    //     '../../test/scoped-modules/export-namespace/namespace.ts',
-    //   ),
-    //   errors: [{messageId: 'missingExports'}, {messageId: 'bannedExport'}],
-    //   output: FS.readFileSync(
-    //     Path.join(
-    //       __dirname,
-    //       '../../test/scoped-modules/export-namespace/namespace.ts.fix',
-    //     ),
-    //   ).toString(),
-    // },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/1/index.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/scoped-modules/export-namespace/1/index.ts',
+      ),
+      errors: [{messageId: 'bannedImportWhenNamespaceExists'}],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/1/index.ts.fix',
+        ),
+      ).toString(),
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/1/namespace.ts',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/scoped-modules/export-namespace/1/namespace.ts',
+      ),
+      errors: [{messageId: 'missingExports'}],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/1/namespace.ts.fix',
+        ),
+      ).toString(),
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/2/namespace.ts',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/scoped-modules/export-namespace/2/namespace.ts',
+      ),
+      errors: [{messageId: 'bannedExport'}],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/2/namespace.ts.fix',
+        ),
+      ).toString(),
+    },
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/2/index.ts.lint',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/scoped-modules/export-namespace/2/index.ts',
+      ),
+      errors: [{messageId: 'missingImports'}],
+      output: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-namespace/2/index.ts.fix',
+        ),
+      ).toString(),
+    },
   ],
 });
