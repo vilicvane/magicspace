@@ -10,6 +10,7 @@ import {
   isRelativeModuleSpecifier,
   isTextualLiteral,
   trimLeftEmptyLines,
+  getFullStart,
 } from './@utils';
 
 const messages = {
@@ -93,12 +94,6 @@ export const importGroupsRule = createRule<Options, MessageId>({
   ],
 
   create(context, [options]) {
-    function getFullStart(node: TSESTree.Node): number {
-      let token = context.getSourceCode().getTokenBefore(node);
-
-      return token === null ? 0 : token.range[1];
-    }
-
     const BUILT_IN_MODULE_GROUP_TESTER_DICT: Dict<ModuleGroupTester> = {
       '$node-core': specifier => isNodeBuiltIn(specifier),
       '$node-modules': (specifier, sourceFileName) => {
@@ -402,7 +397,11 @@ export const importGroupsRule = createRule<Options, MessageId>({
                               .getSourceCode()
                               .getText(
                                 info.node,
-                                info.node.range[0] - getFullStart(info.node),
+                                info.node.range[0] -
+                                  getFullStart(
+                                    context.getSourceCode(),
+                                    info.node,
+                                  ),
                               ),
                           ),
                         )
@@ -411,7 +410,10 @@ export const importGroupsRule = createRule<Options, MessageId>({
                     .join('\n\n');
 
                   return fixer.replaceTextRange(
-                    [getFullStart(startNode), endNode.range[1]],
+                    [
+                      getFullStart(context.getSourceCode(), startNode),
+                      endNode.range[1],
+                    ],
                     text,
                   );
                 },

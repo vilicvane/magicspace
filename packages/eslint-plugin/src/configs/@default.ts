@@ -65,6 +65,14 @@ export const defaultConfig = {
     '@magicspace/import-path-shallowest': 'off',
     '@magicspace/import-path-strict-hierarchy': 'off',
     '@magicspace/no-empty-constructor': 'error',
+    '@magicspace/ordered-imports': [
+      'error',
+      {
+        'import-sources-order': 'case-insensitive',
+        'named-imports-order': 'lowercase-last',
+        'module-source-path': 'full',
+      },
+    ],
     '@magicspace/scoped-modules': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'off',
     '@typescript-eslint/no-floating-promises': 'error',
