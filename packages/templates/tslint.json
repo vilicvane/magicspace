@@ -1,6 +1,0 @@
-{
-  "extends": ["@magicspace/configs/tslint-prettier"],
-  "rules": {
-    "scoped-modules": false
-  }
-}

@@ -31,5 +31,10 @@
     "tslang": "^0.1.15",
     "tslib": "^1.10.0",
     "typescript": "^3.5.3"
+  },
+  "devDependencies": {
+    "@magicspace/tslint-rules": "^0.1.46",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0"
   }
 }

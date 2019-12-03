@@ -8,7 +8,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "tsc --project . && tslint --project ."
+    "test": "tsc --project . && eslint . --ext .js,.ts,.jsx,.tsx"
   },
   "files": [
     "*/**"

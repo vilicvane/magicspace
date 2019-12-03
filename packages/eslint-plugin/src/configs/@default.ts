@@ -404,6 +404,7 @@ export const defaultConfig = {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@magicspace/import-path-base-url': 'off',
+        '@magicspace/explicit-return-type': "error",
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
           'error',
@@ -445,12 +446,7 @@ export const defaultConfig = {
           'error',
           'interface',
         ],
-        '@typescript-eslint/explicit-function-return-type': [
-          'error',
-          {
-            allowExpressions: true,
-          },
-        ],
+        '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-member-accessibility': [
           'error',
           {

@@ -11,7 +11,10 @@
   "files.trimTrailingWhitespace": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.validate": [
-    "javascript",
+    {
+      "language": "javascript",
+      "autoFix": true
+    },
     {
       "language": "typescript",
       "autoFix": true
