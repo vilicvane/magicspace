@@ -4,15 +4,17 @@ import {TemplateConfig} from '@magicspace/core';
 
 declare global {
   namespace Magicspace {
-    namespace Templates.TypeScript {
-      type ProjectType = 'library' | 'program' | 'none';
+    namespace Templates {
+      namespace TypeScript {
+        type ProjectType = 'library' | 'program' | 'none';
 
-      interface ProjectTarget {
-        name: string;
-        development?: boolean;
-        packageExtension?: object;
-        compilerOptions?: object;
-        templates?: TemplateConfig[];
+        interface ProjectTarget {
+          name: string;
+          development?: boolean;
+          packageExtension?: object;
+          compilerOptions?: object;
+          templates?: TemplateConfig[];
+        }
       }
     }
 

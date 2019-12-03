@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "rimraf bld && tsc --project src/library",
-    "lint": "tslint --project src/library",
+    "lint": "eslint src/library --ext .ts,.js",
     "test": "yarn build && yarn lint"
   },
   "main": "bld/library/index.js",

@@ -1,8 +1,10 @@
 /// <reference path="../general/options.d.ts" />
 
 declare namespace Magicspace {
-  namespace Templates.General {
-    type LicenseName = 'MIT';
+  namespace Templates {
+    namespace General {
+      type LicenseName = 'MIT';
+    }
   }
 
   interface TemplateBundleOptions {

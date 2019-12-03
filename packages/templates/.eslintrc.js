@@ -6,5 +6,6 @@ module.exports = {
   },
   rules: {
     '@magicspace/scoped-modules': 'off',
+    '@typescript-eslint/triple-slash-reference': 'off',
   },
 };

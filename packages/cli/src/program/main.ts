@@ -11,5 +11,5 @@ let cli = new CLI('magicspace', Path.join(__dirname, 'commands'));
 
 let shim = new Shim(cli);
 
-// tslint:disable-next-line: no-floating-promises
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 shim.execute(process.argv);
