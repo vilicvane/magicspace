@@ -410,7 +410,7 @@ export const defaultConfig = {
           'error',
           {
             default: 'array',
-            readonly: 'generic',
+            readonly: 'array',
           },
         ],
         '@typescript-eslint/await-thenable': 'off',
@@ -460,6 +460,24 @@ export const defaultConfig = {
         '@typescript-eslint/interface-name-prefix': 'off',
         '@typescript-eslint/member-delimiter-style': 'off',
         '@typescript-eslint/member-naming': 'off',
+        '@typescript-eslint/member-ordering': [
+          'error',
+          {
+            "default": [
+              'instance-field',
+              'public-constructor',
+              'protected-constructor',
+              'private-constructor',
+              'public-instance-method',
+              'protected-instance-method',
+              'private-instance-method',
+              'static-field',
+              "public-static-method",
+              "protected-static-method",
+              "private-static-method",
+            ]
+          }
+        ],
         '@typescript-eslint/no-array-constructor': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
