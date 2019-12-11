@@ -1,6 +1,0 @@
-import test from './services'
-import test from '../services'
-import test from '../../services' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]
-import test from '../../test' // failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [Importing the target module from this file is not allowed]

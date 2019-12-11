@@ -6,32 +6,33 @@
   "license": "MIT",
   "scripts": {
     "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org",
-    "test": "yarn test:tslint-rules && yarn test:core && yarn test:templates && yarn test:cli",
-    "test:tslint-rules": "yarn workspace @magicspace/tslint-rules test",
+    "test": "yarn test:eslint-plugin && yarn test:core && yarn test:templates && yarn test:cli",
+    "test:eslint-plugin": "yarn workspace @magicspace/eslint-plugin test",
     "test:core": "yarn workspace @magicspace/core test",
     "test:templates": "yarn workspace @magicspace/templates test",
     "test:cli": "yarn workspace magicspace test"
   },
   "devDependencies": {
+    "@types/eslint": "^6.1.2",
     "@types/fs-extra": "^8.0.0",
     "@types/glob": "^7.1.1",
-    "@types/lodash": "^4.14.133",
+    "@types/lodash": "^4.14.142",
     "@types/node": "^12.6.2",
     "@types/prettier": "^1.16.4",
     "@types/resolve": "^0.0.8",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.5.0",
     "lerna": "^3.15.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "ts-node": "^8.3.0",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "typescript-tslint-plugin": "^0.5.4"
+    "typescript": "^3.5.3"
   },
   "workspaces": [
     "packages/cli",
     "packages/configs",
     "packages/core",
     "packages/templates",
-    "packages/tslint-rules"
+    "packages/eslint-plugin"
   ]
 }

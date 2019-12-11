@@ -1,0 +1,4 @@
+import * as FS from 'fs'
+
+import * as eslint from 'eslint'
+import 'foo'

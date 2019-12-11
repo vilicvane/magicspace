@@ -1,0 +1,3 @@
+import * as test from './test'
+import * as test from '../core'
+import * as test from '../test' // failure

@@ -1,6 +1,0 @@
-{
-  "rules": {
-    "scoped-modules": true
-  },
-  "rulesDirectory": ["../../../../bld/rules"]
-}

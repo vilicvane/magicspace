@@ -1,0 +1,4 @@
+import {test} from '../core'
+import {test} from '../services'
+import {test} from '../core/core-sub'
+import {test} from '../not-exist' // failure

@@ -1,0 +1,4 @@
+import * as ExportNamespace from './namespace';
+import * as Foo from './@foo';
+
+export {ExportNamespace};

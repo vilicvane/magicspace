@@ -1,0 +1,12 @@
+import * as bar from '../foo/bar'
+
+import * as bar from './bar'
+
+import foo from './@foo';
+import foo from './.foo';
+import foo from './..foo';
+
+import foo from './../foo';
+
+import('./../foo');
+require('./../foo');
