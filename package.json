@@ -5,7 +5,7 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "scripts": {
-    "lerna:publish": "lerna publish --npm-client=npm --registry=https://registry.npmjs.org",
+    "lerna:publish": "lerna publish --registry=https://registry.npmjs.org",
     "test": "yarn test:eslint-plugin && yarn test:core && yarn test:templates && yarn test:cli",
     "test:eslint-plugin": "yarn workspace @magicspace/eslint-plugin test",
     "test:core": "yarn workspace @magicspace/core test",

@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/configs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Custom TSLint rules for MagicSpace.",
   "keywords": [
     "TypeScript",
@@ -13,6 +13,6 @@
     "access": "public"
   },
   "dependencies": {
-    "eslint-config-prettier": "^6.5.0"
+    "eslint-config-prettier": "^6.7.0"
   }
 }
