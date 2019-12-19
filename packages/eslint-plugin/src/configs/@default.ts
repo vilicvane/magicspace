@@ -520,6 +520,7 @@ export const defaultConfig = {
         '@typescript-eslint/typedef': 'off',
         '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/unified-signatures': 'warn',
+        'no-redeclare': 'off',
       },
     },
   ],
