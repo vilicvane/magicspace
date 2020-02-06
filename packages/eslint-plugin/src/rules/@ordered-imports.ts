@@ -1,6 +1,4 @@
-import {createRule} from './@utils';
-
-import * as ts from 'typescript';
+import {TSESLint, TSESTree} from '@typescript-eslint/experimental-utils';
 import {
   isExternalModuleReference,
   isImportDeclaration,
@@ -9,11 +7,9 @@ import {
   isNamedImports,
   isStringLiteral,
 } from 'tsutils';
-import {
-  ParserServices,
-  TSESLint,
-  TSESTree,
-} from '@typescript-eslint/experimental-utils';
+import * as ts from 'typescript';
+
+import {createRule, getParserServices} from './@utils';
 
 const messages = {
   importSourcesNotGroupedPrefix:
@@ -828,32 +824,6 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         : undefined;
     }
 
-    type RequiredParserServices = {
-      [k in keyof ParserServices]: Exclude<ParserServices[k], undefined>;
-    };
-
-    function getParserServices<
-      TMessageIds extends string,
-      TOptions extends unknown[]
-    >(
-      context: TSESLint.RuleContext<TMessageIds, TOptions>,
-    ): RequiredParserServices {
-      if (
-        !context.parserServices ||
-        !context.parserServices.program ||
-        !context.parserServices.esTreeNodeToTSNodeMap
-      ) {
-        /**
-         * The user needs to have configured "project" in their parserOptions
-         * for @typescript-eslint/parser
-         */
-        throw new Error(
-          'You have used a rule which requires parserServices to be generated. You must therefore provide a value for the "parserOptions.project" property for @typescript-eslint/parser.',
-        );
-      }
-
-      return context.parserServices as RequiredParserServices;
-    }
     const parserServices = getParserServices(context);
 
     let sourceFile = parserServices.esTreeNodeToTSNodeMap.get(

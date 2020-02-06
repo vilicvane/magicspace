@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/eslint-plugin",
-  "version": "0.1.14",
+  "version": "0.1.16",
   "description": "Custom ESLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
@@ -32,9 +32,9 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.11.0",
-    "@typescript-eslint/experimental-utils": "^2.11.0",
-    "@typescript-eslint/parser": "^2.11.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/experimental-utils": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-no-null": "^1.0.2",
     "module-lens": "^0.1.3",
