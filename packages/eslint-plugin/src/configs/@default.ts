@@ -78,6 +78,7 @@ export const defaultConfig = {
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/no-for-in-array': 'warn',
     '@typescript-eslint/no-require-imports': 'warn',
+    '@typescript-eslint/no-unused-expressions': 'warn',
     '@typescript-eslint/no-var-requires': 'warn',
     '@typescript-eslint/prefer-for-of': 'warn',
     '@typescript-eslint/semi': 'warn',
@@ -308,7 +309,7 @@ export const defaultConfig = {
     'no-unreachable': 'off',
     'no-unsafe-finally': 'warn',
     'no-unsafe-negation': 'off',
-    'no-unused-expressions': 'warn',
+    'no-unused-expressions': 'off',
     'no-unused-labels': 'off',
     'no-unused-vars': 'off',
     'no-use-before-define': 'off',
@@ -403,8 +404,9 @@ export const defaultConfig = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@magicspace/import-path-base-url': 'off',
         '@magicspace/explicit-return-type': 'error',
+        '@magicspace/import-path-base-url': 'off',
+        '@magicspace/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/adjacent-overload-signatures': 'warn',
         '@typescript-eslint/array-type': [
           'warn',
@@ -493,7 +495,7 @@ export const defaultConfig = {
         '@typescript-eslint/no-unnecessary-condition': 'off',
         '@typescript-eslint/no-unnecessary-qualifier': 'warn',
         '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
-        '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-useless-constructor': 'off',
