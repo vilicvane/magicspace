@@ -10,8 +10,7 @@
     "test:eslint-plugin": "yarn workspace @magicspace/eslint-plugin test",
     "test:core": "yarn workspace @magicspace/core test",
     "test:templates": "yarn workspace @magicspace/templates test",
-    "test:cli": "yarn workspace magicspace test",
-    "link": "lerna link"
+    "test:cli": "yarn workspace magicspace test"
   },
   "devDependencies": {
     "@types/eslint": "^6.1.2",
