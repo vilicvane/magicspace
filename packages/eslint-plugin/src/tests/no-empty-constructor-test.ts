@@ -1,4 +1,4 @@
-// tslint:disable-next-line: import-groups
+// eslint-disable-next-line @magicspace/import-groups
 import {rules} from '../rules';
 
 import {RuleTester} from './@utils';

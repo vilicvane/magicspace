@@ -404,7 +404,7 @@ export const defaultConfig = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        '@magicspace/explicit-return-type': 'error',
+        '@magicspace/explicit-return-type': 'warn',
         '@magicspace/import-path-base-url': 'off',
         '@magicspace/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/adjacent-overload-signatures': 'warn',

@@ -1,3 +1,5 @@
+import {ParserServices, TSESLint} from '@typescript-eslint/experimental-utils';
+import {getChildOfKind, isAssignmentKind} from 'tsutils';
 import {
   ArrowFunction,
   FunctionDeclaration,
@@ -25,10 +27,8 @@ import {
   isTemplateSpan,
   isVariableDeclaration,
 } from 'typescript';
-import {getChildOfKind, isAssignmentKind} from 'tsutils';
 
 import {createRule, getFunctionLikeParent} from './@utils';
-import {TSESLint, ParserServices} from '@typescript-eslint/experimental-utils';
 
 const messages = {
   explicitReturnTypeRequired: 'This function requires explicit return type.',
