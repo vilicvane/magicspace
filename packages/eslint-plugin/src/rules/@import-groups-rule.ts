@@ -6,11 +6,11 @@ import {
   ModuleSpecifierHelper,
   ModuleSpecifierHelperOptions,
   createRule,
+  getFullStart,
   getModuleSpecifier,
   isRelativeModuleSpecifier,
   isTextualLiteral,
   trimLeftEmptyLines,
-  getFullStart,
 } from './@utils';
 
 const messages = {
@@ -265,7 +265,7 @@ export const importGroupsRule = createRule<Options, MessageId>({
 
         let fullStart = start;
 
-        let fullStartLine: number;
+        let fullStartLine: number | undefined;
 
         for (let i = 0; i < node.parent!.body.length; ++i) {
           if (node.parent!.body[i] === node) {

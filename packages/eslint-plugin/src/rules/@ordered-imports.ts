@@ -55,7 +55,7 @@ interface JSONOptions {
     | 'lowercase-last'
     | 'any';
   'module-source-path'?: 'full' | 'basename';
-  groups?: Array<JsonGroupOption | string>;
+  groups?: (JsonGroupOption | string)[];
 }
 
 type Options = [JSONOptions];
@@ -171,9 +171,11 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           }
 
           const splitIndex = x.lastIndexOf('/');
+
           if (splitIndex === -1) {
             return x;
           }
+
           return x.substr(splitIndex + 1);
         },
       ],
@@ -212,7 +214,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       'import-sources-order'?: string;
       'named-imports-order'?: string;
       'module-source-path'?: string;
-      groups?: Array<JsonGroupOption | string>;
+      groups?: (JsonGroupOption | string)[];
     }
 
     interface JsonGroupOption {
@@ -285,12 +287,13 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         return this.importsBlocks[this.importsBlocks.length - 1];
       }
 
-      public walk(sourceFile: ts.SourceFile): void {
+      walk(sourceFile: ts.SourceFile): void {
         // Walk through all statements checking import statements
         // and building up ImportsBlocks along the way (with replacements)
         for (const statement of sourceFile.statements) {
           this.checkStatement(statement);
         }
+
         this.endBlock();
 
         // Optionally check the ImportsBlocks for grouping
@@ -321,16 +324,18 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           this.checkImportEqualsDeclaration(statement);
         } else if (isModuleDeclaration(statement)) {
           const body = moduleDeclarationBody(statement);
+
           if (body !== undefined) {
             for (const subStatement of body.statements) {
               this.checkStatement(subStatement);
             }
+
             this.endBlock();
           }
         }
       }
 
-      private checkImportDeclaration(node: ts.ImportDeclaration) {
+      private checkImportDeclaration(node: ts.ImportDeclaration): void {
         // ex:  import {name1, name2 } from 'import/path';
         if (!isStringLiteral(node.moduleSpecifier)) {
           // Ignore grammar error
@@ -342,6 +347,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
 
         // check the names in the import are ordered correctly
         const {importClause} = node;
+
         if (
           importClause !== undefined &&
           importClause.namedBindings !== undefined &&
@@ -351,7 +357,9 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         }
       }
 
-      private checkImportEqualsDeclaration(node: ts.ImportEqualsDeclaration) {
+      private checkImportEqualsDeclaration(
+        node: ts.ImportEqualsDeclaration,
+      ): void {
         // only allowed `import x = require('y');`
 
         const {moduleReference} = node;
@@ -376,7 +384,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       private checkImport(
         fullImportPath: string,
         node: ImportDeclaration['node'],
-      ) {
+      ): void {
         // from this point forward we use the transformed import paths
         // - group lookup is based upon the full import path with no transform
         const matchingGroup = this.getMatchingGroup(fullImportPath);
@@ -396,6 +404,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         );
 
         if (
+          // eslint-disable-next-line no-null/no-null
           prevImportPath !== null &&
           compare(importPath, prevImportPath) === -1
         ) {
@@ -412,11 +421,14 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       private endBlock(): void {
         if (this.lastFix !== undefined) {
           const replacement = this.currentImportsBlock.getReplacement();
+
           if (replacement !== undefined) {
             this.lastFix.push(replacement);
           }
+
           this.lastFix = undefined;
         }
+
         this.importsBlocks.push(new ImportsBlock());
       }
 
@@ -432,11 +444,13 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           imports,
           this.options.namedImportsOrderTransform,
         );
+
         if (pair !== undefined) {
           const [a, b] = pair;
           const sortedDeclarations = sortByKey(imports, x =>
             this.options.namedImportsOrderTransform(x.getText()),
           ).map(x => x.getText());
+
           // replace in reverse order to preserve earlier offsets
           for (let i = imports.length - 1; i >= 0; i--) {
             const start = imports[i].getStart();
@@ -471,7 +485,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       private checkBlocksGrouping(): void {
         let prevBlockOrder = Number.MIN_SAFE_INTEGER;
 
-        const addFailingImportDecl = (decl: ImportDeclaration) => {
+        const addFailingImportDecl = (decl: ImportDeclaration): void => {
           const groupsMsg = [...this.options.groups]
             .sort((a, b) => a.order - b.order)
             .map(g => g.name)
@@ -528,6 +542,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
             return group;
           }
         }
+
         return this.defaultGroup;
       }
 
@@ -568,6 +583,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       ): FixFunction[] {
         return groupedDeclarations.map((items, index) => {
           let start = items[0].nodeStartOffset;
+
           if (index > 0) {
             const prevItems = groupedDeclarations[index - 1];
             const last = prevItems[prevItems.length - 1];
@@ -576,11 +592,13 @@ export const orderedImportsRule = createRule<Options, MessageId>({
               last.nodeEndOffset,
               start,
             );
+
             if (!/\S/.test(textFragment)) {
               // remove whitespace between blocks
               start = last.nodeEndOffset;
             }
           }
+
           return fixer =>
             fixer.replaceTextRange(
               [start, items[items.length - 1].nodeEndOffset],
@@ -618,6 +636,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       private getEolChar(): string {
         const lineEnd = this.sourceFile.getLineEndOfPosition(0);
         let newLine;
+
         if (lineEnd > 0) {
           if (lineEnd > 1 && this.sourceFile.text[lineEnd - 1] === '\r') {
             newLine = '\r\n';
@@ -625,6 +644,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
             newLine = '\n';
           }
         }
+
         return newLine === undefined ? ts.sys.newLine : newLine;
       }
     }
@@ -654,12 +674,12 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       /**
        * Add a new import declaration to the block
        */
-      public addImportDeclaration(
+      addImportDeclaration(
         sourceFile: ts.SourceFile,
         node: ImportDeclaration['node'],
         importPath: string,
         group: GroupOption,
-      ) {
+      ): void {
         const start = this.getStartOffset(node);
         const end = this.getEndOffset(sourceFile, node);
         const text = sourceFile.text.substring(start, end);
@@ -680,7 +700,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
         });
       }
 
-      public getImportDeclarations(): ImportDeclaration[] {
+      getImportDeclarations(): ImportDeclaration[] {
         return this.importDeclarations;
       }
 
@@ -689,18 +709,20 @@ export const orderedImportsRule = createRule<Options, MessageId>({
        * Updates the imports in place so the getReplacement method below can
        * return full fixes for the entire import block.
        */
-      public replaceNamedImports(
+      replaceNamedImports(
         fileOffset: number,
         length: number,
         replacement: string,
-      ) {
+      ): void {
         const importDeclaration = this.getLastImportDeclaration();
+
         if (importDeclaration === undefined) {
           // nothing to replace. This can happen if the block is skipped
           return;
         }
 
         const start = fileOffset - importDeclaration.nodeStartOffset;
+
         if (start < 0 || start + length > importDeclaration.node.getEnd()) {
           throw new Error('Unexpected named import position');
         }
@@ -715,20 +737,23 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       /**
        * Return the source path of the most recently added import.
        */
-      public getLastImportSource() {
+      getLastImportSource(): string | null {
         if (this.importDeclarations.length === 0) {
+          // eslint-disable-next-line no-null/no-null
           return null;
         }
+
         return this.getLastImportDeclaration()!.importPath;
       }
 
       /**
        * Return a Lint.Replacement object with ordering fixes for the entire block.
        */
-      public getReplacement(): FixFunction | undefined {
+      getReplacement(): FixFunction | undefined {
         if (this.importDeclarations.length === 0) {
           return undefined;
         }
+
         const fixedText = getSortedImportDeclarationsAsText(
           this.importDeclarations,
         );
@@ -738,10 +763,11 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       }
 
       // gets the offset immediately after the end of the previous declaration to include comment above
-      private getStartOffset(node: ImportDeclaration['node']) {
+      private getStartOffset(node: ImportDeclaration['node']): number {
         if (this.importDeclarations.length === 0) {
           return node.getStart();
         }
+
         return this.getLastImportDeclaration()!.nodeEndOffset;
       }
 
@@ -749,7 +775,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       private getEndOffset(
         sourceFile: ts.SourceFile,
         node: ImportDeclaration['node'],
-      ) {
+      ): number {
         return sourceFile.text.indexOf('\n', node.end) + 1;
       }
 
@@ -767,6 +793,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           } else if (char >= 'A' && char <= 'Z') {
             return char.toLowerCase();
           }
+
           return char;
         })
         .join('');
@@ -775,7 +802,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
     // After applying a transformation, are the nodes sorted according to the text they contain?
     // If not, return the pair of nodes which are out of order.
     function findUnsortedPair(
-      xs: ReadonlyArray<ts.Node>,
+      xs: readonly ts.Node[],
       transform: (x: string) => string,
     ): [ts.Node, ts.Node] | undefined {
       for (let i = 1; i < xs.length; i++) {
@@ -783,13 +810,15 @@ export const orderedImportsRule = createRule<Options, MessageId>({
           return [xs[i - 1], xs[i]];
         }
       }
+
       return undefined;
     }
 
     function compare(a: string, b: string): 0 | 1 | -1 {
-      function isLow(value: string) {
+      function isLow(value: string): boolean {
         return value[0] === '.' || value[0] === '/';
       }
+
       if (isLow(a) && !isLow(b)) {
         return 1;
       } else if (!isLow(a) && isLow(b)) {
@@ -799,6 +828,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       } else if (a < b) {
         return -1;
       }
+
       return 0;
     }
 
@@ -807,6 +837,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       if (value.length > 1 && (value[0] === "'" || value[0] === '"')) {
         value = value.substr(1, value.length - 2);
       }
+
       return value;
     }
 
@@ -820,10 +851,7 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       return sortedDeclarations.map(x => x.text).join('');
     }
 
-    function sortByKey<T>(
-      xs: ReadonlyArray<T>,
-      getSortKey: (x: T) => string,
-    ): T[] {
+    function sortByKey<T>(xs: readonly T[], getSortKey: (x: T) => string): T[] {
       return xs.slice().sort((a, b) => compare(getSortKey(a), getSortKey(b)));
     }
 
@@ -831,12 +859,14 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       node: ts.ModuleDeclaration,
     ): ts.ModuleBlock | undefined {
       let body = node.body;
+
       while (
         body !== undefined &&
         body.kind === ts.SyntaxKind.ModuleDeclaration
       ) {
         body = body.body;
       }
+
       return body !== undefined && body.kind === ts.SyntaxKind.ModuleBlock
         ? body
         : undefined;

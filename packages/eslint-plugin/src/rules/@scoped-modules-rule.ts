@@ -11,10 +11,10 @@ import _ from 'lodash';
 import {
   createRule,
   getBaseNameWithoutExtension,
+  getFullStart,
   getModuleSpecifier,
   hasKnownModuleFileExtension,
   removeModuleFileExtension,
-  getFullStart,
 } from './@utils';
 
 const messages = {
@@ -129,9 +129,11 @@ export const scopedModulesRule = createRule<Options, MessageId>({
                   let tokenAfter = context
                     .getSourceCode()
                     .getTokenAfter(statement);
+
                   return fixer.replaceTextRange(
                     [
                       statement.range[0],
+                      // eslint-disable-next-line no-null/no-null
                       tokenAfter === null
                         ? context.getSourceCode().getText().length
                         : tokenAfter.range[0],
@@ -144,7 +146,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       }
     }
 
-    function validateIndexFile(infos: ModuleStatementInfo[]) {
+    function validateIndexFile(infos: ModuleStatementInfo[]): void {
       let fileName = context.getFilename();
       let dirName = Path.dirname(fileName);
       let fileNames;

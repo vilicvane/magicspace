@@ -34,7 +34,7 @@ export function getFunctionLikeParent(
 ): FunctionLikeDeclaration | undefined {
   let parent: Node | undefined = node;
 
-  // tslint:disable-next-line:no-conditional-assignment
+  // eslint-disable-next-line no-cond-assign
   while ((parent = parent.parent)) {
     if (isFunctionLikeDeclaration(parent)) {
       return parent;
@@ -51,8 +51,8 @@ function isDeclarationFile(
 }
 
 export type TextualLiteral =
-  | TSESTree.Literal & {value: string}
-  | TSESTree.TemplateLiteral & {quasis: {length: 1}};
+  | (TSESTree.Literal & {value: string})
+  | (TSESTree.TemplateLiteral & {quasis: {length: 1}});
 
 export function isTextualLiteral(node: TSESTree.Node): node is TextualLiteral {
   return (
@@ -67,10 +67,13 @@ export function getFullStart(
 ): number {
   let token = sourceCode.getTokenBefore(node);
 
+  // eslint-disable-next-line no-null/no-null
   return token === null ? 0 : token.range[1];
 }
 
 // type AssertNever<T extends never> = T;
+
+/* eslint-disable no-bitwise */
 
 export const enum ImportKind {
   ImportDeclaration = 1,
@@ -79,7 +82,6 @@ export const enum ImportKind {
   DynamicImport = 8,
   Require = 16,
   ImportType = 32,
-  // tslint:disable: no-bitwise
   All = ImportDeclaration |
     ImportEquals |
     ExportFrom |
@@ -155,16 +157,16 @@ export function findImports(
 
 type ImportLike =
   | TSESTree.ImportDeclaration
-  | TSESTree.TSImportEqualsDeclaration & {
+  | (TSESTree.TSImportEqualsDeclaration & {
       moduleReference: TSESTree.TSExternalModuleReference;
-    }
-  | (TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration) & {
+    })
+  | ((TSESTree.ExportNamedDeclaration | TSESTree.ExportAllDeclaration) & {
       source: {};
-    }
-  | TSESTree.CallExpression & {
-      callee: TSESTree.Import | TSESTree.Identifier & {name: 'require'};
+    })
+  | (TSESTree.CallExpression & {
+      callee: TSESTree.Import | (TSESTree.Identifier & {name: 'require'});
       arguments: [TSESTree.Expression];
-    }
+    })
   | TSESTree.TSImportType;
 
 function findImportLikeNodes(
@@ -198,7 +200,7 @@ class ImportFinder {
     return this._result;
   }
 
-  private _findImports(statements: ReadonlyArray<TSESTree.Statement>): void {
+  private _findImports(statements: readonly TSESTree.Statement[]): void {
     for (const statement of statements) {
       if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
         if (this._options & ImportKind.ImportDeclaration) {
@@ -258,6 +260,7 @@ class ImportFinder {
 
     for (
       let match = re.exec(this._context.getSourceCode().getText());
+      // eslint-disable-next-line no-null/no-null
       match !== null;
       match = re.exec(this._context.getSourceCode().getText())
     ) {
