@@ -279,7 +279,12 @@ export const defaultConfig = {
     'no-redeclare': 'warn',
     'no-regex-spaces': 'off',
     'no-restricted-globals': 'off',
-    'no-restricted-imports': 'off',
+    'no-restricted-imports': [
+      'warn',
+      {
+        patterns: ['@*/*/bld/*', '*/bld/*', '@*/*/src/*', '*/src/*'],
+      },
+    ],
     'no-restricted-modules': 'off',
     'no-restricted-properties': 'off',
     'no-restricted-syntax': 'off',
