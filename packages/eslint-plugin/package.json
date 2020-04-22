@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/eslint-plugin",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "Custom ESLint rules for MagicSpace.",
   "repository": "https://github.com/makeflow/magicspace.git",
   "author": "Chengdu Mufan Technology Co., Ltd.",
