@@ -1,7 +1,7 @@
 export const overrideDevConfig = {
   rules: {
     'import/no-extraneous-dependencies': [
-      'warn',
+      'error',
       {
         devDependencies: true,
       },
