@@ -1,6 +1,9 @@
 let plugins = ['@magicspace', '@typescript-eslint', 'import', 'no-null'];
 
-if (process.argv[1] && process.argv[1].includes('dbaeumer.vscode-eslint')) {
+if (
+  require.main &&
+  /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
+) {
   plugins.push('only-warn');
 }
 
