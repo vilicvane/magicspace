@@ -80,7 +80,10 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       | TSESTree.ExportNamedDeclaration
       | TSESTree.ExportAllDeclaration;
 
-    type ModuleStatementInfo = ImportStatementInfo | ExportStatementInfo;
+    type ModuleStatementInfo =
+      | ImportStatementInfo
+      | ExportStatementInfo
+      | ExportAsStatementInfo;
     type ModuleStatementType = ModuleStatementInfo['type'];
 
     interface ImportStatementInfo {
@@ -91,6 +94,12 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
     interface ExportStatementInfo {
       type: 'export';
+      statement: ModuleStatement;
+      specifier: string;
+    }
+
+    interface ExportAsStatementInfo {
+      type: 'export-as';
       statement: ModuleStatement;
       specifier: string;
     }
@@ -170,7 +179,8 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
           if (
             type === 'export' ||
-            (type === 'import' && specifier !== './namespace')
+            ((type === 'import' || type === 'export-as') &&
+              specifier !== './namespace')
           ) {
             context.report({
               node: statement,
@@ -192,7 +202,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         }
 
         let importSpecifiers = infos
-          .filter(info => info.type === 'import')
+          .filter(info => info.type === 'import' || info.type === 'export-as')
           .map(info => info.specifier);
 
         let expectedImportSpecifiers = ['./namespace'];
@@ -214,7 +224,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
                     .getSourceCode()
                     .getText()
                     .trimRight(),
-                  `import * as Namespace from './namespace';\n\nexport {Namespace};`,
+                  `export * as Namespace from './namespace';`,
                 ]
                   .filter(text => !!text)
                   .join('\n')}\n`,
@@ -355,11 +365,10 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
       if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
         type = 'import';
-      } else if (
-        statement.type === AST_NODE_TYPES.ExportNamedDeclaration ||
-        statement.type === AST_NODE_TYPES.ExportAllDeclaration
-      ) {
+      } else if (statement.type === AST_NODE_TYPES.ExportNamedDeclaration) {
         type = 'export';
+      } else if (statement.type === AST_NODE_TYPES.ExportAllDeclaration) {
+        type = statement.exported ? 'export-as' : 'export';
       } else {
         continue;
       }

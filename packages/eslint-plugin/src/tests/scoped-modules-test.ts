@@ -14,7 +14,20 @@ const ruleTester = new RuleTester({
 });
 
 ruleTester.run('scoped-modules', rules['scoped-modules'], {
-  valid: [],
+  valid: [
+    {
+      code: FS.readFileSync(
+        Path.join(
+          __dirname,
+          '../../test/scoped-modules/export-as-namespace/1/index.ts',
+        ),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/scoped-modules/export-as-namespace/1/index.ts',
+      ),
+    },
+  ],
   invalid: [
     {
       code: FS.readFileSync(
