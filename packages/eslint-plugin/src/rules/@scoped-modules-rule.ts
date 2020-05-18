@@ -363,14 +363,21 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     for (let statement of context.getSourceCode().ast.body) {
       let type: ModuleStatementType;
 
-      if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
-        type = 'import';
-      } else if (statement.type === AST_NODE_TYPES.ExportNamedDeclaration) {
-        type = 'export';
-      } else if (statement.type === AST_NODE_TYPES.ExportAllDeclaration) {
-        type = statement.exported ? 'export-as' : 'export';
-      } else {
-        continue;
+      switch (statement.type) {
+        case AST_NODE_TYPES.ImportDeclaration:
+          type = 'import';
+          break;
+
+        case AST_NODE_TYPES.ExportNamedDeclaration:
+          type = 'export';
+          break;
+
+        case AST_NODE_TYPES.ExportAllDeclaration:
+          type = statement.exported ? 'export-as' : 'export';
+          break;
+
+        default:
+          continue;
       }
 
       let specifier =
