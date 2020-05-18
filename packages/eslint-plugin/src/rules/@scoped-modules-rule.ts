@@ -80,7 +80,10 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       | TSESTree.ExportNamedDeclaration
       | TSESTree.ExportAllDeclaration;
 
-    type ModuleStatementInfo = ImportStatementInfo | ExportStatementInfo;
+    type ModuleStatementInfo =
+      | ImportStatementInfo
+      | ExportStatementInfo
+      | ExportAsStatementInfo;
     type ModuleStatementType = ModuleStatementInfo['type'];
 
     interface ImportStatementInfo {
@@ -91,6 +94,12 @@ export const scopedModulesRule = createRule<Options, MessageId>({
 
     interface ExportStatementInfo {
       type: 'export';
+      statement: ModuleStatement;
+      specifier: string;
+    }
+
+    interface ExportAsStatementInfo {
+      type: 'export-as';
       statement: ModuleStatement;
       specifier: string;
     }
@@ -168,9 +177,15 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         for (let info of infos) {
           let {type, specifier, statement} = info;
 
+          /**
+           *  When there's a namespace file in the directory, we should just export the namespace.
+           *  The code below will report an error when you write 'export * from xxx' or when you import
+           *  a module which is not the namespace file.
+           */
           if (
             type === 'export' ||
-            (type === 'import' && specifier !== './namespace')
+            ((type === 'import' || type === 'export-as') &&
+              specifier !== './namespace')
           ) {
             context.report({
               node: statement,
@@ -192,7 +207,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         }
 
         let importSpecifiers = infos
-          .filter(info => info.type === 'import')
+          .filter(info => info.type === 'import' || info.type === 'export-as')
           .map(info => info.specifier);
 
         let expectedImportSpecifiers = ['./namespace'];
@@ -214,7 +229,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
                     .getSourceCode()
                     .getText()
                     .trimRight(),
-                  `import * as Namespace from './namespace';\n\nexport {Namespace};`,
+                  `export * as Namespace from './namespace';`,
                 ]
                   .filter(text => !!text)
                   .join('\n')}\n`,
@@ -353,15 +368,21 @@ export const scopedModulesRule = createRule<Options, MessageId>({
     for (let statement of context.getSourceCode().ast.body) {
       let type: ModuleStatementType;
 
-      if (statement.type === AST_NODE_TYPES.ImportDeclaration) {
-        type = 'import';
-      } else if (
-        statement.type === AST_NODE_TYPES.ExportNamedDeclaration ||
-        statement.type === AST_NODE_TYPES.ExportAllDeclaration
-      ) {
-        type = 'export';
-      } else {
-        continue;
+      switch (statement.type) {
+        case AST_NODE_TYPES.ImportDeclaration:
+          type = 'import';
+          break;
+
+        case AST_NODE_TYPES.ExportNamedDeclaration:
+          type = 'export';
+          break;
+
+        case AST_NODE_TYPES.ExportAllDeclaration:
+          type = statement.exported ? 'export-as' : 'export';
+          break;
+
+        default:
+          continue;
       }
 
       let specifier =
