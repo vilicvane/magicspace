@@ -177,6 +177,11 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         for (let info of infos) {
           let {type, specifier, statement} = info;
 
+          /**
+           *  When there's a namespace file in the directory, we should just export the namespace.
+           *  The code below will report an error when you write 'export * from xxx' or when you import
+           *  a module which is not the namespace file.
+           */
           if (
             type === 'export' ||
             ((type === 'import' || type === 'export-as') &&
