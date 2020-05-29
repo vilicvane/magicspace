@@ -16,7 +16,17 @@ const ruleTester = new RuleTester({
 });
 
 ruleTester.run('explicit-return-type', rules['explicit-return-type'], {
-  valid: [],
+  valid: [
+    {
+      code: FS.readFileSync(
+        Path.join(__dirname, '../../test/explicit-return-type/test.tsx'),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/explicit-return-type/test.tsx',
+      ),
+    },
+  ],
   invalid: [
     {
       code: FS.readFileSync(
