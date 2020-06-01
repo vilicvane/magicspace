@@ -20,6 +20,7 @@ import {
   isFunctionDeclaration,
   isFunctionExpression,
   isGetAccessorDeclaration,
+  isJsxExpression,
   isMethodDeclaration,
   isNewExpression,
   isPropertyDeclaration,
@@ -210,6 +211,11 @@ export const explicitReturnTypeRule = createRule<Options, MessageId>({
 
         if (!parent) {
           return false;
+        }
+
+        // const a = <div>{() => <div></div>}</div>
+        if (isJsxExpression(node.parent)) {
+          return true;
         }
 
         if (
