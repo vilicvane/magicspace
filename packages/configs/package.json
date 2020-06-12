@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/configs",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Custom TSLint rules for MagicSpace.",
   "keywords": [
     "TypeScript",
@@ -11,8 +11,5 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "eslint-config-prettier": "^6.7.0"
   }
 }
