@@ -1,10 +1,18 @@
-let plugins = ['@magicspace', '@typescript-eslint', 'import', 'no-null'];
+import {Dict} from 'tslang';
 
-if (
-  require.main &&
-  /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
-) {
-  plugins.push('only-warn');
+let plugins = ['@magicspace', '@typescript-eslint', 'import', 'no-null'];
+let additionRules: Dict<string> = {};
+
+if (require.main) {
+  if (
+    /[\\/]\.vscode(?:-server)?[\\/]extensions[\\/]/.test(require.main.filename)
+  ) {
+    plugins.push('only-warn');
+  }
+
+  if (require.main.filename.includes('eslint/bin/eslint.js')) {
+    additionRules['@magicspace/import-type-unification'] = 'error';
+  }
 }
 
 export const defaultConfig = {
@@ -20,6 +28,7 @@ export const defaultConfig = {
   },
   plugins,
   rules: {
+    ...additionRules,
     '@magicspace/empty-line-around-blocks': 'error',
     '@magicspace/import-groups': [
       'error',
