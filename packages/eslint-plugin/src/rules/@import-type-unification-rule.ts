@@ -180,6 +180,24 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
       }
     }
 
+    function reportPreviousError(
+      identifier: TSESTree.Identifier,
+      data: Record<string, unknown>,
+    ): void {
+      if (data.filename === context.getFilename()) {
+        context.report({
+          node: identifier,
+          messageId: 'importTypeNotUnified',
+        });
+      } else {
+        context.report({
+          node: identifier,
+          messageId: 'importTypeNotUnifiedPreviously',
+          data,
+        });
+      }
+    }
+
     function reportPreviousErrors(
       importTypes: ImportType[],
       groups: _.Dictionary<ImportInfo[]>,
@@ -196,30 +214,20 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         if (importTypes.length !== 1) {
           for (let importType of importTypes) {
             if (info.importType !== importType) {
-              context.report({
-                node: groups[importType][0].identifier,
-                messageId: 'importTypeNotUnifiedPreviously',
-                data,
-              });
+              reportPreviousError(info.identifier, data);
 
               break;
             }
           }
         } else {
           if (info.importType !== importTypes[0]) {
-            context.report({
-              node: groups[importTypes[0]][0].identifier,
-              messageId: 'importTypeNotUnifiedPreviously',
-              data,
-            });
+            reportPreviousError(info.identifier, data);
           } else {
             for (let {identifier} of groups[info.importType]) {
               if (identifier.name !== info.identifier.name) {
-                context.report({
-                  node: identifier,
-                  messageId: 'importTypeNotUnifiedPreviously',
-                  data,
-                });
+                reportPreviousError(info.identifier, data);
+
+                break;
               }
             }
           }
@@ -247,13 +255,15 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
         return true;
       }
 
+      let identifierName = groups[importTypes[0]][0].identifier.name;
+
       for (let info of reportNeededInfos) {
         if (info.importType !== importTypes[0]) {
           return false;
         }
 
         if (info.importType !== 'named') {
-          if (info.identifier !== groups[importTypes[0]][0].identifier) {
+          if (info.identifier.name !== identifierName) {
             return false;
           }
         }
@@ -308,16 +318,14 @@ export const importTypeUnificationRule = createRule<Options, MessageId>({
               if (oldReportNeededInfo.importType !== importType) {
                 newReportNeededInfos.push(oldReportNeededInfo);
               } else {
-                context.report({
-                  node: identifier,
-                  messageId: 'importTypeNotUnifiedPreviously',
-                  data: {
-                    filename: oldReportNeededInfo.filename,
-                    identifier: oldReportNeededInfo.identifier.name,
-                    line: oldReportNeededInfo.identifier.loc.start.line,
-                    column: oldReportNeededInfo.identifier.loc.start.column,
-                  },
-                });
+                const data = {
+                  filename: oldReportNeededInfo.filename,
+                  identifier: oldReportNeededInfo.identifier.name,
+                  line: oldReportNeededInfo.identifier.loc.start.line,
+                  column: oldReportNeededInfo.identifier.loc.start.column,
+                };
+
+                reportPreviousError(oldReportNeededInfo.identifier, data);
               }
             }
 
