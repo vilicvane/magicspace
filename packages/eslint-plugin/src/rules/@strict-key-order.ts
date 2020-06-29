@@ -65,7 +65,7 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
 
       let strictOrderSpecified = _.some(
         comments.map(comment => {
-          return comment.value.trim() === '@strict-order';
+          return comment.value.trim() === 'strict-key-order';
         }),
       );
 
