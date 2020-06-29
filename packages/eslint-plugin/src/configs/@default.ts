@@ -403,6 +403,7 @@ export const defaultConfig = {
         '@magicspace/explicit-return-type': 'error',
         '@magicspace/import-path-base-url': 'off',
         '@magicspace/no-unnecessary-type-assertion': 'error',
+        '@magicspace/strict-key-order': 'error',
         '@typescript-eslint/adjacent-overload-signatures': 'error',
         '@typescript-eslint/array-type': [
           'error',

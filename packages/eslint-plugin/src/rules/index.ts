@@ -10,6 +10,7 @@ import {noEmptyConstructorRule} from './@no-empty-constructor-rule';
 import {noUnnecessaryTypeAssertionRule} from './@no-unnecessary-type-assertion';
 import {orderedImportsRule} from './@ordered-imports';
 import {scopedModulesRule} from './@scoped-modules-rule';
+import {strictKeyOrderRule} from './@strict-key-order';
 
 export const rules = {
   'empty-line-around-blocks': emptyLineAroundBlocksRule,
@@ -24,4 +25,5 @@ export const rules = {
   'no-unnecessary-type-assertion': noUnnecessaryTypeAssertionRule,
   'ordered-imports': orderedImportsRule,
   'scoped-modules': scopedModulesRule,
+  'strict-key-order': strictKeyOrderRule,
 };
