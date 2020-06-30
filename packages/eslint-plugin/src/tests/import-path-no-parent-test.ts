@@ -18,6 +18,15 @@ ruleTester.run('import-path-no-parent', rules['import-path-no-parent'], {
       code: `import("./widget")`,
     },
     {
+      code: `type A = import( "./widget" );`,
+    },
+    {
+      code: `/** import( "./.." ) */ import("./widget")`,
+    },
+    {
+      code: `/** require( "./.." ) */ require("./widget")`,
+    },
+    {
       code: `import * as Foo from './foo';`,
       filename: Path.join(__dirname, 'foo0'),
     },
@@ -40,7 +49,15 @@ ruleTester.run('import-path-no-parent', rules['import-path-no-parent'], {
   ],
   invalid: [
     {
-      code: `import("./..")`,
+      code: `import( "./.." )`,
+      errors: [{messageId: 'bannedParentImport'}],
+    },
+    {
+      code: `type A = import( "./.." );`,
+      errors: [{messageId: 'bannedParentImport'}],
+    },
+    {
+      code: `require( "./.." )`,
       errors: [{messageId: 'bannedParentImport'}],
     },
     {

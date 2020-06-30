@@ -1,10 +1,10 @@
 import * as fs from 'fs'
-// comment
+// comment1
 import * as path from 'path'
-// comment
-import * as eslint from 'eslint'
-// comment
-import * as typescript from 'typescript'
 
-//comment
+// comment2
+import * as eslint from 'eslint'
+// comment3
+import * as typescript from 'typescript'
+//comment4
 import resolve from 'resolve'
