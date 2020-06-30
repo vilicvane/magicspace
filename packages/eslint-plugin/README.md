@@ -17,11 +17,7 @@ yarn add @magicspace/configs @magicspace/eslint-plugin --dev
 
 ```js
 module.exports = {
-  extends: [
-    'plugin:@magicspace/default',
-    'plugin:@magicspace/override-dev',
-    'prettier',
-  ],
+  extends: ['plugin:@magicspace/default', 'plugin:@magicspace/override-dev'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
