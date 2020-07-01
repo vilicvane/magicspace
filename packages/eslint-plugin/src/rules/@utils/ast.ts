@@ -155,7 +155,7 @@ export function findImports(
 
   function addIfTextualLiteral(node: TSESTree.Expression): void {
     if (isTextualLiteral(node)) {
-      result.push(node); // TODO: duplicate node added here
+      result.push(node); // TODO(ooyyloo): duplicate node added here
     }
   }
 }
@@ -225,7 +225,7 @@ class ImportFinder {
         statement.type === AST_NODE_TYPES.ExportAllDeclaration
       ) {
         if (
-          statement.source !== undefined && // TODO: 有必要判断是否为undefined吗？
+          statement.source !== undefined && // TODO(ooyyloo): Is it necessary to check if statement.source is undefined?
           this._options & ImportKind.ExportFrom
         ) {
           this._result.push(statement as any);
@@ -273,7 +273,7 @@ class ImportFinder {
       const token = this._context.getSourceCode().getNodeByRangeIndex(
         match.index,
         // // only look for ImportTypeNode within JSDoc in JS files
-        // match[0][0] === 'i' && isJavaScriptFile,  // TODO: How to handle JSDoc?
+        // match[0][0] === 'i' && isJavaScriptFile,  // TODO(ooyyloo): How to handle JSDoc?
       )!;
 
       // skip comment
@@ -285,7 +285,8 @@ class ImportFinder {
         token.type === AST_NODE_TYPES.ImportExpression ||
         token.type === AST_NODE_TYPES.TSImportType
       ) {
-        // if (token.range[0] !== match.index) {
+        // TODO(ooyyloo): Figure out all situations the code below deals with.
+        // if (token.range[1] - 'import'.length !== match.index) {
         //   continue;
         // }
 

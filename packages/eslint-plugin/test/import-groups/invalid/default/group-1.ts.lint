@@ -7,6 +7,6 @@ const v = 'a' // failure
 
 import * as Typescript from 'typescript'
 import * as Lint from 'eslint'
-import { func } from '../lib' // failure
+import {func} from '../lib' // failure
 
 import * as http from 'http' // failure
