@@ -52,7 +52,7 @@ import {
   isWhileStatement,
 } from 'typescript';
 
-import {createRule} from './@utils';
+import {createRule, getParserServices} from './@utils';
 
 const messages = {
   emptyLineAroundStatementRequired:
@@ -159,7 +159,9 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
             this.walkFunctionLikeDeclaration(node);
           }
         } else if (isBlockIncludingStatement(node)) {
-          this.walkBlockIncludingStatement(node);
+          if (!isObjectLiteralExpression(node.parent)) {
+            this.walkBlockIncludingStatement(node);
+          }
         }
 
         forEachChild(node, this.walkNode);
@@ -473,29 +475,6 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
       }
 
       return false;
-    }
-
-    function getParserServices<
-      TMessageIds extends string,
-      TOptions extends unknown[]
-    >(
-      context: TSESLint.RuleContext<TMessageIds, TOptions>,
-    ): RequiredParserServices {
-      if (
-        !context.parserServices ||
-        !context.parserServices.program ||
-        !context.parserServices.esTreeNodeToTSNodeMap
-      ) {
-        /**
-         * The user needs to have configured "project" in their parserOptions
-         * for @typescript-eslint/parser
-         */
-        throw new Error(
-          'You have used a rule which requires parserServices to be generated. You must therefore provide a value for the "parserOptions.project" property for @typescript-eslint/parser.',
-        );
-      }
-
-      return context.parserServices as RequiredParserServices;
     }
 
     const emptyLineAroundBlocksWalker = new EmptyLineAroundBlocksWalker();
