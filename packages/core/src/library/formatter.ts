@@ -13,7 +13,7 @@ export class Formatter {
     let {inferredParser: parser} = await getFileInfo(filePath);
 
     return format(content, {
-      ...(parser ? {parser} as Options : undefined),
+      ...(parser ? ({parser} as Options) : undefined),
       ...options,
     });
   }

@@ -225,10 +225,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
               return fixer.replaceTextRange(
                 context.getSourceCode().ast.range,
                 `${[
-                  context
-                    .getSourceCode()
-                    .getText()
-                    .trimRight(),
+                  context.getSourceCode().getText().trimRight(),
                   `export * as Namespace from './namespace';`,
                 ]
                   .filter(text => !!text)
@@ -342,10 +339,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
         fixer.replaceTextRange(
           [0, context.getSourceCode().getText().length],
           `${[
-            context
-              .getSourceCode()
-              .getText()
-              .trimRight(),
+            context.getSourceCode().getText().trimRight(),
             ...nodesPath.map(
               value => `export * from '${removeModuleFileExtension(value)}';`,
             ),

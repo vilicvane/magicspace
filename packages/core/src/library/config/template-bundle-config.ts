@@ -119,7 +119,7 @@ export interface TemplateModuleSourceConfig
 }
 
 export interface ITemplateTextSourceConfig extends ITemplateSourceConfig {
-  encoding?: string;
+  encoding?: BufferEncoding;
 }
 
 export interface TemplateTextSourceConfig extends ITemplateTextSourceConfig {

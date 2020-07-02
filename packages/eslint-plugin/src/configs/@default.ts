@@ -19,6 +19,7 @@ export const defaultConfig = {
     es6: true,
   },
   plugins,
+  ignorePatterns: ['.eslintrc.js'],
   rules: {
     '@magicspace/empty-line-around-blocks': 'error',
     '@magicspace/import-groups': [
@@ -413,11 +414,13 @@ export const defaultConfig = {
           },
         ],
         '@typescript-eslint/await-thenable': 'off',
-        '@typescript-eslint/ban-ts-ignore': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/ban-types': [
           'error',
           {
             types: {
+              '{}': false,
+              object: false,
               Object: {
                 message:
                   'Avoid using the `Object` type. Did you mean `object`?',
@@ -438,8 +441,6 @@ export const defaultConfig = {
           },
         ],
         '@typescript-eslint/brace-style': 'off',
-        '@typescript-eslint/camelcase': 'off',
-        '@typescript-eslint/class-name-casing': 'error',
         '@typescript-eslint/consistent-type-assertions': 'error',
         '@typescript-eslint/consistent-type-definitions': [
           'error',
@@ -453,12 +454,9 @@ export const defaultConfig = {
           },
         ],
         '@typescript-eslint/func-call-spacing': 'off',
-        '@typescript-eslint/generic-type-naming': 'off',
         '@typescript-eslint/indent': 'off',
         '@typescript-eslint/index': 'off',
-        '@typescript-eslint/interface-name-prefix': 'off',
         '@typescript-eslint/member-delimiter-style': 'off',
-        '@typescript-eslint/member-naming': 'off',
         '@typescript-eslint/member-ordering': [
           'error',
           {
@@ -475,6 +473,17 @@ export const defaultConfig = {
               'protected-static-method',
               'private-static-method',
             ],
+          },
+        ],
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'class',
+            format: ['PascalCase'],
+          },
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
           },
         ],
         '@typescript-eslint/no-array-constructor': 'off',

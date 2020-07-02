@@ -175,7 +175,7 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
 
     let sourceFile = parserServices.esTreeNodeToTSNodeMap.get(
       context.getSourceCode().ast,
-    ) as ts.SourceFile;
+    );
 
     const program = parserServices.program;
     const compilerOptions = program.getCompilerOptions();

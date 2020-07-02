@@ -878,8 +878,8 @@ export const orderedImportsRule = createRule<Options, MessageId>({
       context.getSourceCode().ast,
     );
 
-    new Walker(sourceFile as ts.SourceFile, parseOptions(options)).walk(
-      sourceFile as ts.SourceFile,
+    new Walker(sourceFile, parseOptions(options)).walk(
+      sourceFile,
     );
 
     for (let reportDescriptor of reportDescriptors) {
