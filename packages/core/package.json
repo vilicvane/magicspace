@@ -19,22 +19,17 @@
     "bld/library"
   ],
   "dependencies": {
-    "fs-extra": "^8.1.0",
-    "glob": "^7.1.4",
-    "handlebars": "^4.1.2",
-    "lodash": "^4.17.14",
-    "prettier": "^1.18.2",
-    "resolve": "^1.11.1",
-    "sort-keys": "^3.0.0",
-    "strip-json-comments": "^3.0.1",
-    "ts-node": "^8.3.0",
-    "tslang": "^0.1.15",
-    "tslib": "^1.10.0",
-    "typescript": "^3.5.3"
-  },
-  "devDependencies": {
-    "@magicspace/tslint-rules": "^0.1.46",
-    "tslint": "^5.20.1",
-    "tslint-config-prettier": "^1.18.0"
+    "fs-extra": "^9.0.1",
+    "glob": "^7.1.6",
+    "handlebars": "^4.7.6",
+    "lodash": "^4.17.15",
+    "prettier": "^2.0.5",
+    "resolve": "^1.17.0",
+    "sort-keys": "^4.0.0",
+    "strip-json-comments": "^3.1.0",
+    "ts-node": "^8.10.2",
+    "tslang": "^0.1.22",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
   }
 }

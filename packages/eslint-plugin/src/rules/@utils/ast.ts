@@ -71,8 +71,6 @@ export function getFullStart(
   return token === null ? 0 : token.range[1];
 }
 
-// type AssertNever<T extends never> = T;
-
 /* eslint-disable no-bitwise */
 
 export const enum ImportKind {
@@ -134,6 +132,13 @@ export function findImports(
         addIfTextualLiteral(node.arguments[0]);
         break;
 
+      case AST_NODE_TYPES.ImportExpression:
+        if (node.source.type === AST_NODE_TYPES.Literal) {
+          addIfTextualLiteral(node.source);
+        }
+
+        break;
+
       case AST_NODE_TYPES.TSImportType:
         if (node.parameter.type === AST_NODE_TYPES.TSLiteralType) {
           addIfTextualLiteral(node.parameter.literal);
@@ -150,7 +155,7 @@ export function findImports(
 
   function addIfTextualLiteral(node: TSESTree.Expression): void {
     if (isTextualLiteral(node)) {
-      result.push(node); // TODO: 这里的node有重复加
+      result.push(node); // TODO(ooyyloo): duplicate node added here
     }
   }
 }
@@ -164,10 +169,11 @@ type ImportLike =
       source: {};
     })
   | (TSESTree.CallExpression & {
-      callee: TSESTree.Import | (TSESTree.Identifier & {name: 'require'});
+      callee: TSESTree.Identifier & {name: 'require'};
       arguments: [TSESTree.Expression];
     })
-  | TSESTree.TSImportType;
+  | TSESTree.TSImportType
+  | TSESTree.ImportExpression;
 
 function findImportLikeNodes(
   context: TSESLint.RuleContext<string, unknown[]>,
@@ -219,7 +225,7 @@ class ImportFinder {
         statement.type === AST_NODE_TYPES.ExportAllDeclaration
       ) {
         if (
-          statement.source !== undefined && // TODO: 有必要判断是否为undefined吗？
+          statement.source !== undefined && // TODO(ooyyloo): Is it necessary to check if statement.source is undefined?
           this._options & ImportKind.ExportFrom
         ) {
           this._result.push(statement as any);
@@ -267,24 +273,29 @@ class ImportFinder {
       const token = this._context.getSourceCode().getNodeByRangeIndex(
         match.index,
         // // only look for ImportTypeNode within JSDoc in JS files
-        // match[0][0] === 'i' && isJavaScriptFile,  // TODO: How to handle JSDoc?
+        // match[0][0] === 'i' && isJavaScriptFile,  // TODO(ooyyloo): How to handle JSDoc?
       )!;
 
-      if (token.type === AST_NODE_TYPES.Import) {
-        if (token.range[1] - 'import'.length !== match.index) {
-          continue;
-        }
+      // skip comment
+      if (!token) {
+        continue;
+      }
 
-        switch (token.parent!.type) {
+      if (
+        token.type === AST_NODE_TYPES.ImportExpression ||
+        token.type === AST_NODE_TYPES.TSImportType
+      ) {
+        // TODO(ooyyloo): Figure out all situations the code below deals with.
+        // if (token.range[1] - 'import'.length !== match.index) {
+        //   continue;
+        // }
+
+        switch (token.type) {
           case AST_NODE_TYPES.TSImportType:
-            this._result.push(token.parent as TSESTree.TSImportType);
+            this._result.push(token);
             break;
-          case AST_NODE_TYPES.CallExpression:
-            if (
-              (token.parent as TSESTree.CallExpression).arguments.length === 1
-            ) {
-              this._result.push(token.parent as any);
-            }
+          case AST_NODE_TYPES.ImportExpression:
+            this._result.push(token as any);
 
             break;
         }
