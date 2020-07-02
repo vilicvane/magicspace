@@ -73,7 +73,7 @@ export default bundle({
         source: {
           type: 'inline',
           content: {
-            [commandName]: 'bld/program/main.js',
+            [commandName!]: 'bld/program/main.js',
           },
         },
         destination: {
