@@ -24,8 +24,10 @@ ruleTester.run('strict-key-order', rules['strict-key-order'], {
       ).toString(),
       filename: Path.join(__dirname, '../../test/strict-key-order/test.ts'),
       errors: [
-        {messageId: 'strictKeyOrder', line: 34, column: 3, endColumn: 26},
-        {messageId: 'strictKeyOrder', line: 40, column: 3, endColumn: 26},
+        {messageId: 'wrongPosition', line: 33, column: 3, endColumn: 15},
+        {messageId: 'wrongPosition', line: 39, column: 3, endColumn: 15},
+        {messageId: 'wrongPosition', line: 65, column: 3, endColumn: 4},
+        {messageId: 'wrongPosition', line: 70, column: 3, endColumn: 4},
       ],
     },
   ],

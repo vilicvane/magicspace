@@ -1,12 +1,12 @@
 import {AST_NODE_TYPES, TSESTree} from '@typescript-eslint/experimental-utils';
+import * as jsdiff from 'diff';
 import * as _ from 'lodash';
 import ts from 'typescript';
 
 import {createRule, getParserServices} from './@utils';
 
 const messages = {
-  strictKeyOrder:
-    'The key {{key}} is in wrong position or missing in "{{type}}".',
+  wrongPosition: 'The key "{{key}}" is in wrong position.',
 };
 
 type Options = [];
@@ -29,6 +29,11 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
   defaultOptions: [],
 
   create(context) {
+    interface PropertyKeyInfo {
+      key: string;
+      index: number;
+    }
+
     const parserServices = getParserServices(context);
     let typeChecker = parserServices.program.getTypeChecker();
 
@@ -77,52 +82,60 @@ export const strictKeyOrderRule = createRule<Options, MessageId>({
         typeAnnotation.typeAnnotation,
       );
 
-      let keys = mapIteratorToArray(
+      let typeKeys = mapIteratorToArray(
         typeChecker.getTypeAtLocation(typeNode).symbol.members!.keys(),
       );
 
-      let propertyKeyInfos = _.compact(
+      let propertyKeyInfos: PropertyKeyInfo[] = _.compact(
         init.properties.map((property, index) => {
-          if (
-            property.type !== AST_NODE_TYPES.Property ||
-            property.key.type !== AST_NODE_TYPES.Literal
-          ) {
+          if (property.type !== AST_NODE_TYPES.Property) {
             return undefined;
           }
 
-          return {key: property.key.value, index};
+          if (property.key.type === AST_NODE_TYPES.Literal) {
+            return {key: property.key.value as string, index};
+          }
+
+          if (property.key.type === AST_NODE_TYPES.Identifier) {
+            return {key: property.key.name, index};
+          }
+
+          return undefined;
         }),
       );
+      let propertyKeys = propertyKeyInfos.map(
+        propertyKeyInfo => propertyKeyInfo.key,
+      );
 
-      let i = 0;
-      let j = 0;
+      let typeKeySet = new Set(typeKeys);
 
-      while (i < keys.length && j < propertyKeyInfos.length) {
-        if (keys[i] === propertyKeyInfos[j].key) {
-          ++i;
-          ++j;
+      let diffResult = jsdiff.diffArrays(typeKeys, propertyKeys);
 
-          continue;
+      let propertyKeyIndex = 0;
+
+      for (let diffResultPart of diffResult) {
+        if (diffResultPart.added) {
+          for (let i = 0; i < diffResultPart.value.length; ++i) {
+            let key = diffResultPart.value[i];
+            let property = init.properties[
+              propertyKeyInfos[propertyKeyIndex + i].index
+            ] as TSESTree.Property;
+
+            if (typeKeySet.has(key)) {
+              context.report({
+                node: property.key,
+                messageId: 'wrongPosition',
+                data: {
+                  key,
+                },
+              });
+            }
+          }
         }
 
-        ++i;
-      }
-
-      if (j < propertyKeyInfos.length) {
-        let property = init.properties[
-          propertyKeyInfos[j].index
-        ] as TSESTree.Property;
-
-        context.report({
-          node: property.key,
-          messageId: 'strictKeyOrder',
-          data: {
-            key: propertyKeyInfos[j].key,
-            type: context
-              .getSourceCode()
-              .getText(typeAnnotation.typeAnnotation),
-          },
-        });
+        if (!diffResultPart.removed) {
+          propertyKeyIndex += diffResultPart.value.length;
+        }
       }
     }
 

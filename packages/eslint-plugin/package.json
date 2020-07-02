@@ -25,6 +25,7 @@
     "!bld/tests"
   ],
   "devDependencies": {
+    "@types/diff": "^4.0.2",
     "mocha": "^8.0.1",
     "source-map-support": "^0.5.19"
   },
@@ -36,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^3.5.0",
     "@typescript-eslint/experimental-utils": "^3.5.0",
     "@typescript-eslint/parser": "^3.5.0",
+    "diff": "^4.0.2",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-only-warn": "^1.0.2",
