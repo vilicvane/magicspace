@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('import-path-strict-hierarchy');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -20,15 +22,9 @@ ruleTester.run(
     valid: [
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/index.ts.lint'),
         ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/index.ts.lint',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/index.ts.lint'),
         options: [
           {
             hierarchy: {
@@ -46,15 +42,9 @@ ruleTester.run(
     invalid: [
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/main.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/main.ts.lint'),
         ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/main.ts',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/main.ts'),
         options: [
           {
             hierarchy: {
@@ -75,10 +65,7 @@ ruleTester.run(
       },
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/core/core-sub/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/core/core-sub/index.ts.lint'),
         ).toString(),
         options: [
           {
@@ -92,10 +79,7 @@ ruleTester.run(
             baseUrl: 'src',
           },
         ],
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/core/core-sub/index.ts.lint',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/core/core-sub/index.ts.lint'),
         errors: [
           {messageId: 'bannedHierarchyImport', line: 3},
           {messageId: 'bannedHierarchyImport', line: 4},
@@ -103,10 +87,7 @@ ruleTester.run(
       },
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/core/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/core/index.ts.lint'),
         ).toString(),
         options: [
           {
@@ -120,10 +101,7 @@ ruleTester.run(
             baseUrl: 'src',
           },
         ],
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/core/index.ts.lint',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/core/index.ts.lint'),
         errors: [
           {messageId: 'bannedHierarchyImport', line: 2},
           {messageId: 'bannedHierarchyImport', line: 3},
@@ -133,10 +111,7 @@ ruleTester.run(
       },
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/main/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/main/index.ts.lint'),
         ).toString(),
         options: [
           {
@@ -150,18 +125,12 @@ ruleTester.run(
             baseUrl: 'src',
           },
         ],
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/main/index.ts.lint',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/main/index.ts.lint'),
         errors: [{messageId: 'bannedHierarchyImport', line: 4}],
       },
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/services/services-sub/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/services/services-sub/index.ts.lint'),
         ).toString(),
         options: [
           {
@@ -176,17 +145,14 @@ ruleTester.run(
           },
         ],
         filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/services/services-sub/index.ts.lint',
+          TEST_DIR_PATH,
+          'src/services/services-sub/index.ts.lint',
         ),
         errors: [{messageId: 'bannedHierarchyImport', line: 5}],
       },
       {
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/import-path-strict-hierarchy/src/services/index.ts.lint',
-          ),
+          Path.join(TEST_DIR_PATH, 'src/services/index.ts.lint'),
         ).toString(),
         options: [
           {
@@ -200,10 +166,7 @@ ruleTester.run(
             baseUrl: 'src',
           },
         ],
-        filename: Path.join(
-          __dirname,
-          '../../test/import-path-strict-hierarchy/src/services/index.ts.lint',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'src/services/index.ts.lint'),
         errors: [{messageId: 'bannedHierarchyImport', line: 3}],
       },
     ],

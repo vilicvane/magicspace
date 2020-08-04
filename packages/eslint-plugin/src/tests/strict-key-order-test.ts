@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('strict-key-order');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -11,7 +13,7 @@ const ruleTester = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(__dirname, '../../test/strict-key-order/'),
+    tsconfigRootDir: TEST_DIR_PATH,
   },
 });
 
@@ -19,10 +21,8 @@ ruleTester.run('strict-key-order', rules['strict-key-order'], {
   valid: [],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/strict-key-order/test.ts'),
-      ).toString(),
-      filename: Path.join(__dirname, '../../test/strict-key-order/test.ts'),
+      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test.ts')).toString(),
+      filename: Path.join(TEST_DIR_PATH, 'test.ts'),
       errors: [
         {messageId: 'wrongPosition', line: 33, column: 3, endColumn: 15},
         {messageId: 'wrongPosition', line: 39, column: 3, endColumn: 15},

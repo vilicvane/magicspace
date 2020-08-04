@@ -3,7 +3,9 @@ import * as Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('no-unnecessary-type-assertion');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -21,26 +23,20 @@ ruleTester.run(
           sourceType: 'module',
           project: './tsconfig.json',
           tsconfigRootDir: Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/noStrictNullChecks',
+            TEST_DIR_PATH,
+            'invalid/noStrictNullChecks',
           ),
         },
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/noStrictNullChecks/test.ts',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/noStrictNullChecks/test.ts'),
         ).toString(),
         filename: Path.join(
-          __dirname,
-          '../../test/no-unnecessary-type-assertion/invalid/noStrictNullChecks/test.ts',
+          TEST_DIR_PATH,
+          'invalid/noStrictNullChecks/test.ts',
         ),
         errors: [{messageId: 'unnecessaryAssertion', line: 5}],
         output: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/noStrictNullChecks/test.ts.fix',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/noStrictNullChecks/test.ts.fix'),
         ).toString(),
       },
       {
@@ -48,27 +44,15 @@ ruleTester.run(
           ecmaVersion: 2018,
           sourceType: 'module',
           project: './tsconfig.json',
-          tsconfigRootDir: Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strict',
-          ),
+          tsconfigRootDir: Path.join(TEST_DIR_PATH, 'invalid/strict'),
         },
         options: [['AnyDuringMigration']],
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strict/test.ts',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/strict/test.ts'),
         ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/no-unnecessary-type-assertion/invalid/strict/test.ts',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'invalid/strict/test.ts'),
         output: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strict/test.ts.fix',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/strict/test.ts.fix'),
         ).toString(),
         errors: [
           {messageId: 'unnecessaryAssertion', line: 9},
@@ -97,27 +81,15 @@ ruleTester.run(
           ecmaVersion: 2018,
           sourceType: 'module',
           project: './tsconfig.json',
-          tsconfigRootDir: Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strictNullChecks',
-          ),
+          tsconfigRootDir: Path.join(TEST_DIR_PATH, 'invalid/strictNullChecks'),
         },
         options: [['AnyDuringMigration']],
         code: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strictNullChecks/test.ts',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/strictNullChecks/test.ts'),
         ).toString(),
-        filename: Path.join(
-          __dirname,
-          '../../test/no-unnecessary-type-assertion/invalid/strictNullChecks/test.ts',
-        ),
+        filename: Path.join(TEST_DIR_PATH, 'invalid/strictNullChecks/test.ts'),
         output: FS.readFileSync(
-          Path.join(
-            __dirname,
-            '../../test/no-unnecessary-type-assertion/invalid/strictNullChecks/test.ts.fix',
-          ),
+          Path.join(TEST_DIR_PATH, 'invalid/strictNullChecks/test.ts.fix'),
         ).toString(),
         errors: [
           {messageId: 'unnecessaryAssertion', line: 9},

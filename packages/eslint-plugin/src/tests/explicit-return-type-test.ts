@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('explicit-return-type');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -11,28 +13,21 @@ const ruleTester = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(__dirname, '../../test/explicit-return-type/'),
+    tsconfigRootDir: TEST_DIR_PATH,
   },
 });
 
 ruleTester.run('explicit-return-type', rules['explicit-return-type'], {
   valid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/explicit-return-type/test.tsx'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/explicit-return-type/test.tsx',
-      ),
+      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test.tsx')).toString(),
+      filename: Path.join(TEST_DIR_PATH, 'test.tsx'),
     },
   ],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/explicit-return-type/test.ts'),
-      ).toString(),
-      filename: Path.join(__dirname, '../../test/explicit-return-type/test.ts'),
+      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test.ts')).toString(),
+      filename: Path.join(TEST_DIR_PATH, 'test.ts'),
       errors: [
         {messageId: 'explicitReturnTypeRequired', line: 1},
         {messageId: 'explicitReturnTypeRequired', line: 2, column: 11},
@@ -55,7 +50,7 @@ ruleTester.run('explicit-return-type', rules['explicit-return-type'], {
         {messageId: 'explicitReturnTypeRequired', line: 70, endLine: 72},
       ],
       output: FS.readFileSync(
-        Path.join(__dirname, '../../test/explicit-return-type/test.ts.fix'),
+        Path.join(TEST_DIR_PATH, 'test.ts.fix'),
       ).toString(),
     },
   ],

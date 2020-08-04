@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('import-path-shallowest');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -17,116 +19,77 @@ ruleTester.run('import-path-shallowest', rules['import-path-shallowest'], {
   valid: [
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/foo/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'foo/test.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/foo/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'foo/test.ts.lint'),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/bar/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'bar/test.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/bar/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'bar/test.ts.lint'),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/bar/he/c.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'bar/he/c.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/bar/he/c.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'bar/he/c.ts.lint'),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/core/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'core/test.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/core/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'core/test.ts.lint'),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/core/b/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'core/b/test.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/core/b/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'core/b/test.ts.lint'),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-path-shallowest/core/b/c/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'core/b/c/test.ts.lint'),
       ).toString(),
       options: [
         {
           baseUrl: 'core',
         },
       ],
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/core/b/c/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'core/b/c/test.ts.lint'),
     },
   ],
   invalid: [
     {
       code: FS.readFileSync(
-        Path.join(__dirname, '../../test/import-path-shallowest/test.ts.lint'),
+        Path.join(TEST_DIR_PATH, 'test.ts.lint'),
       ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-path-shallowest/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'test.ts.lint'),
       options: [
         {
           baseUrl: 'core',

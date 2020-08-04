@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('empty-line-around-blocks');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -11,34 +13,21 @@ const ruleTester = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(
-      __dirname,
-      '../../test/empty-line-around-blocks/',
-    ),
+    tsconfigRootDir: TEST_DIR_PATH,
   },
 });
 
 ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
   valid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test2.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/empty-line-around-blocks/test2.ts',
-      ),
+      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test2.ts')).toString(),
+      filename: Path.join(TEST_DIR_PATH, 'test2.ts'),
     },
   ],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/empty-line-around-blocks/test.ts',
-      ),
+      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test.ts')).toString(),
+      filename: Path.join(TEST_DIR_PATH, 'test.ts'),
       errors: [
         {messageId: 'emptyLineAroundStatementRequired', line: 8},
         {messageId: 'emptyLineAroundStatementRequired', line: 9},
@@ -98,7 +87,7 @@ ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
         },
       ],
       output: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test.ts.fix'),
+        Path.join(TEST_DIR_PATH, 'test.ts.fix'),
       ).toString(),
     },
   ],

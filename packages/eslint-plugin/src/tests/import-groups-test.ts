@@ -3,7 +3,9 @@ import Path from 'path';
 
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {RuleTester, getTestsDirPath} from './@utils';
+
+const TEST_DIR_PATH = getTestsDirPath('import-groups');
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -17,48 +19,27 @@ ruleTester.run('import-groups', rules['import-groups'], {
   valid: [
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/valid/base/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'valid/base/test.ts.lint'),
       ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-groups/valid/base/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'valid/base/test.ts.lint'),
     },
   ],
   invalid: [
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/side-effect/test.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/side-effect/test.ts.lint'),
       ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-groups/invalid/side-effect/test.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'invalid/side-effect/test.ts.lint'),
       errors: [{messageId: 'expectingEmptyLine'}],
       output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/side-effect/test.ts.fix',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/side-effect/test.ts.fix'),
       ).toString(),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/group-1.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/group-1.ts.lint'),
       ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-groups/invalid/default/group-1.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'invalid/default/group-1.ts.lint'),
       errors: [
         {messageId: 'unexpectedEmptyLine', line: 4},
         {messageId: 'unexpectedCodeBetweenImports', line: 6},
@@ -68,58 +49,40 @@ ruleTester.run('import-groups', rules['import-groups'], {
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/group-2.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/group-2.ts.lint'),
       ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/import-groups/invalid/default/group-2.ts.lint',
-      ),
+      filename: Path.join(TEST_DIR_PATH, 'invalid/default/group-2.ts.lint'),
       errors: [
         {messageId: 'expectingEmptyLine', line: 5},
         {messageId: 'unexpectedEmptyLine', line: 10},
       ],
       output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/group-2.ts.fix',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/group-2.ts.fix'),
       ).toString(),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/leading-comments.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/leading-comments.ts.lint'),
       ).toString(),
       filename: Path.join(
-        __dirname,
-        '../../test/import-groups/invalid/default/leading-comments.ts.lint',
+        TEST_DIR_PATH,
+        'invalid/default/leading-comments.ts.lint',
       ),
       errors: [
         {messageId: 'unexpectedEmptyLine', line: 6},
         {messageId: 'unexpectedEmptyLine', line: 11},
       ],
       output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/leading-comments.ts.fix',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/leading-comments.ts.fix'),
       ).toString(),
     },
     {
       code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/sort-imports.ts.lint',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/sort-imports.ts.lint'),
       ).toString(),
       filename: Path.join(
-        __dirname,
-        '../../test/import-groups/invalid/default/sort-imports.ts.lint',
+        TEST_DIR_PATH,
+        'invalid/default/sort-imports.ts.lint',
       ),
       errors: [
         {messageId: 'expectingEmptyLine', line: 2},
@@ -127,10 +90,7 @@ ruleTester.run('import-groups', rules['import-groups'], {
         {messageId: 'notGrouped', line: 4},
       ],
       output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/import-groups/invalid/default/sort-imports.ts.fix',
-        ),
+        Path.join(TEST_DIR_PATH, 'invalid/default/sort-imports.ts.fix'),
       ).toString(),
     },
   ],
