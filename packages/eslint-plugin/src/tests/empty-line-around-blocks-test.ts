@@ -11,12 +11,25 @@ const ruleTester = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(process.cwd(), 'test/empty-line-around-blocks/'),
+    tsconfigRootDir: Path.join(
+      __dirname,
+      '../../test/empty-line-around-blocks/',
+    ),
   },
 });
 
 ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
-  valid: [],
+  valid: [
+    {
+      code: FS.readFileSync(
+        Path.join(__dirname, '../../test/empty-line-around-blocks/test2.ts'),
+      ).toString(),
+      filename: Path.join(
+        __dirname,
+        '../../test/empty-line-around-blocks/test2.ts',
+      ),
+    },
+  ],
   invalid: [
     {
       code: FS.readFileSync(
