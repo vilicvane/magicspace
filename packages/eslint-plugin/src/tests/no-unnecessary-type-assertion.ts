@@ -139,6 +139,7 @@ ruleTester.run(
           {messageId: 'unnecessaryAssertion', line: 72},
           {messageId: 'unnecessaryAssertion', line: 74},
           {messageId: 'unnecessaryAssertion', line: 96},
+          {messageId: 'unnecessaryAssertion', line: 106},
         ],
       },
     ],
