@@ -1,9 +1,15 @@
-import FS from 'fs';
-import Path from 'path';
-
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {
+  RuleTester,
+  getTestFileContent,
+  getTestFileFullPath,
+  getTestsDirPath,
+} from './@utils';
+
+const RULE_NAME = 'scoped-modules';
+
+const TEST_DIR_PATH = getTestsDirPath(RULE_NAME);
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -13,217 +19,148 @@ const ruleTester = new RuleTester({
   },
 });
 
-ruleTester.run('scoped-modules', rules['scoped-modules'], {
+ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-as-namespace/1/index.ts',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/export-as-namespace/1/index.ts',
+      code: getTestFileContent(TEST_DIR_PATH, 'export-as-namespace/1/index.ts'),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'export-as-namespace/1/index.ts',
       ),
     },
   ],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/@test.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/banned-exports/@test.ts.lint',
+      code: getTestFileContent(TEST_DIR_PATH, 'banned-exports/@test.ts.lint'),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'banned-exports/@test.ts.lint',
       ),
       errors: [
         {messageId: 'bannedExport', line: 3},
         {messageId: 'bannedExport', line: 5},
       ],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/@test.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'banned-exports/@test.ts.fix'),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/test.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/banned-exports/test.ts.lint',
+      code: getTestFileContent(TEST_DIR_PATH, 'banned-exports/test.ts.lint'),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'banned-exports/test.ts.lint',
       ),
       errors: [{messageId: 'bannedExport', line: 2}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/test.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'banned-exports/test.ts.fix'),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/test2.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/banned-exports/test2.ts.lint',
+      code: getTestFileContent(TEST_DIR_PATH, 'banned-exports/test2.ts.lint'),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'banned-exports/test2.ts.lint',
       ),
       errors: [{messageId: 'bannedExport', line: 1}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-exports/test2.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'banned-exports/test2.ts.fix'),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-imports/test.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/banned-imports/test.ts.lint',
+      code: getTestFileContent(TEST_DIR_PATH, 'banned-imports/test.ts.lint'),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'banned-imports/test.ts.lint',
       ),
       errors: [
         {messageId: 'bannedImport', line: 1},
         {messageId: 'bannedImport', line: 2},
       ],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/banned-imports/test.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'banned-imports/test.ts.fix'),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/missing-all-imports/index.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/missing-all-imports/index.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'missing-all-imports/index.ts.lint',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'missing-all-imports/index.ts',
       ),
       errors: [{messageId: 'missingExports'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/missing-all-imports/index.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'missing-all-imports/index.ts.fix',
+      ),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/missing-some-imports/index.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/missing-some-imports/index.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'missing-some-imports/index.ts.lint',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'missing-some-imports/index.ts',
       ),
       errors: [{messageId: 'missingExports'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/missing-some-imports/index.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'missing-some-imports/index.ts.fix',
+      ),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/1/index.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/export-namespace/1/index.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/1/index.ts.lint',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'export-namespace/1/index.ts',
       ),
       errors: [{messageId: 'bannedImportWhenNamespaceExists'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/1/index.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/1/index.ts.fix',
+      ),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/1/namespace.ts',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/export-namespace/1/namespace.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/1/namespace.ts',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'export-namespace/1/namespace.ts',
       ),
       errors: [{messageId: 'missingExports'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/1/namespace.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/1/namespace.ts.fix',
+      ),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/2/namespace.ts',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/export-namespace/2/namespace.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/2/namespace.ts',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'export-namespace/2/namespace.ts',
       ),
       errors: [{messageId: 'bannedExport'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/2/namespace.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/2/namespace.ts.fix',
+      ),
     },
     {
-      code: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/2/index.ts.lint',
-        ),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/scoped-modules/export-namespace/2/index.ts',
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/2/index.ts.lint',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'export-namespace/2/index.ts',
       ),
       errors: [{messageId: 'missingImports'}],
-      output: FS.readFileSync(
-        Path.join(
-          __dirname,
-          '../../test/scoped-modules/export-namespace/2/index.ts.fix',
-        ),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'export-namespace/2/index.ts.fix',
+      ),
     },
   ],
 });

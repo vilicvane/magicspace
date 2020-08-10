@@ -1,4 +1,4 @@
-import {ParserServices, TSESLint} from '@typescript-eslint/experimental-utils';
+import {TSESLint} from '@typescript-eslint/experimental-utils';
 import {getNextStatement, isBlockLike} from 'tsutils';
 import {
   Block,
@@ -142,10 +142,6 @@ export const emptyLineAroundBlocksRule = createRule<Options, MessageId>({
       isArrowFunctionInitializedPropertyDeclaration,
       isPlainBlock,
     ];
-
-    type RequiredParserServices = {
-      [k in keyof ParserServices]: Exclude<ParserServices[k], undefined>;
-    };
 
     const parserServices = getParserServices(context);
 

@@ -101,3 +101,6 @@ function foo() {
     f();
     xx as 1 | 2 === 2; // xx is inferred as 1, assertion is necessary to avoid compile error
 }
+
+let xx: any;
+let yy: any = xx!;

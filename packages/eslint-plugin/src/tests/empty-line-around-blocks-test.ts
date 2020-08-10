@@ -1,9 +1,15 @@
-import FS from 'fs';
-import Path from 'path';
-
 import {rules} from '../rules';
 
-import {RuleTester} from './@utils';
+import {
+  RuleTester,
+  getTestFileContent,
+  getTestFileFullPath,
+  getTestsDirPath,
+} from './@utils';
+
+const RULE_NAME = 'empty-line-around-blocks';
+
+const TEST_DIR_PATH = getTestsDirPath(RULE_NAME);
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -11,34 +17,21 @@ const ruleTester = new RuleTester({
     ecmaVersion: 2018,
     sourceType: 'module',
     project: './tsconfig.json',
-    tsconfigRootDir: Path.join(
-      __dirname,
-      '../../test/empty-line-around-blocks/',
-    ),
+    tsconfigRootDir: TEST_DIR_PATH,
   },
 });
 
-ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
+ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test2.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/empty-line-around-blocks/test2.ts',
-      ),
+      code: getTestFileContent(TEST_DIR_PATH, 'test2.ts'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test2.ts'),
     },
   ],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test.ts'),
-      ).toString(),
-      filename: Path.join(
-        __dirname,
-        '../../test/empty-line-around-blocks/test.ts',
-      ),
+      code: getTestFileContent(TEST_DIR_PATH, 'test.ts'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test.ts'),
       errors: [
         {messageId: 'emptyLineAroundStatementRequired', line: 8},
         {messageId: 'emptyLineAroundStatementRequired', line: 9},
@@ -97,9 +90,7 @@ ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
           endLine: 206,
         },
       ],
-      output: FS.readFileSync(
-        Path.join(__dirname, '../../test/empty-line-around-blocks/test.ts.fix'),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'test.ts.fix'),
     },
   ],
 });

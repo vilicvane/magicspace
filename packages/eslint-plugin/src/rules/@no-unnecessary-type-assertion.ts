@@ -17,6 +17,7 @@
  */
 
 import {TSESLint} from '@typescript-eslint/experimental-utils';
+import {ReportFixFunction} from '@typescript-eslint/experimental-utils/dist/ts-eslint';
 import {isObjectFlagSet, isObjectType, isTypeFlagSet} from 'tsutils';
 import * as ts from 'typescript';
 
@@ -91,11 +92,17 @@ export const noUnnecessaryTypeAssertionRule = createRule<Options, MessageId>({
         const type = this.checker.getTypeAtLocation(node.expression);
 
         if (type === this.checker.getNonNullableType(type)) {
+          let fix: ReportFixFunction | undefined;
+
+          if (this.checker.typeToString(type) !== 'any') {
+            fix = (fixer: TSESLint.RuleFixer) =>
+              fixer.replaceTextRange([node.expression.end, node.end], '');
+          }
+
           context.report({
             node: parserServices.tsNodeToESTreeNodeMap.get(node),
             messageId: 'unnecessaryAssertion',
-            fix: (fixer: TSESLint.RuleFixer) =>
-              fixer.replaceTextRange([node.expression.end, node.end], ''),
+            fix,
           });
         }
       }
