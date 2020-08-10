@@ -2,9 +2,12 @@
   "[plaintext]": {
     "files.insertFinalNewline": false
   },
-  "editor.codeActionsOnSaveTimeout": 10000,
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "editor.codeActionsOnSaveTimeout": 10000,
   "editor.tabSize": 2,
   "files.eol": "\n",
   "files.insertFinalNewline": true,

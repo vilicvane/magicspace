@@ -1,11 +1,15 @@
-import FS from 'fs';
-import Path from 'path';
-
 import {rules} from '../rules';
 
-import {RuleTester, getTestsDirPath} from './@utils';
+import {
+  RuleTester,
+  getTestFileContent,
+  getTestFileFullPath,
+  getTestsDirPath,
+} from './@utils';
 
-const TEST_DIR_PATH = getTestsDirPath('import-path-base-url');
+const RULE_NAME = 'import-path-base-url';
+
+const TEST_DIR_PATH = getTestsDirPath(RULE_NAME);
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -15,32 +19,33 @@ const ruleTester = new RuleTester({
   },
 });
 
-ruleTester.run('import-path-base-url', rules['import-path-base-url'], {
+ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [],
   invalid: [
     {
-      code: FS.readFileSync(
-        Path.join(TEST_DIR_PATH, 'invalid/outter.ts.lint'),
-      ).toString(),
-      filename: Path.join(TEST_DIR_PATH, 'invalid/outter.ts.lint'),
+      code: getTestFileContent(TEST_DIR_PATH, 'invalid/outter.ts.lint'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'invalid/outter.ts.lint'),
       errors: [{messageId: 'importMustUseBaseURL', line: 1}],
-      output: FS.readFileSync(
-        Path.join(TEST_DIR_PATH, 'invalid/outter.ts.fix'),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'invalid/outter.ts.fix'),
     },
     {
-      code: FS.readFileSync(
-        Path.join(TEST_DIR_PATH, 'invalid/core/someFunc/bar.ts.lint'),
-      ).toString(),
-      filename: Path.join(TEST_DIR_PATH, 'invalid/core/someFunc/bar.ts.lint'),
+      code: getTestFileContent(
+        TEST_DIR_PATH,
+        'invalid/core/someFunc/bar.ts.lint',
+      ),
+      filename: getTestFileFullPath(
+        TEST_DIR_PATH,
+        'invalid/core/someFunc/bar.ts.lint',
+      ),
       errors: [
         {messageId: 'importMustBeRelativePath', line: 1},
         {messageId: 'importMustBeRelativePath', line: 2},
         {messageId: 'importMustUseBaseURL', line: 9},
       ],
-      output: FS.readFileSync(
-        Path.join(TEST_DIR_PATH, 'invalid/core/someFunc/bar.ts.fix'),
-      ).toString(),
+      output: getTestFileContent(
+        TEST_DIR_PATH,
+        'invalid/core/someFunc/bar.ts.fix',
+      ),
     },
   ],
 });

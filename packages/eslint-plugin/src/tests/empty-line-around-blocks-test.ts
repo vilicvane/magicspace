@@ -1,11 +1,15 @@
-import FS from 'fs';
-import Path from 'path';
-
 import {rules} from '../rules';
 
-import {RuleTester, getTestsDirPath} from './@utils';
+import {
+  RuleTester,
+  getTestFileContent,
+  getTestFileFullPath,
+  getTestsDirPath,
+} from './@utils';
 
-const TEST_DIR_PATH = getTestsDirPath('empty-line-around-blocks');
+const RULE_NAME = 'empty-line-around-blocks';
+
+const TEST_DIR_PATH = getTestsDirPath(RULE_NAME);
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
@@ -17,17 +21,17 @@ const ruleTester = new RuleTester({
   },
 });
 
-ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
+ruleTester.run(RULE_NAME, rules[RULE_NAME], {
   valid: [
     {
-      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test2.ts')).toString(),
-      filename: Path.join(TEST_DIR_PATH, 'test2.ts'),
+      code: getTestFileContent(TEST_DIR_PATH, 'test2.ts'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test2.ts'),
     },
   ],
   invalid: [
     {
-      code: FS.readFileSync(Path.join(TEST_DIR_PATH, 'test.ts')).toString(),
-      filename: Path.join(TEST_DIR_PATH, 'test.ts'),
+      code: getTestFileContent(TEST_DIR_PATH, 'test.ts'),
+      filename: getTestFileFullPath(TEST_DIR_PATH, 'test.ts'),
       errors: [
         {messageId: 'emptyLineAroundStatementRequired', line: 8},
         {messageId: 'emptyLineAroundStatementRequired', line: 9},
@@ -86,9 +90,7 @@ ruleTester.run('empty-line-around-blocks', rules['empty-line-around-blocks'], {
           endLine: 206,
         },
       ],
-      output: FS.readFileSync(
-        Path.join(TEST_DIR_PATH, 'test.ts.fix'),
-      ).toString(),
+      output: getTestFileContent(TEST_DIR_PATH, 'test.ts.fix'),
     },
   ],
 });

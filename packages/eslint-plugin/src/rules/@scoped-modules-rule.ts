@@ -239,7 +239,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       }
     }
 
-    function validateNamespaceFile(infos: ModuleStatementInfo[]): void {
+    function validateNamespaceFile(): void {
       let fileName = context.getFilename();
       let dirName = Path.dirname(fileName);
       let fileNames;
@@ -407,7 +407,7 @@ export const scopedModulesRule = createRule<Options, MessageId>({
       }
 
       if (NAMESPACE_FILE_REGEX.test(fileName)) {
-        validateNamespaceFile(infos);
+        validateNamespaceFile();
       }
     }
 
