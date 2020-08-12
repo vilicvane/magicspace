@@ -1,0 +1,4 @@
+{
+  "root": "template",
+  "files": ["**/*.json.js"]
+}

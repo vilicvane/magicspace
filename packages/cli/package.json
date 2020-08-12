@@ -19,6 +19,10 @@
     "@magicspace/core": "^0.1.5",
     "@magicspace/templates": "^0.1.6",
     "clime": "^0.5.14",
+    "prompts": "^2.3.2",
     "tslib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.0.8"
   }
 }

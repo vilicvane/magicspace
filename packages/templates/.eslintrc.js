@@ -1,11 +1,18 @@
 module.exports = {
-  extends: ['plugin:@magicspace/default'],
-  parserOptions: {
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname,
+  root: true,
+  extends: ['eslint:recommended'],
+  env: {
+    node: true,
+    es2020: true,
   },
-  rules: {
-    '@magicspace/scoped-modules': 'off',
-    '@typescript-eslint/triple-slash-reference': 'off',
-  },
+  overrides: [
+    {
+      files: ['**/*.{ts,tsx}'],
+      extends: ['plugin:@magicspace/default'],
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+  ],
 };

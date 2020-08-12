@@ -1,9 +1,0 @@
-{
-  "devDependencies": {
-    "@magicspace/configs": "^0.1.49",
-    "@types/node": "^12.6.2",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "typescript-tslint-plugin": "^0.5.4"
-  }
-}

@@ -1,0 +1,15 @@
+{
+  "extends": ["@magicspace/templates/general"],
+  "options": {
+    "project": {
+      "name": "magicspace",
+      "packages": [
+        {"name": "@magicspace/core"},
+        {"name": "@magicspace/cli"},
+        {"name": "@magicspace/eslint-plugin"},
+        {"name": "@magicspace/configs"},
+        {"name": "@magicspace/templates"}
+      ]
+    }
+  }
+}
