@@ -17,13 +17,15 @@ export class Context {
     path: string,
     composable: File.Composable<unknown, unknown>,
   ): File.File<unknown, unknown> {
+    let project = this.project;
+
     let fileMap = this.fileMap;
 
     let file = fileMap.get(path);
 
-    if (!file) {
-      let project = this.project;
-
+    if (file) {
+      project.assertFileObject(file, path, composable.type);
+    } else {
       file = project.createFileObject(
         path,
         Path.join(project.dir, Path.relative(this.dir, path)),

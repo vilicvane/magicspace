@@ -3,13 +3,13 @@ import {File} from '../file';
 export interface BinaryFileOptions {}
 
 export class BinaryFile extends File.File<Buffer, BinaryFileOptions> {
-  private content: Buffer | undefined = undefined;
+  content = Buffer.alloc(0);
 
-  compose(composable: File.Composable<Buffer, BinaryFileOptions>): void {
-    this.content = composable.compose(this.content, this.context);
+  constructor(path: string, possiblePathInProject: string) {
+    super('binary', path, possiblePathInProject);
   }
 
   toBuffer(): Buffer {
-    return this.content!;
+    return this.content;
   }
 }

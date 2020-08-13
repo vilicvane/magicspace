@@ -4,14 +4,22 @@ import {BuiltInParserName} from 'prettier';
 import {getPrettierModule} from '../@prettier';
 
 import {Composable} from './composable';
-import {Context} from './context';
 
 export abstract class File<TContent, TComposeOptions> {
-  readonly context = new Context(this.path);
+  abstract content: TContent;
 
-  constructor(readonly path: string, readonly possiblePathInProject: string) {}
+  composables: Composable<TContent, TComposeOptions>[] = [];
 
-  abstract compose(composable: Composable<TContent, TComposeOptions>): void;
+  constructor(
+    readonly type: string,
+    readonly path: string,
+    readonly possiblePathInProject: string,
+  ) {}
+
+  compose(composable: Composable<TContent, TComposeOptions>): void {
+    this.composables.push(composable);
+    this.content = composable.compose(this.content, this);
+  }
 
   toText?(): string;
 
@@ -50,7 +58,7 @@ export abstract class File<TContent, TComposeOptions> {
       content = this.toBuffer();
     } else {
       throw new Error(
-        'Invalid composable file, either `toText()` or `toBuffer` must be implemented',
+        'Invalid composable file, either `toText()` or `toBuffer()` must be implemented',
       );
     }
 

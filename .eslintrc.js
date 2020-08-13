@@ -5,5 +5,13 @@ module.exports = {
     node: true,
     es2020: true,
   },
-  ignorePatterns: ['packages/**'],
+  overrides: [
+    {
+      files: ['**/*.{ts,tsx}'],
+      extends: ['plugin:@magicspace/default'],
+      parserOptions: {
+        project: './packages/**/tsconfig.json',
+      },
+    },
+  ],
 };

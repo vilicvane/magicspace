@@ -3,10 +3,10 @@ import {File} from '../file';
 export interface TextFileOptions {}
 
 export class TextFile extends File.File<string, TextFileOptions> {
-  private content = '';
+  content = '';
 
-  compose(composable: File.Composable<string, TextFileOptions>): void {
-    this.content = composable.compose(this.content, this.context);
+  constructor(path: string, possiblePathInProject: string) {
+    super('text', path, possiblePathInProject);
   }
 
   toText(): string {

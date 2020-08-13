@@ -2,8 +2,7 @@
   "useWorkspaces": true,
   "packages": [
     "packages/core",
-    "packages/cli",
-    "packages/utils"
+    "packages/cli"
   ],
   "version": "0.2.2"
 }
