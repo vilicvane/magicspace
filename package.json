@@ -27,10 +27,8 @@
     "typescript": "^3.9.7"
   },
   "workspaces": [
-    "packages/cli",
-    "packages/configs",
     "packages/core",
-    "packages/templates",
-    "packages/eslint-plugin"
+    "packages/cli",
+    "packages/utils"
   ]
 }
