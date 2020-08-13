@@ -1,0 +1,9 @@
+{
+  "name": "magicspace",
+  "private": true,
+  "workspaces": [
+    "packages/core",
+    "packages/cli",
+    "packages/utils"
+  ]
+}
