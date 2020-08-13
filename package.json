@@ -11,6 +11,11 @@
     "lint-prettier": "prettier --list-different \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
+  "workspaces": [
+    "packages/core",
+    "packages/cli",
+    "packages/utils"
+  ],
   "devDependencies": {
     "@magicspace/configs": "^0.2.5",
     "@magicspace/eslint-plugin": "^0.1.32",
@@ -20,10 +25,5 @@
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.7"
-  },
-  "workspaces": [
-    "packages/core",
-    "packages/cli",
-    "packages/utils"
-  ]
+  }
 }
