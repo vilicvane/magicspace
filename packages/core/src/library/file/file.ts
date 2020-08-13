@@ -8,9 +8,12 @@ import {Composable} from './composable';
 export abstract class File<TContent, TComposeOptions> {
   abstract content: TContent;
 
+  composables: Composable<TContent, TComposeOptions>[] = [];
+
   constructor(readonly path: string, readonly possiblePathInProject: string) {}
 
   compose(composable: Composable<TContent, TComposeOptions>): void {
+    this.composables.push(composable);
     this.content = composable.compose(this.content, this);
   }
 
