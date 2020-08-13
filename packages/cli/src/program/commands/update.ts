@@ -33,7 +33,9 @@ export default class extends Command {
         return compact([
           `\
 Update applied, please review and commit changes to complete the update merge.
-Please avoid resetting the on-going merge unless you want to start over again.`,
+
+Please avoid resetting the on-going merge if you want to continue and complete this update.
+Otherwise, you can use "git merge --abort" to cancel this update and start over again.`,
           renames.length &&
             `\
 Possible renamed directories detected:
