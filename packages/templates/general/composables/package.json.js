@@ -19,10 +19,14 @@ module.exports = ({
   return [
     json('package.json', {
       name: project.name,
-      version: '0.0.0',
-      workspaces: packages.length
-        ? packages.map(package => package.dir)
-        : undefined,
+      ...(packages.length
+        ? {
+            private: true,
+            workspaces: packages.map(package => package.dir),
+          }
+        : {
+            version: '0.0.0',
+          }),
     }),
     ...packages.map(package =>
       json(Path.join(package.dir, 'package.json'), {

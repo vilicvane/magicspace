@@ -22,7 +22,7 @@ export default class extends Command {
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await project.initialize();
+    let result = await project.initialize(options.force);
 
     switch (result) {
       case true:

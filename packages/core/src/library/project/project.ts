@@ -10,14 +10,26 @@ import {ComposableModule} from './composable-module';
 import {Context} from './context';
 
 export class Project {
+  get config(): Config.Config {
+    let config = this._config;
+
+    if (!config) {
+      throw new Error('Config is not available under current context');
+    }
+
+    return config;
+  }
+
   constructor(
     private fileObjectCreatorMap: Map<string | undefined, FileObjectCreator>,
     private extensionToFileTypeMap: Map<string, string>,
     readonly dir: string,
-    readonly config: Config.Config,
+    private _config?: Config.Config,
   ) {}
 
-  async initialize(): Promise<
+  async initialize(
+    force = false,
+  ): Promise<
     | 'not-repository-root'
     | 'already-initialized'
     | 'working-directory-not-clean'
@@ -33,7 +45,7 @@ export class Project {
       return 'not-repository-root';
     }
 
-    if (!projectGit.isWorkingDirectoryClean()) {
+    if (!force && !projectGit.isWorkingDirectoryClean()) {
       return 'working-directory-not-clean';
     }
 
@@ -60,7 +72,9 @@ export class Project {
     return true;
   }
 
-  async update(): Promise<
+  async update(
+    force = false,
+  ): Promise<
     | 'not-repository-root'
     | 'working-directory-not-clean'
     | 'not-initialized'
@@ -77,7 +91,7 @@ export class Project {
       return 'not-repository-root';
     }
 
-    if (!projectGit.isWorkingDirectoryClean()) {
+    if (!force && !projectGit.isWorkingDirectoryClean()) {
       return 'working-directory-not-clean';
     }
 

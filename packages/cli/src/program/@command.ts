@@ -8,4 +8,10 @@ export class CommonOptions extends Options {
     default: DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME,
   })
   template!: string;
+
+  @option({
+    toggle: true,
+    default: false,
+  })
+  force!: boolean;
 }

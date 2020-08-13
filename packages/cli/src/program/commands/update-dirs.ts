@@ -4,8 +4,6 @@ import {Project} from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import prompts from 'prompts';
 
-import {CommonOptions} from '../@command';
-
 @command({
   description: 'Update possible renamed directories',
 })
@@ -16,12 +14,8 @@ export default class extends Command {
       default: '.',
     })
     projectDir: string,
-    options: CommonOptions,
   ): Promise<string> {
-    let project = Project.createDefaultProject(
-      Path.resolve(projectDir),
-      Path.resolve(projectDir, options.template),
-    );
+    let project = Project.createDefaultProject(Path.resolve(projectDir));
 
     if (!project.isRepositoryRoot()) {
       throw new ExpectedError(

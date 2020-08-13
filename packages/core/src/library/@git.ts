@@ -13,7 +13,7 @@ import {
   MAGIC_COMMIT_MESSAGE_REGEX_STRING,
   PULL_FIND_RENAMES_THRESHOLD,
 } from './@constants';
-import {spawnSync, uniqueBy} from './@utils';
+import {SpawnSyncFailure, spawnSync, uniqueBy} from './@utils';
 
 export class Git {
   constructor(readonly dir: string) {}
@@ -53,7 +53,17 @@ export class ProjectGit extends Git {
   addOrUpdateMagicspaceRemote(tempDir: string): void {
     try {
       spawnSync(this.dir, 'git', ['remote', 'remove', MAGICSPACE_REMOTE]);
-    } catch {}
+    } catch (error) {
+      if (!(error instanceof SpawnSyncFailure)) {
+        throw error;
+      }
+
+      if (!/fatal: No such remote:/.test(error.stderr)) {
+        process.stderr.write(error.stderr);
+
+        throw new Error('Error removing magicspace remote');
+      }
+    }
 
     spawnSync(this.dir, 'git', [
       'remote',
@@ -69,7 +79,7 @@ export class ProjectGit extends Git {
 
   pullMagicspaceChangesWithoutCommit(type: 'initialize' | 'update'): void {
     try {
-      spawnSync(this.dir, 'git', [
+      let stdout = spawnSync(this.dir, 'git', [
         'pull',
         '--no-commit',
         '--allow-unrelated-histories',
@@ -78,7 +88,19 @@ export class ProjectGit extends Git {
         MAGICSPACE_REMOTE,
         MAGICSPACE_BRANCH,
       ]);
-    } catch {}
+
+      process.stdout.write(stdout);
+    } catch (error) {
+      if (!(error instanceof SpawnSyncFailure)) {
+        throw error;
+      }
+
+      if (!/^CONFLICT/m.test(error.stdout)) {
+        throw new Error('Error merging magicspace changes');
+      }
+
+      process.stdout.write(error.stdout);
+    }
 
     FSExtra.outputFileSync(
       Path.join(this.dir, '.git/MERGE_MSG'),

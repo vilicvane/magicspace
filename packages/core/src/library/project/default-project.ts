@@ -32,9 +32,12 @@ export const DEFAULT_EXTENSION_TO_FILE_TYPE_MAP = new Map<string, string>([
 
 export function createDefaultProject(
   projectDir: string,
-  templateDir: string,
+  templateDir?: string,
 ): Project {
-  let config = resolveTemplateConfig(templateDir);
+  let config =
+    typeof templateDir === 'string'
+      ? resolveTemplateConfig(templateDir)
+      : undefined;
 
   return new Project(
     DEFAULT_FILE_OBJECT_CREATOR_MAP,

@@ -24,6 +24,14 @@ export function uniqueBy<T, TKey>(
   return Array.from(map.values());
 }
 
+export class SpawnSyncFailure {
+  constructor(
+    readonly stdout: string,
+    readonly stderr: string,
+    readonly code: number | null,
+  ) {}
+}
+
 export function spawnSync(
   cwd: string,
   command: string,
@@ -39,7 +47,7 @@ export function spawnSync(
   }
 
   if (status !== 0) {
-    throw new Error(stderr.trim() || stdout.trim());
+    throw new SpawnSyncFailure(stdout, stderr, status);
   }
 
   return stdout;
@@ -75,7 +83,9 @@ export function conservativelyMove(from: string, to: string): boolean {
   }
 }
 
-export function getClosetExistingUpperDirectory(path: string): string | undefined{
+export function getClosetExistingUpperDirectory(
+  path: string,
+): string | undefined {
   while (!FSExtra.existsSync(path)) {
     let upperPath = Path.dirname(path);
 
