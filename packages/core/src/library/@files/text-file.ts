@@ -9,7 +9,7 @@ export class TextFile extends File.File<string, TextFileOptions> {
     this.content = composable.compose(this.content, this.context);
   }
 
-  toBuffer(): Buffer {
-    return Buffer.from(this.content, 'utf8');
+  toText(): string {
+    return this.content;
   }
 }

@@ -31,6 +31,10 @@ export default class extends Command {
       );
     }
 
+    if (!project.isMerging()) {
+      throw new ExpectedError('This project is not actively merging');
+    }
+
     let renames = project.listPendingPossibleDirectoryRenames();
 
     if (!renames.length) {

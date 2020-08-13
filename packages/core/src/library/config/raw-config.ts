@@ -19,9 +19,9 @@ export interface RawConfig {
   /**
    * Composable file patterns.
    *
-   * @link https://github.com/isaacs/node-glob
+   * @link https://github.com/mrmlnc/fast-glob
    */
-  files?: string[];
+  composables?: string[];
   /**
    * Options are merged using `...` operator, otherwise use a function to handle it manually.
    */

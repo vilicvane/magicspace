@@ -10,19 +10,19 @@ import {CommonOptions} from '../@command';
 })
 export default class extends Command {
   @metadata
-  execute(
+  async execute(
     @param({
       default: '.',
     })
     projectDir: string,
     options: CommonOptions,
-  ): string {
+  ): Promise<string> {
     let project = Project.createDefaultProject(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );
 
-    let result = project.initialize();
+    let result = await project.initialize();
 
     switch (result) {
       case true:

@@ -14,8 +14,7 @@ export abstract class StructuredFile<
     this.content = composable.compose(this.content, this.context);
   }
 
-  toBuffer(): Buffer {
-    let text = this.stringify(this.content);
-    return Buffer.from(text, 'utf8');
+  toText(): string {
+    return this.stringify(this.content);
   }
 }

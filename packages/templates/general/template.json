@@ -1,4 +1,4 @@
 {
-  "root": "template",
-  "files": ["**/*.json.js"]
+  "root": "composables",
+  "composables": ["files.js", "**/*.json.js"]
 }

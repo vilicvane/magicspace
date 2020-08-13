@@ -34,6 +34,12 @@ export class ProjectGit extends Git {
     }
   }
 
+  isMerging(): boolean {
+    let mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
+
+    return FSExtra.existsSync(mergeHeadFilePath);
+  }
+
   getLastMagicspaceCommit(): string | undefined {
     return spawnSync(this.dir, 'git', [
       'rev-list',

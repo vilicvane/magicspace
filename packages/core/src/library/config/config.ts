@@ -11,7 +11,7 @@ export interface Config {
   /**
    * Composable file entries to be resolved.
    */
-  files: ComposableFileEntry[];
+  composables: ComposableFileEntry[];
   /**
    * Merged template options.
    */
@@ -41,7 +41,7 @@ function _resolveTemplateConfig(dir: string): Config {
 
   let {
     extends: superSpecifiers,
-    files: filePatterns,
+    composables: filePatterns,
     root: rootDir,
     options = {},
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -105,7 +105,7 @@ function _resolveTemplateConfig(dir: string): Config {
       }
 
       let {
-        files: superFileEntries,
+        composables: superFileEntries,
         options: superOptions,
       } = resolveTemplateConfig(superDir);
 
@@ -128,7 +128,7 @@ function _resolveTemplateConfig(dir: string): Config {
   }
 
   return {
-    files: fileEntries,
+    composables: fileEntries,
     options,
   };
 }

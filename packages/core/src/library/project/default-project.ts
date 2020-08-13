@@ -7,10 +7,23 @@ export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
   string | undefined,
   FileObjectCreator
 >([
-  [undefined, path => new TextFile(path)],
-  ['text', path => new TextFile(path)],
-  ['binary', path => new BinaryFile(path)],
-  ['json', path => new JSONFile(path)],
+  [
+    undefined,
+    (path, possiblePathInProject) => new TextFile(path, possiblePathInProject),
+  ],
+  [
+    'text',
+    (path, possiblePathInProject) => new TextFile(path, possiblePathInProject),
+  ],
+  [
+    'binary',
+    (path, possiblePathInProject) =>
+      new BinaryFile(path, possiblePathInProject),
+  ],
+  [
+    'json',
+    (path, possiblePathInProject) => new JSONFile(path, possiblePathInProject),
+  ],
 ]);
 
 export const DEFAULT_EXTENSION_TO_FILE_TYPE_MAP = new Map<string, string>([

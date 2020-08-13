@@ -11,6 +11,7 @@
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
+  "task.autoDetect": "off",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.enable": true,
   "eslint.validate": ["javascript", "typescript"],
@@ -18,11 +19,13 @@
   "cSpell.words": [
     "EDITMSG",
     "Mufan",
+    "Parens",
     "composables",
     "cond",
     "globby",
     "magicspace",
     "multiselect",
-    "tslang"
+    "tslang",
+    "tslib"
   ]
 }

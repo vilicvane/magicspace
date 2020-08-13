@@ -17,11 +17,12 @@ export class Project {
     readonly config: Config.Config,
   ) {}
 
-  initialize():
+  async initialize(): Promise<
     | 'not-repository-root'
     | 'already-initialized'
     | 'working-directory-not-clean'
-    | true {
+    | true
+  > {
     let projectDir = this.dir;
     let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
 
@@ -46,7 +47,7 @@ export class Project {
 
     tempGit.checkoutOrphanMagicspaceBranch();
 
-    this.generate(tempDir);
+    await this.generate(tempDir);
 
     tempGit.addAndCommitChanges('initialize');
 
@@ -59,12 +60,13 @@ export class Project {
     return true;
   }
 
-  update():
+  async update(): Promise<
     | 'not-repository-root'
     | 'working-directory-not-clean'
     | 'not-initialized'
     | 'already-up-to-date'
-    | true {
+    | true
+  > {
     let projectDir = this.dir;
     let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
 
@@ -89,7 +91,7 @@ export class Project {
 
     tempGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
 
-    this.generate(tempDir);
+    await this.generate(tempDir);
 
     if (tempGit.isWorkingDirectoryClean()) {
       return 'already-up-to-date';
@@ -112,6 +114,12 @@ export class Project {
     return projectGit.isRepositoryRoot();
   }
 
+  isMerging(): boolean {
+    let projectGit = new ProjectGit(this.dir);
+
+    return projectGit.isMerging();
+  }
+
   listPendingPossibleDirectoryRenames(): PossibleDirectorRename[] {
     let projectGit = new ProjectGit(this.dir);
 
@@ -124,10 +132,10 @@ export class Project {
     }
   }
 
-  generate(outputDir: string): void {
-    let {files: fileEntries, options} = this.config;
+  async generate(outputDir: string): Promise<void> {
+    let {composables: fileEntries, options} = this.config;
 
-    let context = new Context(this);
+    let context = new Context(this, outputDir);
 
     for (let {path: composableModulePath, base: baseDir} of fileEntries) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -158,11 +166,12 @@ export class Project {
       }
     }
 
-    context.generate();
+    await context.generate();
   }
 
   createFileObject(
     path: string,
+    possiblePathInProject: string,
     type = this.extensionToFileTypeMap.get(Path.dirname(path)),
   ): File.File<unknown, unknown> {
     let creator = this.fileObjectCreatorMap.get(type);
@@ -171,7 +180,7 @@ export class Project {
       throw new Error(`Unknown file type ${JSON.stringify(type)}`);
     }
 
-    return creator(path);
+    return creator(path, possiblePathInProject);
   }
 }
 
@@ -198,7 +207,10 @@ function resolveComposingFilePath({
   return Path.resolve(outputDir, baseDir, composingFilePath);
 }
 
-export type FileObjectCreator = (path: string) => File.File<unknown, unknown>;
+export type FileObjectCreator = (
+  path: string,
+  possiblePathInProject: string,
+) => File.File<unknown, unknown>;
 
 /**
  * Possible directory rename from and to, relative path.

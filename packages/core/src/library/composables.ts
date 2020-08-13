@@ -80,11 +80,28 @@ export function json(
   };
 }
 
+export interface CopyOptions {
+  /**
+   * Copy content as binary, defaults to `false`.
+   */
+  binary?: boolean;
+}
+
 export function copy(
   dir: string,
   patterns: string | string[],
-  toOverwrite = false,
-): File.Composable<Buffer, BinaryFileOptions>[] {
+  options?: CopyOptions & {binary: false},
+): File.Composable<string, TextFileOptions>[];
+export function copy(
+  dir: string,
+  patterns: string | string[],
+  options: CopyOptions & {binary: true},
+): File.Composable<Buffer, BinaryFileOptions>[];
+export function copy(
+  dir: string,
+  patterns: string | string[],
+  {binary = false}: CopyOptions = {},
+): File.Composable<Buffer | string, BinaryFileOptions | TextFileOptions>[] {
   if (!Array.isArray(patterns)) {
     patterns = [patterns];
   }
@@ -95,17 +112,21 @@ export function copy(
     onlyFiles: true,
   });
 
-  if (!toOverwrite) {
-    paths = paths.filter(path => !FS.existsSync(Path.join(dir, path)));
-  }
-
   return paths.map(path => {
-    return {
-      type: 'binary',
-      path,
-      compose() {
-        return FS.readFileSync(Path.join(dir, path));
-      },
-    };
+    return binary
+      ? {
+          type: 'binary',
+          path,
+          compose() {
+            return FS.readFileSync(Path.join(dir, path));
+          },
+        }
+      : {
+          type: 'text',
+          path,
+          compose() {
+            return FS.readFileSync(Path.join(dir, path), 'utf8');
+          },
+        };
   });
 }

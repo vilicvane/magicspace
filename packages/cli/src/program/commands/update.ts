@@ -11,20 +11,20 @@ import {compact} from '../@utils';
 })
 export default class extends Command {
   @metadata
-  execute(
+  async execute(
     @param({
       default: '.',
     })
     projectDir: string,
     options: CommonOptions,
     context: Context,
-  ): string {
+  ): Promise<string> {
     let project = Project.createDefaultProject(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );
 
-    let result = project.update();
+    let result = await project.update();
 
     switch (result) {
       case true:
