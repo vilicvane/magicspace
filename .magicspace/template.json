@@ -5,7 +5,7 @@
       "name": "magicspace",
       "packages": [
         {"name": "@magicspace/core"},
-        {"name": "@magicspace/cli"},
+        {"name": "magicspace", "dir": "cli"},
         {"name": "@magicspace/utils"}
       ]
     }
