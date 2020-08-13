@@ -46,6 +46,10 @@ Otherwise, you can use "git merge --abort" to cancel this update and start over 
             projectDir,
           )} is not repository root`,
         );
+      case 'merge-in-progress':
+        throw new ExpectedError(
+          'A merge is already in progress, please resolve it before continue',
+        );
       case 'working-directory-not-clean':
         throw new ExpectedError('Working directory not clean');
       case 'already-initialized':

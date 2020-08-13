@@ -33,6 +33,7 @@ export class Project {
   }: ProjectInitializeOptions): Promise<
     | 'not-repository-root'
     | 'already-initialized'
+    | 'merge-in-progress'
     | 'working-directory-not-clean'
     | true
   > {
@@ -44,6 +45,10 @@ export class Project {
 
     if (!projectGit.isRepositoryRoot()) {
       return 'not-repository-root';
+    }
+
+    if (projectGit.isMerging()) {
+      return 'merge-in-progress';
     }
 
     if (!force && !projectGit.isWorkingDirectoryClean()) {
@@ -77,6 +82,7 @@ export class Project {
     force = false,
   }: ProjectUpdateOptions): Promise<
     | 'not-repository-root'
+    | 'merge-in-progress'
     | 'working-directory-not-clean'
     | 'not-initialized'
     | 'already-up-to-date'
@@ -90,6 +96,10 @@ export class Project {
 
     if (!projectGit.isRepositoryRoot()) {
       return 'not-repository-root';
+    }
+
+    if (projectGit.isMerging()) {
+      return 'merge-in-progress';
     }
 
     if (!force && !projectGit.isWorkingDirectoryClean()) {
