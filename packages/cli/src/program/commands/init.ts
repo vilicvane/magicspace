@@ -1,9 +1,18 @@
 import * as Path from 'path';
 
 import {Project} from '@magicspace/core';
-import {Command, ExpectedError, command, metadata, param} from 'clime';
+import {Command, ExpectedError, command, metadata, option, param} from 'clime';
 
 import {CommonOptions} from '../@command';
+
+export class InitOptions extends CommonOptions {
+  @option({
+    toggle: true,
+    description: 'Use "ours" merge strategy',
+    default: false,
+  })
+  ours!: boolean;
+}
 
 @command({
   description: 'Initialize magicspace',
@@ -15,14 +24,14 @@ export default class extends Command {
       default: '.',
     })
     projectDir: string,
-    options: CommonOptions,
+    options: InitOptions,
   ): Promise<string> {
     let project = Project.createDefaultProject(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await project.initialize(options.force);
+    let result = await project.initialize(options);
 
     switch (result) {
       case true:

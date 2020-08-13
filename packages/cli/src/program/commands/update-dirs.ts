@@ -5,7 +5,7 @@ import {Command, ExpectedError, command, metadata, param} from 'clime';
 import prompts from 'prompts';
 
 @command({
-  description: 'Update possible renamed directories',
+  description: 'Update possible renamed directories interactively',
 })
 export default class extends Command {
   @metadata

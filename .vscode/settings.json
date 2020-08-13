@@ -20,11 +20,13 @@
     "EDITMSG",
     "Mufan",
     "Parens",
+    "Subcommand",
     "composables",
     "cond",
     "globby",
     "magicspace",
     "multiselect",
+    "subcommands",
     "tslang",
     "tslib"
   ]

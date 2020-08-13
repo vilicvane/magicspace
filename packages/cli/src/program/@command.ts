@@ -11,6 +11,7 @@ export class CommonOptions extends Options {
 
   @option({
     toggle: true,
+    description: 'Force operation under dirty working directory',
     default: false,
   })
   force!: boolean;

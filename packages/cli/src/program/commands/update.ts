@@ -24,7 +24,7 @@ export default class extends Command {
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await project.update(options.force);
+    let result = await project.update(options);
 
     switch (result) {
       case true:

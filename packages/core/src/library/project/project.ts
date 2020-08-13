@@ -27,9 +27,10 @@ export class Project {
     private _config?: Config.Config,
   ) {}
 
-  async initialize(
+  async initialize({
     force = false,
-  ): Promise<
+    ours = false,
+  }: ProjectInitializeOptions): Promise<
     | 'not-repository-root'
     | 'already-initialized'
     | 'working-directory-not-clean'
@@ -65,16 +66,16 @@ export class Project {
 
     projectGit.addOrUpdateMagicspaceRemote(tempDir);
 
-    projectGit.pullMagicspaceChangesWithoutCommit('initialize');
+    projectGit.pullMagicspaceChangesWithoutCommit('initialize', ours);
 
     projectGit.removeMagicspaceRemote();
 
     return true;
   }
 
-  async update(
+  async update({
     force = false,
-  ): Promise<
+  }: ProjectUpdateOptions): Promise<
     | 'not-repository-root'
     | 'working-directory-not-clean'
     | 'not-initialized'
@@ -196,6 +197,15 @@ export class Project {
 
     return creator(path, possiblePathInProject);
   }
+}
+
+export interface ProjectInitializeOptions {
+  force?: boolean;
+  ours?: boolean;
+}
+
+export interface ProjectUpdateOptions {
+  force?: boolean;
 }
 
 interface ResolveComposingFilePathOptions {

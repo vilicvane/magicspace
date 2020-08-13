@@ -77,12 +77,16 @@ export class ProjectGit extends Git {
     spawnSync(this.dir, 'git', ['remote', 'remove', MAGICSPACE_REMOTE]);
   }
 
-  pullMagicspaceChangesWithoutCommit(type: 'initialize' | 'update'): void {
+  pullMagicspaceChangesWithoutCommit(
+    type: 'initialize' | 'update',
+    ours = false,
+  ): void {
     try {
       let stdout = spawnSync(this.dir, 'git', [
         'pull',
         '--no-commit',
         '--allow-unrelated-histories',
+        ...(ours ? ['--strategy=ours'] : []),
         '--strategy-option=patience',
         `--strategy-option=find-renames=${PULL_FIND_RENAMES_THRESHOLD}`,
         MAGICSPACE_REMOTE,
