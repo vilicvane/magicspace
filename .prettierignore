@@ -1,3 +1,4 @@
 bld/
 
 package.json
+lerna.json
