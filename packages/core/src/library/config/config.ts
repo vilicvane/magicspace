@@ -92,9 +92,13 @@ function _resolveTemplateConfig(dir: string): Config {
     let superOptionsArray: Magicspace.TemplateOptions[] = [];
 
     for (let specifier of superSpecifiers) {
-      let superDir = resolve(specifier, {
-        sourceFileName: configFilePath,
-      });
+      let superDir =
+        resolve(specifier, {
+          sourceFileName: configFilePath,
+        }) ??
+        resolve(specifier, {
+          sourceFileName: __filename,
+        });
 
       if (!superDir) {
         throw new Error(
