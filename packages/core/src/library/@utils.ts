@@ -83,18 +83,6 @@ export function conservativelyMove(from: string, to: string): boolean {
   }
 }
 
-export function getClosetExistingUpperDirectory(
-  path: string,
-): string | undefined {
-  while (!FSExtra.existsSync(path)) {
-    let upperPath = Path.dirname(path);
-
-    if (upperPath === path) {
-      return undefined;
-    }
-
-    path = upperPath;
-  }
-
-  return path;
+export function removePathExtension(path: string): string {
+  return path.slice(0, -Path.extname(path).length);
 }

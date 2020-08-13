@@ -2,6 +2,7 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import * as FastGlob from 'fast-glob';
+import * as Handlebars from 'handlebars';
 
 import {
   BinaryFileOptions,
@@ -10,6 +11,7 @@ import {
   TextFile,
   TextFileOptions,
 } from './@files';
+import {removePathExtension} from './@utils';
 import {File} from './file';
 
 export function text<TMetadata extends object = object>(
@@ -135,4 +137,49 @@ export function copy(
           },
         };
   });
+}
+
+export interface HandlebarsOptions {
+  /**
+   * Path to template, defaults to file sibling to the composable module with
+   * name `removePathExtension(composableModulePath) + '.hbs'` if not
+   * specified.
+   */
+  template?: string;
+}
+
+export function handlebars<TData>(
+  data: TData,
+  options?: HandlebarsOptions,
+): File.Composable<string, TextFileOptions>;
+export function handlebars<TData>(
+  path: string,
+  data: TData,
+  options?: HandlebarsOptions,
+): File.Composable<string, TextFileOptions>;
+export function handlebars(
+  ...args: any[]
+): File.Composable<string, TextFileOptions> {
+  let path: string | undefined;
+  let data: unknown;
+  let options: HandlebarsOptions;
+
+  if (typeof args[0] === 'string') {
+    [path, data, options = {}] = args;
+  } else {
+    [data, options = {}] = args;
+  }
+
+  return {
+    type: 'text',
+    path,
+    compose(_content, {composableModulePath}) {
+      let templatePath =
+        options.template ?? `${removePathExtension(composableModulePath)}.hbs`;
+
+      let template = FS.readFileSync(templatePath, 'utf8');
+
+      return Handlebars.compile(template)(data);
+    },
+  };
 }
