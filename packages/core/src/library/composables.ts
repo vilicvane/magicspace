@@ -3,16 +3,22 @@ import * as Path from 'path';
 
 import * as FastGlob from 'fast-glob';
 
-import {BinaryFileOptions, JSONFileOptions, TextFileOptions} from './@files';
+import {
+  BinaryFileOptions,
+  JSONFile,
+  JSONFileOptions,
+  TextFile,
+  TextFileOptions,
+} from './@files';
 import {File} from './file';
 
 export function text<TMetadata extends object = object>(
-  content: string | File.ComposeFunction<unknown, string, TMetadata>,
+  content: string | File.ComposeFunction<TextFile>,
   options?: TextFileOptions,
 ): File.Composable<string, TextFileOptions>;
 export function text<TMetadata extends object = object>(
   path: string,
-  content: string | File.ComposeFunction<unknown, string, TMetadata>,
+  content: string | File.ComposeFunction<TextFile>,
   options?: TextFileOptions,
 ): File.Composable<string, TextFileOptions>;
 export function text(...args: any[]): File.Composable<string, TextFileOptions> {
@@ -26,10 +32,10 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
     [content, options] = args;
   }
 
-  let composer: File.ComposeFunction<unknown, string, object>;
+  let composer: File.ComposeFunction<TextFile>;
 
   if (typeof content === 'function') {
-    composer = content as File.ComposeFunction<unknown, string, object>;
+    composer = content as File.ComposeFunction<TextFile>;
   } else {
     composer = () => content;
   }
@@ -42,13 +48,13 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
   };
 }
 
-export function json<TContent, TMetadata extends object = object>(
-  value: TContent | File.ComposeFunction<unknown, TContent, TMetadata>,
+export function json<TContent>(
+  value: TContent | File.ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
 ): File.Composable<TContent, JSONFileOptions>;
-export function json<TContent, TMetadata extends object = object>(
+export function json<TContent>(
   path: string,
-  value: TContent | File.ComposeFunction<unknown, TContent, TMetadata>,
+  value: TContent | File.ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
 ): File.Composable<TContent, JSONFileOptions>;
 export function json(
@@ -64,10 +70,10 @@ export function json(
     [value, options] = args;
   }
 
-  let composer: File.ComposeFunction<unknown, unknown, object>;
+  let composer: File.ComposeFunction<JSONFile<unknown>>;
 
   if (typeof value === 'function') {
-    composer = value as File.ComposeFunction<unknown, unknown, object>;
+    composer = value as File.ComposeFunction<JSONFile<unknown>>;
   } else {
     composer = () => value;
   }

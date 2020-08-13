@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
+import globalNodeModulesDir from 'global-modules';
 import {resolve} from 'module-lens';
 
 import {uniqueBy} from '../@utils';
@@ -98,6 +99,9 @@ function _resolveTemplateConfig(dir: string): Config {
         }) ??
         resolve(specifier, {
           sourceFileName: __filename,
+        }) ??
+        resolve(specifier, {
+          sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
         });
 
       if (!superDir) {
