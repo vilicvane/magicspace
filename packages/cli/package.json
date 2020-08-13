@@ -7,6 +7,11 @@
   "bin": {
     "magicspace": "bld/program/main.js"
   },
+  "files": [
+    "src/program/**/*.ts",
+    "bld/program",
+    "!*.tsbuildinfo"
+  ],
   "dependencies": {
     "@magicspace/core": "^0.2.0",
     "clime": "^0.5.14",
