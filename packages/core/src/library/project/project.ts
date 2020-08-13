@@ -197,6 +197,12 @@ export class Project {
     possiblePathInProject: string,
     type = this.extensionToFileTypeMap.get(Path.dirname(path)),
   ): File.File<unknown, unknown> {
+    if (!type) {
+      throw new Error(
+        `Cannot infer composable file type from path ${JSON.stringify(path)}`,
+      );
+    }
+
     let creator = this.fileObjectCreatorMap.get(type);
 
     if (!creator) {
@@ -204,6 +210,22 @@ export class Project {
     }
 
     return creator(path, possiblePathInProject);
+  }
+
+  assertFileObject(
+    file: File.File<unknown, unknown>,
+    path: string,
+    type: string | undefined,
+  ): void {
+    if (type && file.type !== type) {
+      throw new Error(
+        `File ${JSON.stringify(
+          path,
+        )} has inconsistent composable file types ${JSON.stringify(
+          file.type,
+        )} and ${JSON.stringify(type)}`,
+      );
+    }
   }
 }
 

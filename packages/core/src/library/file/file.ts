@@ -10,7 +10,11 @@ export abstract class File<TContent, TComposeOptions> {
 
   composables: Composable<TContent, TComposeOptions>[] = [];
 
-  constructor(readonly path: string, readonly possiblePathInProject: string) {}
+  constructor(
+    readonly type: string,
+    readonly path: string,
+    readonly possiblePathInProject: string,
+  ) {}
 
   compose(composable: Composable<TContent, TComposeOptions>): void {
     this.composables.push(composable);
