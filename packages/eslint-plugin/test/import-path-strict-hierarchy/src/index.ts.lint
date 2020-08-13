@@ -1,5 +1,0 @@
-import * as test from './test'
-import * as test from '../core'
-import * as test from '../test'
-import * as test from '../src/core'
-import * as FS from 'fs'

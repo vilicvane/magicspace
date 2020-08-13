@@ -1,5 +1,5 @@
 {
-  "extends": ["@magicspace/templates/general"],
+  "extends": ["@mufan/code-templates/general"],
   "options": {
     "project": {
       "name": "magicspace",

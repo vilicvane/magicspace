@@ -1,4 +1,0 @@
-import * as resolve from '../../../../../node_modules/resolve'
-import * as resolve from '../../../../../node_modules/@types/resolve';
-
-import * as resolve from 'resolve'

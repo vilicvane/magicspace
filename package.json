@@ -5,25 +5,21 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "scripts": {
-    "lerna:publish": "lerna publish --registry=https://registry.npmjs.org",
-    "test": "yarn test:eslint-plugin && yarn test:core && yarn test:templates && yarn test:cli",
-    "test:eslint-plugin": "yarn workspace @magicspace/eslint-plugin test",
-    "test:core": "yarn workspace @magicspace/core test",
-    "test:templates": "yarn workspace @magicspace/templates test",
-    "test:cli": "yarn workspace magicspace test"
+    "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
+    "build": "rimraf packages/*/{bld,.bld-cache} && tsc --build tsconfig.json",
+    "lint": "run-in-every eslint-project --echo --parallel -- eslint --config {configFileName} .",
+    "lint-prettier": "prettier --list-different \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "test": "yarn lint-prettier && yarn build && yarn lint"
   },
   "devDependencies": {
-    "@types/eslint": "^7.2.0",
-    "@types/fs-extra": "^9.0.1",
-    "@types/glob": "^7.1.2",
-    "@types/lodash": "^4.14.157",
+    "@magicspace/configs": "^0.2.5",
+    "@magicspace/eslint-plugin": "^0.1.32",
     "@types/node": "^14.0.14",
-    "@types/prettier": "^2.0.1",
     "eslint": "^7.3.1",
     "lerna": "^3.22.1",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "ts-node": "^8.10.2",
+    "run-in-every": "^0.1.6",
     "typescript": "^3.9.7"
   },
   "workspaces": [

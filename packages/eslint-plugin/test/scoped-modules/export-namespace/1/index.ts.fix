@@ -1,3 +1,0 @@
-import * as ExportNamespace from './namespace';
-
-export {ExportNamespace};

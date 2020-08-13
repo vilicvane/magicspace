@@ -1,9 +1,0 @@
-import * as foo from'./foo/bar'
-
-import * as foo from './foo/foo'
-
-import * as b from './foo/a/b'
-
-import * as foo from './foo'
-
-import * as parse from 'parse'

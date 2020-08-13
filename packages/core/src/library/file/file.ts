@@ -1,10 +1,7 @@
-// import * as Path from "path";
-
 import * as FSExtra from 'fs-extra';
 import {BuiltInParserName} from 'prettier';
 
 import {getPrettierModule} from '../@prettier';
-// import { getClosetExistingUpperDirectory } from '../@utils';
 
 import {Composable} from './composable';
 import {Context} from './context';
@@ -30,11 +27,11 @@ export abstract class File<TContent, TComposeOptions> {
 
       let Prettier = getPrettierModule(possiblePathInProject);
 
-      let prettierConfigOptions = await Prettier.resolveConfig(
-        possiblePathInProject,
-      ) ?? await Prettier.resolveConfig(this.path, {
-        useCache: false,
-      });
+      let prettierConfigOptions =
+        (await Prettier.resolveConfig(possiblePathInProject)) ??
+        (await Prettier.resolveConfig(this.path, {
+          useCache: false,
+        }));
 
       if (prettierConfigOptions) {
         let {inferredParser} = await Prettier.getFileInfo(
@@ -49,7 +46,6 @@ export abstract class File<TContent, TComposeOptions> {
           });
         }
       }
-
     } else if (this.toBuffer) {
       content = this.toBuffer();
     } else {

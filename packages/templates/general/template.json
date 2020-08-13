@@ -1,4 +1,0 @@
-{
-  "root": "composables",
-  "composables": ["files.js", "**/*.json.js"]
-}

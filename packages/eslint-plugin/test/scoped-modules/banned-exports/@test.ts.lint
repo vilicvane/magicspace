@@ -1,5 +1,0 @@
-export * from './@bar';
-export * from './@foo';
-export * from './@bar/@foo';
-export * from './@bar/test';
-export * from './@bar/test/@foo';

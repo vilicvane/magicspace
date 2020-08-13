@@ -147,8 +147,16 @@ export class Project {
     }
   }
 
-  async generate(outputDir: string): Promise<void> {
-    let {composables: fileEntries, options} = this.config;
+  async generate(
+    outputDir: string,
+    options?: Magicspace.TemplateOptions,
+  ): Promise<void> {
+    let {composables: fileEntries, options: configOptions} = this.config;
+
+    options = {
+      ...configOptions,
+      ...options,
+    };
 
     let context = new Context(this, outputDir);
 

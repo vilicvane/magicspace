@@ -1,4 +1,0 @@
-import test from './services'
-import test from '../services'
-import test from '../../services' // failure
-import test from '../../test' // failure
