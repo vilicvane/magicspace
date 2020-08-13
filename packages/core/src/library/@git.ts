@@ -100,6 +100,12 @@ export class ProjectGit extends Git {
       }
 
       if (!/^CONFLICT/m.test(error.stdout)) {
+        if (/^error: Your local changes/m.test(error.stderr)) {
+          throw new Error(
+            'Error merging magicspace changes, conflict with local changes',
+          );
+        }
+
         throw new Error('Error merging magicspace changes');
       }
 
