@@ -1,4 +1,0 @@
-import * as b from '../b'
-
-import * as tslint from 'tslint'
-import * as FS from 'fs'

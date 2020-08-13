@@ -1,0 +1,13 @@
+{
+  "extends": ["@mufan/code-templates/general"],
+  "options": {
+    "project": {
+      "name": "magicspace",
+      "packages": [
+        {"name": "@magicspace/core"},
+        {"name": "magicspace", "dir": "cli"},
+        {"name": "@magicspace/utils"}
+      ]
+    }
+  }
+}

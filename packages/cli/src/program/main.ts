@@ -2,10 +2,7 @@
 
 import * as Path from 'path';
 
-import {registerTSNode} from '@magicspace/core';
 import {CLI, Shim} from 'clime';
-
-registerTSNode();
 
 let cli = new CLI('magicspace', Path.join(__dirname, 'commands'));
 

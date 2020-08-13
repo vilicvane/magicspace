@@ -1,24 +1,24 @@
 {
   "name": "magicspace",
-  "version": "0.1.9",
+  "version": "0.2.2",
   "description": "",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "rimraf bld && tsc --project src/program",
-    "lint": "eslint src/program --ext .ts,.js",
-    "test": "yarn build && yarn lint"
-  },
   "bin": {
     "magicspace": "bld/program/main.js"
   },
+  "files": [
+    "src/program/**/*.ts",
+    "bld/program",
+    "!*.tsbuildinfo"
+  ],
   "dependencies": {
-    "@magicspace/core": "^0.1.5",
-    "@magicspace/templates": "^0.1.6",
+    "@magicspace/core": "^0.2.2",
     "clime": "^0.5.14",
-    "tslib": "^2.0.0"
+    "prompts": "^2.3.2",
+    "tslib": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.0.8"
   }
 }

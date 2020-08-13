@@ -1,23 +1,10 @@
 {
+  "extends": "@magicspace/configs/tsconfig.json",
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "lib": ["esnext"],
-    "types": [],
-    "importHelpers": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "stripInternal": true,
-    "strict": true,
-    "strictFunctionTypes": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "newLine": "LF",
-    "declaration": true,
-    "rootDir": ".",
+    "composite": true,
+
+    "types": ["node"],
+
     "outDir": "../../bld/library"
   }
 }

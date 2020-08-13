@@ -5,15 +5,29 @@
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": true
+    "source.fixAll.eslint": true
   },
-  "editor.codeActionsOnSaveTimeout": 10000,
   "editor.tabSize": 2,
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
+  "task.autoDetect": "off",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.enable": true,
   "eslint.validate": ["javascript", "typescript"],
-  "eslint.workingDirectories": [{"mode": "auto"}]
+  "eslint.workingDirectories": [{"mode": "auto"}],
+  "cSpell.words": [
+    "EDITMSG",
+    "Mufan",
+    "Parens",
+    "Subcommand",
+    "composables",
+    "cond",
+    "globby",
+    "magicspace",
+    "multiselect",
+    "subcommands",
+    "tslang",
+    "tslib"
+  ]
 }

@@ -1,9 +1,0 @@
-import * as Foo from '../foo';
-import * as Foo from './pia';
-
-import * as Foo from '../foo';
-import * as Foo from './pia';
-
-import * as Util from 'util';
-
-import * as Util from 'util/yoha';

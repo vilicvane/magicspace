@@ -1,6 +1,0 @@
-import test from './test/core'
-
-import test from './test'
-import test from '../test'
-import test from '../../test' // failure
-import test from '../../core'

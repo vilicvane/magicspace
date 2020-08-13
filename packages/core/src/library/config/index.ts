@@ -1,2 +1,1 @@
-export * from './template-bundle-config';
-export * from './project-config';
+export * as Config from './namespace';

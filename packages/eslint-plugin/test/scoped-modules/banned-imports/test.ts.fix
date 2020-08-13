@@ -1,4 +1,0 @@
-import '../banned-exports/@bar';
-import '../banned-exports/@foo';
-import './@bar';
-import './@foo';
