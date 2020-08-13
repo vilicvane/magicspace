@@ -13,7 +13,9 @@ export interface Composable<TContent, TOptions> {
 export type ComposeFunction<TFile extends File<any, any>> = (
   content: TFile extends File<infer TContent, any> ? TContent : never,
   file: TFile,
-) => TFile extends File<infer TContent, any> ? TContent : never;
+) => TFile extends File<infer TContent, any>
+  ? Promise<TContent> | TContent
+  : never;
 
 /**
  * A utility function that returns the givin composable as-is.

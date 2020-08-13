@@ -10,4 +10,8 @@ export type ComposableModule =
 export type ComposableModuleFunction = (
   options: Magicspace.TemplateOptions,
   context: Context,
-) => File.Composable<unknown, unknown> | File.Composable<unknown, unknown>[];
+) =>
+  | File.Composable<unknown, unknown>
+  | File.Composable<unknown, unknown>[] extends infer TReturn
+  ? Promise<TReturn> | TReturn
+  : never;

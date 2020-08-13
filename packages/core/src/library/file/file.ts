@@ -16,9 +16,11 @@ export abstract class File<TContent, TComposeOptions> {
     readonly possiblePathInProject: string,
   ) {}
 
-  compose(composable: Composable<TContent, TComposeOptions>): void {
+  async compose(
+    composable: Composable<TContent, TComposeOptions>,
+  ): Promise<void> {
     this.composables.push(composable);
-    this.content = composable.compose(this.content, this);
+    this.content = await composable.compose(this.content, this);
   }
 
   toText?(): string;

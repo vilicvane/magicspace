@@ -165,7 +165,7 @@ export class Project {
       let module: ComposableModule = require(composableModulePath);
 
       let composables =
-        typeof module === 'function' ? module(options, context) : module;
+        typeof module === 'function' ? await module(options, context) : module;
 
       if (!Array.isArray(composables)) {
         composables = [composables];
@@ -185,7 +185,7 @@ export class Project {
 
         let file = context.ensureFile(path, composable);
 
-        file.compose(composable);
+        await file.compose(composable);
       }
     }
 
