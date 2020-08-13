@@ -7,7 +7,7 @@
   "scripts": {
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/{bld,.bld-cache} && tsc --build tsconfig.json",
-    "lint": "run-in-every eslint-project --echo --parallel -- eslint --config {configFileName} .",
+    "lint": "eslint .",
     "lint-prettier": "prettier --list-different \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
@@ -19,7 +19,6 @@
     "lerna": "^3.22.1",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "run-in-every": "^0.1.6",
     "typescript": "^3.9.7"
   },
   "workspaces": [

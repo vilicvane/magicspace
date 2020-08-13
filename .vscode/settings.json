@@ -15,7 +15,6 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.enable": true,
   "eslint.validate": ["javascript", "typescript"],
-  "eslint.workingDirectories": [{"mode": "auto"}],
   "cSpell.words": [
     "EDITMSG",
     "Mufan",
