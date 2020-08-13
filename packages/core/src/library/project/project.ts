@@ -185,7 +185,7 @@ export class Project {
 
         let file = context.ensureFile(path, composable);
 
-        await file.compose(composable);
+        await file.compose(composable, {composableModulePath});
       }
     }
 
@@ -194,7 +194,7 @@ export class Project {
 
   createFileObject(
     path: string,
-    possiblePathInProject: string,
+    context: File.FileContext,
     type = this.extensionToFileTypeMap.get(Path.dirname(path)),
   ): File.File<unknown, unknown> {
     if (!type) {
@@ -209,7 +209,7 @@ export class Project {
       throw new Error(`Unknown file type ${JSON.stringify(type)}`);
     }
 
-    return creator(path, possiblePathInProject);
+    return creator(path, context);
   }
 
   assertFileObject(
@@ -263,7 +263,7 @@ function resolveComposingFilePath({
 
 export type FileObjectCreator = (
   path: string,
-  possiblePathInProject: string,
+  context: File.FileContext,
 ) => File.File<unknown, unknown>;
 
 /**

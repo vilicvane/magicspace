@@ -10,9 +10,15 @@ export interface Composable<TContent, TOptions> {
   options?: TOptions;
 }
 
+export interface ComposeContext<TFile extends File<any, any>> {
+  file: TFile;
+  possibleOutputPath: string;
+  composableModulePath: string;
+}
+
 export type ComposeFunction<TFile extends File<any, any>> = (
   content: TFile extends File<infer TContent, any> ? TContent : never,
-  file: TFile,
+  ComposeContext: ComposeContext<TFile>,
 ) => TFile extends File<infer TContent, any>
   ? Promise<TContent> | TContent
   : never;

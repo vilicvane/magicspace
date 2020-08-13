@@ -5,8 +5,8 @@ export interface TextFileOptions {}
 export class TextFile extends File.File<string, TextFileOptions> {
   content = '';
 
-  constructor(path: string, possiblePathInProject: string) {
-    super('text', path, possiblePathInProject);
+  constructor(path: string, context: File.FileContext) {
+    super('text', path, context);
   }
 
   toText(): string {

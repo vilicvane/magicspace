@@ -13,14 +13,19 @@ export abstract class File<TContent, TComposeOptions> {
   constructor(
     readonly type: string,
     readonly path: string,
-    readonly possiblePathInProject: string,
+    readonly context: FileContext,
   ) {}
 
   async compose(
     composable: Composable<TContent, TComposeOptions>,
+    context: FileComposeContext,
   ): Promise<void> {
     this.composables.push(composable);
-    this.content = await composable.compose(this.content, this);
+    this.content = await composable.compose(this.content, {
+      file: this,
+      ...this.context,
+      ...context,
+    });
   }
 
   toText?(): string;
@@ -33,21 +38,20 @@ export abstract class File<TContent, TComposeOptions> {
     if (this.toText) {
       content = this.toText();
 
-      let possiblePathInProject = this.possiblePathInProject;
+      let {possibleOutputPath} = this.context;
 
-      let Prettier = getPrettierModule(possiblePathInProject);
+      let Prettier = getPrettierModule(possibleOutputPath);
 
       let prettierConfigOptions =
-        (await Prettier.resolveConfig(possiblePathInProject)) ??
+        (await Prettier.resolveConfig(possibleOutputPath)) ??
         (await Prettier.resolveConfig(this.path, {
           useCache: false,
         }));
 
       if (prettierConfigOptions) {
-        let {inferredParser} = await Prettier.getFileInfo(
-          possiblePathInProject,
-          {resolveConfig: true},
-        );
+        let {inferredParser} = await Prettier.getFileInfo(possibleOutputPath, {
+          resolveConfig: true,
+        });
 
         if (inferredParser) {
           content = Prettier.format(content, {
@@ -66,4 +70,12 @@ export abstract class File<TContent, TComposeOptions> {
 
     FSExtra.outputFileSync(this.path, content);
   }
+}
+
+export interface FileContext {
+  possibleOutputPath: string;
+}
+
+export interface FileComposeContext {
+  composableModulePath: string;
 }

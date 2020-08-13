@@ -28,7 +28,12 @@ export class Context {
     } else {
       file = project.createFileObject(
         path,
-        Path.join(project.dir, Path.relative(this.dir, path)),
+        {
+          possibleOutputPath: Path.join(
+            project.dir,
+            Path.relative(this.dir, path),
+          ),
+        },
         composable.type,
       );
 
