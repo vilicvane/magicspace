@@ -3,7 +3,10 @@ import sortKeys from 'sort-keys';
 import {File} from '../file';
 
 export interface StructuredFileOptions {
-  sortKeys?: StructuredFileSortKeysOptions;
+  /**
+   * Sort content keys. A string array can be specified as a shortcut of `top`.
+   */
+  sortKeys?: StructuredFileSortKeysOptions | string[];
 }
 
 export abstract class StructuredFile<
@@ -21,6 +24,10 @@ export abstract class StructuredFile<
     let content = this.content;
 
     if (sortKeysOptions) {
+      if (Array.isArray(sortKeysOptions)) {
+        sortKeysOptions = {top: sortKeysOptions};
+      }
+
       let {top, bottom, compare, deep} = sortKeysOptions;
 
       let topKeyToIndexMap = new Map(top?.map((key, index) => [key, index]));
