@@ -5,6 +5,7 @@ import {Context} from './context';
 export type ComposableModule =
   | File.Composable<unknown, unknown>
   | File.Composable<unknown, unknown>[]
+  | undefined
   | ComposableModuleFunction;
 
 export type ComposableModuleFunction = (
@@ -12,6 +13,7 @@ export type ComposableModuleFunction = (
   context: Context,
 ) =>
   | File.Composable<unknown, unknown>
-  | File.Composable<unknown, unknown>[] extends infer TReturn
+  | File.Composable<unknown, unknown>[]
+  | undefined extends infer TReturn
   ? Promise<TReturn> | TReturn
   : never;

@@ -177,6 +177,10 @@ export class Project {
       let composables =
         typeof module === 'function' ? await module(options, context) : module;
 
+      if (!composables) {
+        continue;
+      }
+
       if (!Array.isArray(composables)) {
         composables = [composables];
       }
