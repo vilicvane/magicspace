@@ -1,6 +1,6 @@
 {
   "name": "magicspace",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "!*.tsbuildinfo"
   ],
   "dependencies": {
-    "@magicspace/core": "^0.2.4",
+    "@magicspace/core": "^0.2.5",
     "clime": "^0.5.14",
     "prompts": "^2.3.2",
     "tslib": "^2.0.1"
