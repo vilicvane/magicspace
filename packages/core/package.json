@@ -23,7 +23,7 @@
     "fs-extra": "^9.0.1",
     "global-modules": "^2.0.0",
     "handlebars": "^4.7.6",
-    "module-lens": "^0.1.5",
+    "module-lens": "^0.1.6",
     "prettier": "^2.0.5",
     "sort-keys": "^4.0.0",
     "tslang": "^0.1.22",
