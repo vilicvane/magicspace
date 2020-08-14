@@ -2,8 +2,8 @@
   "name": "magicspace",
   "private": true,
   "repository": "https://github.com/makeflow/magicspace.git",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/{bld,.bld-cache} && tsc --build tsconfig.json",

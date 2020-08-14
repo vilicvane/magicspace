@@ -3,6 +3,8 @@
   "options": {
     "project": {
       "name": "magicspace",
+      "author": "Chengdu Mufan Technology Co., Ltd.",
+      "license": "MIT",
       "packages": [
         {"name": "@magicspace/core"},
         {"name": "magicspace", "dir": "cli"},

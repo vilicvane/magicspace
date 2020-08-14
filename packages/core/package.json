@@ -1,17 +1,11 @@
 {
   "name": "@magicspace/core",
   "version": "0.2.6",
-  "description": "",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
-  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "build": "rimraf bld && tsc --project src/library",
-    "lint": "eslint src/library --ext .ts,.js",
-    "test": "yarn build && yarn lint"
-  },
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "files": [
@@ -19,6 +13,11 @@
     "bld/library",
     "!*.tsbuildinfo"
   ],
+  "scripts": {
+    "build": "rimraf bld && tsc --project src/library",
+    "lint": "eslint src/library --ext .ts,.js",
+    "test": "yarn build && yarn lint"
+  },
   "dependencies": {
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",

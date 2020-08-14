@@ -1,17 +1,16 @@
 {
   "name": "magicspace",
   "version": "0.2.6",
-  "description": "",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
-  "bin": {
-    "magicspace": "bld/program/main.js"
-  },
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "files": [
     "src/program/**/*.ts",
     "bld/program",
     "!*.tsbuildinfo"
   ],
+  "bin": {
+    "magicspace": "bld/program/main.js"
+  },
   "dependencies": {
     "@magicspace/core": "^0.2.6",
     "clime": "^0.5.14",
