@@ -11,7 +11,7 @@ export interface RawConfig {
    *
    * @link https://github.com/vilic/module-lens
    */
-  extends?: string[];
+  extends?: string | string[];
   /**
    * Root directory of composable files.
    */

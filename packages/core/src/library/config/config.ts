@@ -88,6 +88,10 @@ function _resolveTemplateConfig(dir: string): Config {
     },
   );
 
+  if (typeof superSpecifiers === 'string') {
+    superSpecifiers = [superSpecifiers];
+  }
+
   if (superSpecifiers && superSpecifiers.length) {
     let superFileEntriesArray: ComposableFileEntry[][] = [];
     let superOptionsArray: Magicspace.TemplateOptions[] = [];
