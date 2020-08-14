@@ -1,6 +1,8 @@
 {
   "name": "magicspace",
   "private": true,
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "workspaces": [
     "packages/core",
     "packages/cli",
