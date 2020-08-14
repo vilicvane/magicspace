@@ -146,6 +146,7 @@ export interface HandlebarsOptions {
    * specified.
    */
   template?: string;
+  noEscape?: boolean;
 }
 
 export function handlebars<TData>(
@@ -179,7 +180,9 @@ export function handlebars(
 
       let template = FS.readFileSync(templatePath, 'utf8');
 
-      return Handlebars.compile(template)(data);
+      return Handlebars.compile(template, {
+        noEscape: options.noEscape,
+      })(data);
     },
   };
 }
