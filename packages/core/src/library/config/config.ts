@@ -3,10 +3,13 @@ import * as Path from 'path';
 import FastGlob from 'fast-glob';
 import globalNodeModulesDir from 'global-modules';
 import {resolve} from 'module-lens';
+import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
 
 import {uniqueBy} from '../@utils';
 
 import {RawConfig} from './raw-config';
+
+const yarnGlobalNodeModulesParentDir = getYarnGlobalNodeModulesParentDir();
 
 export interface Config {
   /**
@@ -103,6 +106,12 @@ function _resolveTemplateConfig(dir: string): Config {
         }) ??
         resolve(specifier, {
           sourceFileName: __filename,
+        }) ??
+        resolve(specifier, {
+          sourceFileName: Path.join(
+            yarnGlobalNodeModulesParentDir,
+            '__placeholder__',
+          ),
         }) ??
         resolve(specifier, {
           sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),

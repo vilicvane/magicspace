@@ -2843,6 +2843,13 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+homedir-polyfill@^1.0.1:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/homedir-polyfill/-/homedir-polyfill-1.0.3.tgz#743298cef4e5af3e194161fbadcc2151d3a058e8"
+  integrity sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==
+  dependencies:
+    parse-passwd "^1.0.0"
+
 hosted-git-info@^2.1.4, hosted-git-info@^2.7.1:
   version "2.8.5"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.5.tgz#759cfcf2c4d156ade59b0b2dfabddc42a6b9c70c"
@@ -3777,10 +3784,10 @@ modify-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
 
-module-lens@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/module-lens/-/module-lens-0.1.3.tgz#4f078a653fdb9987421dac1ac0cdf786ff836417"
-  integrity sha512-ZlSMYskPR0fJwWeJlKJFcqUC0YnGg4coEGQrzLl6BQQ3c3zSPk94FOJLil2hMIO5Zqx4DdDXJhgDcyoXjjyBjQ==
+module-lens@^0.1.3, module-lens@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/module-lens/-/module-lens-0.1.5.tgz#2aeffe394f76b94ed4fab80d7775c71d6f4ad3a7"
+  integrity sha512-mLEl8RPGPjRQlB2DkjVLYWYOPAGm2GMEkrNxjxO6nVON7TWjRD6ndOAkzysjxvl6TjA2tmb+c7+Y/Ca65ExJ2Q==
   dependencies:
     lodash "^4.17.11"
 
@@ -4242,6 +4249,11 @@ parse-messy-time@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/parse-messy-time/-/parse-messy-time-2.1.0.tgz#7a14ce7a1c4f65b5ede243399cc056d86bd57ad5"
   integrity sha1-ehTOehxPZbXt4kM5nMBW2GvVetU=
+
+parse-passwd@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parse-passwd/-/parse-passwd-1.0.0.tgz#6d5b934a456993b23d37f40a382d6f1666a8e5c6"
+  integrity sha1-bVuTSkVpk7I9N/QKOC1vFmao5cY=
 
 parse-path@^4.0.0:
   version "4.0.1"
@@ -5784,3 +5796,17 @@ yargs@^14.2.2:
     which-module "^2.0.0"
     y18n "^4.0.0"
     yargs-parser "^15.0.0"
+
+yarn-config-directory@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/yarn-config-directory/-/yarn-config-directory-1.0.2.tgz#2cedebe406c5799193bfcaf5f65a0a3235d2b7ba"
+  integrity sha512-vSeu9mdbkaQB1ivgQ+hgLWWlPGja+eHRMWe+KmBzNIkfCEqk12T4PKeR19PX/k00A84SqK83o7hCvWCq2iY6jg==
+  dependencies:
+    homedir-polyfill "^1.0.1"
+
+yarn-global-modules@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/yarn-global-modules/-/yarn-global-modules-1.0.1.tgz#be2d96e57e1f31f217eab0ef1b207c25bde37f5d"
+  integrity sha512-KoXxzwjZ65oCETpcd4sUnJZD6iUFrzo4k2p2a4C3h0OXOpjUvDnehNxA4jdmjAI3p4M6UFA+xoDtU8uN5u63Eg==
+  dependencies:
+    yarn-config-directory "^1.0.0"
