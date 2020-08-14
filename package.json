@@ -5,5 +5,9 @@
     "packages/core",
     "packages/cli",
     "packages/utils"
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "prettier": "^2.0.5"
+  }
 }

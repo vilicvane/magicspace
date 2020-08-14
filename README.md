@@ -1,1 +1,3 @@
-# Magicspace Project
+# magicspace
+
+Just another awesome magic.
