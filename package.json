@@ -9,7 +9,7 @@
     "build": "rimraf packages/*/{bld,.bld-cache} && tsc --build tsconfig.json",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
-    "test": "yarn lint-prettier && yarn build && yarn lint"
+    "test": "yarn lint-prettier && yarn build && yarn lint && jest"
   },
   "workspaces": [
     "packages/core",
@@ -19,8 +19,10 @@
   "devDependencies": {
     "@mufan/code": "^0.2.5",
     "@mufan/eslint-plugin": "^0.1.32",
+    "@types/jest": "^26.0.10",
     "@types/node": "^14.0.14",
     "eslint": "^7.6.0",
+    "jest": "^26.4.0",
     "lerna": "^3.22.1",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",

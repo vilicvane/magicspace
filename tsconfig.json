@@ -2,6 +2,8 @@
   "files": [],
   "references": [
     {"path": "packages/core/src/library"},
-    {"path": "packages/cli/src/program"}
+    {"path": "packages/cli/src/program"},
+    {"path": "packages/utils/src/library"},
+    {"path": "packages/utils/src/test"}
   ]
 }

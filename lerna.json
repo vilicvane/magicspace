@@ -1,7 +1,8 @@
 {
   "packages": [
     "packages/core",
-    "packages/cli"
+    "packages/cli",
+    "packages/utils"
   ],
   "version": "0.2.9"
 }

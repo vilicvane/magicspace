@@ -1,6 +1,27 @@
 {
   "name": "@magicspace/utils",
-  "version": "0.0.0",
+  "version": "0.2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
-  "author": "Chengdu Mufan Technology Co., Ltd."
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
+  "files": [
+    "src/library/**/*.ts",
+    "bld/library",
+    "!*.tsbuildinfo"
+  ],
+  "dependencies": {
+    "latest-version": "^5.1.0",
+    "micromatch": "^4.0.2",
+    "sort-keys": "^4.0.0",
+    "tslang": "^0.1.22"
+  },
+  "devDependencies": {
+    "@types/micromatch": "^4.0.1",
+    "@types/jest": "^26.0.10",
+    "jest": "^26.4.0"
+  }
 }
