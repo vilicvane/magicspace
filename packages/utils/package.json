@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/utils",
-  "version": "0.2.0",
+  "version": "0.2.10",
   "publishConfig": {
     "access": "public"
   },
@@ -20,8 +20,8 @@
     "tslang": "^0.1.22"
   },
   "devDependencies": {
-    "@types/micromatch": "^4.0.1",
     "@types/jest": "^26.0.10",
+    "@types/micromatch": "^4.0.1",
     "jest": "^26.4.0"
   }
 }
