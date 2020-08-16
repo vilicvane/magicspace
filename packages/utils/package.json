@@ -14,6 +14,7 @@
     "!*.tsbuildinfo"
   ],
   "dependencies": {
+    "chalk": "^4.1.0",
     "latest-version": "^5.1.0",
     "micromatch": "^4.0.2",
     "sort-keys": "^4.0.0",

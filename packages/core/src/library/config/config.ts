@@ -9,6 +9,8 @@ import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
 
 import {unique, uniqueBy} from '../@utils';
 
+import {ConfigLogger} from './config-logger';
+
 const TYPES_PATH = Path.join(__dirname, '../../../types/index.d.ts');
 
 const yarnGlobalNodeModulesParentDir = getYarnGlobalNodeModulesParentDir();
@@ -37,10 +39,24 @@ export interface ComposableFileEntry {
 
 export {ValidateError};
 
-export async function resolveTemplateConfig(dir: string): Promise<Config> {
+export function resolveRawTemplateConfig(dir: string): Magicspace.Config {
+  return _resolveRawTemplateConfig(Path.resolve(dir)).config;
+}
+
+export interface ResolveTemplateConfigOptions {
+  logger?: ConfigLogger;
+}
+
+export async function resolveTemplateConfig(
+  dir: string,
+  {logger}: ResolveTemplateConfigOptions = {},
+): Promise<Config> {
   dir = Path.resolve(dir);
 
-  let {config, optionsDeclarationFilePaths} = _resolveTemplateConfig(dir);
+  let {config, optionsDeclarationFilePaths} = _resolveTemplateConfig(
+    dir,
+    logger,
+  );
 
   let types = [TYPES_PATH, ...optionsDeclarationFilePaths].map(path =>
     path.replace(/\.d\.ts$/, ''),
@@ -60,6 +76,23 @@ export async function resolveTemplateConfig(dir: string): Promise<Config> {
   return config;
 }
 
+interface InternalResolveRawConfigResult {
+  configFilePath: string;
+  config: Magicspace.Config;
+}
+
+function _resolveRawTemplateConfig(
+  dir: string,
+): InternalResolveRawConfigResult {
+  let configFilePath = require.resolve(Path.join(dir, 'template'));
+
+  return {
+    configFilePath,
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    config: require(configFilePath),
+  };
+}
+
 interface InternalResolveTemplateConfigResult {
   config: Config;
   optionsDeclarationFilePaths: string[];
@@ -67,19 +100,26 @@ interface InternalResolveTemplateConfigResult {
 
 function _resolveTemplateConfig(
   dir: string,
+  logger: ConfigLogger | undefined,
 ): InternalResolveTemplateConfigResult {
-  let configFilePath = require.resolve(Path.join(dir, 'template'));
+  logger?.info({
+    type: 'resolve-template',
+    path: dir,
+  });
+
+  let {
+    configFilePath,
+    config: {
+      extends: superSpecifiers,
+      composables: filePatterns,
+      root: rootDir,
+      options = {},
+      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    },
+  } = _resolveRawTemplateConfig(dir);
 
   // This is not identical to `dir`.
   let configFileDir = Path.dirname(configFilePath);
-
-  let {
-    extends: superSpecifiers,
-    composables: filePatterns,
-    root: rootDir,
-    options = {},
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  } = require(configFilePath) as Magicspace.Config;
 
   if (rootDir && !filePatterns) {
     // If root is specified but file patterns are not, make it '**' by default.
@@ -163,8 +203,6 @@ function _resolveTemplateConfig(
           sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
         });
 
-      console.info(`Resolved template ${JSON.stringify(superDir)}.`);
-
       if (!superDir) {
         throw new Error(
           `Cannot resolve template ${JSON.stringify(
@@ -176,7 +214,7 @@ function _resolveTemplateConfig(
       let {
         config: {composables: superFileEntries, options: superOptions},
         optionsDeclarationFilePaths: superOptionsDeclarationFilePaths,
-      } = _resolveTemplateConfig(superDir);
+      } = _resolveTemplateConfig(superDir, logger);
 
       superFileEntriesArray.push(superFileEntries);
       superOptionsArray.push(superOptions);

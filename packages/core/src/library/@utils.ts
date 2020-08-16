@@ -26,6 +26,9 @@ export function uniqueBy<T, TKey>(
 
 export class SpawnSyncFailure {
   constructor(
+    readonly command: string,
+    readonly args: string[],
+    readonly cwd: string,
     readonly stdout: string,
     readonly stderr: string,
     readonly code: number | null,
@@ -47,7 +50,7 @@ export function spawnSync(
   }
 
   if (status !== 0) {
-    throw new SpawnSyncFailure(stdout, stderr, status);
+    throw new SpawnSyncFailure(command, args, cwd, stdout, stderr, status);
   }
 
   return stdout;

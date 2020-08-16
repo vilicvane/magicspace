@@ -3,7 +3,7 @@ import * as Path from 'path';
 import {Command, Context, ExpectedError, command, metadata, param} from 'clime';
 
 import {CommonOptions} from '../@command';
-import {createDefaultProject} from '../@project';
+import {createDefaultSpace} from '../@space';
 import {compact} from '../@utils';
 
 @command({
@@ -19,16 +19,16 @@ export default class extends Command {
     options: CommonOptions,
     context: Context,
   ): Promise<string> {
-    let project = await createDefaultProject(
+    let space = await createDefaultSpace(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await project.update(options);
+    let result = await space.update(options);
 
     switch (result) {
       case true:
-        let renames = project.listPendingPossibleDirectoryRenames();
+        let renames = space.listPendingPossibleDirectoryRenames();
 
         return compact([
           `\
@@ -60,7 +60,7 @@ Execute "${
         throw new ExpectedError('Working directory not clean');
       case 'not-initialized':
         throw new ExpectedError(
-          'The project has not been initialized with magicspace yet',
+          'This repository has not been initialized with magicspace yet, run `magicspace init` first',
         );
       case 'already-up-to-date':
         return 'Already up-to-date.';

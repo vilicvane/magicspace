@@ -1,36 +1,36 @@
 import * as Path from 'path';
 
-import {File} from '../file';
+import {Composable, File} from '../file';
 
-import {Project} from './project';
+import {Space} from './space';
 
 export class Context {
-  private fileMap = new Map<string, File.File<unknown, unknown>>();
+  private fileMap = new Map<string, File<unknown, unknown>>();
 
-  constructor(readonly project: Project, readonly dir: string) {}
+  constructor(readonly space: Space, readonly dir: string) {}
 
-  getFile(path: string): File.File<unknown, unknown> | undefined {
+  getFile(path: string): File<unknown, unknown> | undefined {
     return this.fileMap.get(path);
   }
 
   ensureFile(
     path: string,
-    composable: File.Composable<unknown, unknown>,
-  ): File.File<unknown, unknown> {
-    let project = this.project;
+    composable: Composable<unknown, unknown>,
+  ): File<unknown, unknown> {
+    let space = this.space;
 
     let fileMap = this.fileMap;
 
     let file = fileMap.get(path);
 
     if (file) {
-      project.assertFileObject(file, path, composable.type);
+      space.assertFileObject(file, path, composable.type);
     } else {
-      file = project.createFileObject(
+      file = space.createFileObject(
         path,
         {
           possibleOutputPath: Path.join(
-            project.dir,
+            space.dir,
             Path.relative(this.dir, path),
           ),
         },

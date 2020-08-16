@@ -1,6 +1,6 @@
 import {BinaryFile, JSONFile, TextFile} from '../@files';
 
-import {FileObjectCreator} from './project';
+import {FileObjectCreator} from './space';
 
 export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
   string | undefined,

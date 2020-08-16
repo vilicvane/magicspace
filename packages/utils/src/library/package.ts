@@ -1,6 +1,8 @@
 import latestVersion from 'latest-version';
 import {Dict} from 'tslang';
 
+import {logger} from './@logger';
+
 export interface FetchPackageVersionsOptions {
   /**
    * Defaults to '^'.
@@ -11,8 +13,8 @@ export interface FetchPackageVersionsOptions {
 export async function fetchPackageVersions(
   versionRangeDict: Dict<string>,
 ): Promise<Dict<string>> {
-  console.info('Fetching versions of the following packages...');
-  console.info(
+  logger.info('fetching package versions...');
+  logger.info(
     Object.entries(versionRangeDict)
       .map(([name, versionRange]) => `  - ${name}: ${versionRange}`)
       .join('\n'),

@@ -1,1 +1,2 @@
-export * as Config from './namespace';
+export * from './config';
+export * from './config-logger';

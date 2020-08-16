@@ -3,7 +3,7 @@ import * as Path from 'path';
 import {Command, ExpectedError, command, metadata, option, param} from 'clime';
 
 import {CommonOptions} from '../@command';
-import {createDefaultProject} from '../@project';
+import {createDefaultSpace} from '../@space';
 
 export class InitOptions extends CommonOptions {
   @option({
@@ -26,12 +26,12 @@ export default class extends Command {
     projectDir: string,
     options: InitOptions,
   ): Promise<string> {
-    let project = await createDefaultProject(
+    let space = await createDefaultSpace(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await project.initialize(options);
+    let result = await space.initialize(options);
 
     switch (result) {
       case true:
@@ -53,7 +53,9 @@ Otherwise, you can use "git merge --abort" to cancel this initialization and sta
       case 'working-directory-not-clean':
         throw new ExpectedError('Working directory not clean');
       case 'already-initialized':
-        throw new ExpectedError('The project has already been initialized');
+        throw new ExpectedError(
+          'This repository has already been initialized with magicspace, run `magicspace update` instead',
+        );
     }
   }
 }

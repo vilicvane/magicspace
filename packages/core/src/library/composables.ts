@@ -12,18 +12,18 @@ import {
   TextFileOptions,
 } from './@files';
 import {removePathExtension} from './@utils';
-import {File} from './file';
+import {Composable, ComposeFunction} from './file';
 
 export function text(
   path: string,
-  content: string | File.ComposeFunction<TextFile>,
+  content: string | ComposeFunction<TextFile>,
   options?: TextFileOptions,
-): File.Composable<string, TextFileOptions>;
+): Composable<string, TextFileOptions>;
 export function text(
-  content: string | File.ComposeFunction<TextFile>,
+  content: string | ComposeFunction<TextFile>,
   options?: TextFileOptions,
-): File.Composable<string, TextFileOptions>;
-export function text(...args: any[]): File.Composable<string, TextFileOptions> {
+): Composable<string, TextFileOptions>;
+export function text(...args: any[]): Composable<string, TextFileOptions> {
   let path: string | undefined;
   let content: string;
   let options: TextFileOptions;
@@ -34,10 +34,10 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
     [content, options] = args;
   }
 
-  let composer: File.ComposeFunction<TextFile>;
+  let composer: ComposeFunction<TextFile>;
 
   if (typeof content === 'function') {
-    composer = content as File.ComposeFunction<TextFile>;
+    composer = content as ComposeFunction<TextFile>;
   } else {
     composer = () => content;
   }
@@ -52,16 +52,14 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
 
 export function json<TContent>(
   path: string,
-  value: TContent | File.ComposeFunction<JSONFile<TContent>>,
+  value: TContent | ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
-): File.Composable<TContent, JSONFileOptions>;
+): Composable<TContent, JSONFileOptions>;
 export function json<TContent>(
-  value: TContent | File.ComposeFunction<JSONFile<TContent>>,
+  value: TContent | ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
-): File.Composable<TContent, JSONFileOptions>;
-export function json(
-  ...args: any[]
-): File.Composable<unknown, JSONFileOptions> {
+): Composable<TContent, JSONFileOptions>;
+export function json(...args: any[]): Composable<unknown, JSONFileOptions> {
   let path: string | undefined;
   let value: unknown;
   let options: JSONFileOptions;
@@ -72,10 +70,10 @@ export function json(
     [value, options] = args;
   }
 
-  let composer: File.ComposeFunction<JSONFile<unknown>>;
+  let composer: ComposeFunction<JSONFile<unknown>>;
 
   if (typeof value === 'function') {
-    composer = value as File.ComposeFunction<JSONFile<unknown>>;
+    composer = value as ComposeFunction<JSONFile<unknown>>;
   } else {
     composer = () => value;
   }
@@ -99,17 +97,17 @@ export function copy(
   dir: string,
   patterns: string | string[],
   options?: CopyOptions & {binary: false},
-): File.Composable<string, TextFileOptions>[];
+): Composable<string, TextFileOptions>[];
 export function copy(
   dir: string,
   patterns: string | string[],
   options: CopyOptions & {binary: true},
-): File.Composable<Buffer, BinaryFileOptions>[];
+): Composable<Buffer, BinaryFileOptions>[];
 export function copy(
   dir: string,
   patterns: string | string[],
   {binary = false}: CopyOptions = {},
-): File.Composable<Buffer | string, BinaryFileOptions | TextFileOptions>[] {
+): Composable<Buffer | string, BinaryFileOptions | TextFileOptions>[] {
   if (!Array.isArray(patterns)) {
     patterns = [patterns];
   }
@@ -153,14 +151,14 @@ export function handlebars<TData>(
   path: string,
   data: TData,
   options?: HandlebarsOptions,
-): File.Composable<string, TextFileOptions>;
+): Composable<string, TextFileOptions>;
 export function handlebars<TData>(
   data: TData,
   options?: HandlebarsOptions,
-): File.Composable<string, TextFileOptions>;
+): Composable<string, TextFileOptions>;
 export function handlebars(
   ...args: any[]
-): File.Composable<string, TextFileOptions> {
+): Composable<string, TextFileOptions> {
   let path: string | undefined;
   let data: unknown;
   let options: HandlebarsOptions;

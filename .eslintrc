@@ -12,6 +12,12 @@
       "parserOptions": {
         "project": "./packages/**/tsconfig.json"
       }
+    },
+    {
+      "files": ["packages/core/**/*.{ts,tsx}"],
+      "rules": {
+        "no-console": ["error", {}]
+      }
     }
   ]
 }

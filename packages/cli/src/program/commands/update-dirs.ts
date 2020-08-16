@@ -1,10 +1,10 @@
 import * as Path from 'path';
 
-import {Project} from '@magicspace/core';
+import {PossibleDirectorRename} from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import prompts from 'prompts';
 
-import {createDefaultProject} from '../@project';
+import {createDefaultSpace} from '../@space';
 
 @command({
   description: 'Update possible renamed directories interactively',
@@ -17,9 +17,9 @@ export default class extends Command {
     })
     projectDir: string,
   ): Promise<string> {
-    let project = await createDefaultProject(Path.resolve(projectDir));
+    let space = await createDefaultSpace(Path.resolve(projectDir), undefined);
 
-    if (!project.isRepositoryRoot()) {
+    if (!space.isRepositoryRoot()) {
       throw new ExpectedError(
         `Project directory ${JSON.stringify(
           projectDir,
@@ -27,11 +27,11 @@ export default class extends Command {
       );
     }
 
-    if (!project.isMerging()) {
+    if (!space.isMerging()) {
       throw new ExpectedError('This project is not actively merging');
     }
 
-    let renames = project.listPendingPossibleDirectoryRenames();
+    let renames = space.listPendingPossibleDirectoryRenames();
 
     if (!renames.length) {
       return 'No pending possible directory renames detected.';
@@ -50,10 +50,10 @@ export default class extends Command {
           };
         }),
       },
-    ])) as {renames: Project.PossibleDirectorRename[]};
+    ])) as {renames: PossibleDirectorRename[]};
 
     if (selectedRenames.length) {
-      project.renameDirectories(selectedRenames);
+      space.renameDirectories(selectedRenames);
 
       return 'Renaming completed.';
     } else {

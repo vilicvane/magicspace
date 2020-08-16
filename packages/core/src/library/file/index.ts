@@ -1,1 +1,2 @@
-export * as File from './namespace';
+export * from './composable';
+export * from './file';

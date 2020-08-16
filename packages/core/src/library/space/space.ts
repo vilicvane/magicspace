@@ -3,16 +3,17 @@ import * as Path from 'path';
 import {__importDefault} from 'tslib';
 
 import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
-import {ProjectGit, Rename, TempGit} from '../@git';
 import {conservativelyMove} from '../@utils';
 import {Config} from '../config';
-import {File} from '../file';
+import {File, FileContext} from '../file';
 
+import {ProjectGit, Rename, TempGit} from './@git';
 import {ComposableModuleDefault} from './composable-module';
 import {Context} from './context';
+import {SpaceLogger} from './space-logger';
 
-export class Project {
-  get config(): Config.Config {
+export class Space {
+  get config(): Config {
     let config = this._config;
 
     if (!config) {
@@ -26,7 +27,8 @@ export class Project {
     private fileObjectCreatorMap: Map<string | undefined, FileObjectCreator>,
     private extensionToFileTypeMap: Map<string, string>,
     readonly dir: string,
-    private _config?: Config.Config,
+    private _config?: Config,
+    private logger?: SpaceLogger,
   ) {}
 
   async initialize({
@@ -187,9 +189,10 @@ export class Project {
         continue;
       }
 
-      console.info(
-        `Loaded composables from ${JSON.stringify(composableModulePath)}.`,
-      );
+      this.logger?.info({
+        type: 'loaded-composable-module',
+        path: composableModulePath,
+      });
 
       if (!Array.isArray(composables)) {
         composables = [composables];
@@ -218,9 +221,9 @@ export class Project {
 
   createFileObject(
     path: string,
-    context: File.FileContext,
+    context: FileContext,
     type = this.extensionToFileTypeMap.get(Path.dirname(path)),
-  ): File.File<unknown, unknown> {
+  ): File<unknown, unknown> {
     if (!type) {
       throw new Error(
         `Cannot infer composable file type from path ${JSON.stringify(path)}`,
@@ -237,7 +240,7 @@ export class Project {
   }
 
   assertFileObject(
-    file: File.File<unknown, unknown>,
+    file: File<unknown, unknown>,
     path: string,
     type: string | undefined,
   ): void {
@@ -287,8 +290,8 @@ function resolveComposingFilePath({
 
 export type FileObjectCreator = (
   path: string,
-  context: File.FileContext,
-) => File.File<unknown, unknown>;
+  context: FileContext,
+) => File<unknown, unknown>;
 
 /**
  * Possible directory rename from and to, relative path.

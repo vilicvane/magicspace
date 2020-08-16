@@ -1,4 +1,4 @@
-import {File} from '../file';
+import {FileContext} from '../file';
 
 import {StructuredFile, StructuredFileOptions} from './structured-file';
 
@@ -10,7 +10,7 @@ export class JSONFile<TContent> extends StructuredFile<
 > {
   content: TContent | undefined;
 
-  constructor(path: string, context: File.FileContext) {
+  constructor(path: string, context: FileContext) {
     super('json', path, context);
   }
 

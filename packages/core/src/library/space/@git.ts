@@ -12,11 +12,13 @@ import {
   MAGICSPACE_UPDATE_MERGE_MESSAGE,
   MAGIC_COMMIT_MESSAGE_REGEX_STRING,
   PULL_FIND_RENAMES_THRESHOLD,
-} from './@constants';
-import {SpawnSyncFailure, spawnSync, uniqueBy} from './@utils';
+} from '../@constants';
+import {SpawnSyncFailure, spawnSync, uniqueBy} from '../@utils';
+
+import {SpaceLogger} from './space-logger';
 
 export class Git {
-  constructor(readonly dir: string) {}
+  constructor(readonly dir: string, protected logger?: SpaceLogger) {}
 
   isWorkingDirectoryClean(): boolean {
     return !spawnSync(this.dir, 'git', ['status', '--porcelain']).trim();
@@ -59,7 +61,7 @@ export class ProjectGit extends Git {
       }
 
       if (!/fatal: No such remote:/.test(error.stderr)) {
-        process.stderr.write(error.stderr);
+        this.logger?.stderr(error.stderr);
 
         throw new Error('Error removing magicspace remote');
       }
@@ -93,7 +95,7 @@ export class ProjectGit extends Git {
         MAGICSPACE_BRANCH,
       ]);
 
-      process.stdout.write(stdout);
+      this.logger?.stdout(stdout);
     } catch (error) {
       if (!(error instanceof SpawnSyncFailure)) {
         throw error;
@@ -109,7 +111,7 @@ export class ProjectGit extends Git {
         throw new Error('Error merging magicspace changes');
       }
 
-      process.stdout.write(error.stdout);
+      this.logger?.stdout(error.stdout);
     }
 
     FSExtra.outputFileSync(
