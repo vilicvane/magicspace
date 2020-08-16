@@ -26,6 +26,8 @@
     "magicspace",
     "multiselect",
     "subcommands",
+    "tiva",
+    "tsbuildinfo",
     "tslang",
     "tslib"
   ]

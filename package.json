@@ -8,7 +8,7 @@
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/{bld,.bld-cache} && tsc --build tsconfig.json",
     "lint": "eslint .",
-    "lint-prettier": "prettier --list-different \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
   "workspaces": [
@@ -17,8 +17,8 @@
     "packages/utils"
   ],
   "devDependencies": {
-    "@magicspace/configs": "^0.2.5",
-    "@magicspace/eslint-plugin": "^0.1.32",
+    "@mufan/code": "^0.2.5",
+    "@mufan/eslint-plugin": "^0.1.32",
     "@types/node": "^14.0.14",
     "eslint": "^7.6.0",
     "lerna": "^3.22.1",

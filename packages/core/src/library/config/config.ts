@@ -1,13 +1,15 @@
+import * as FS from 'fs';
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
 import globalNodeModulesDir from 'global-modules';
 import {resolve} from 'module-lens';
+import {Tiva, ValidateError} from 'tiva';
 import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
 
-import {uniqueBy} from '../@utils';
+import {unique, uniqueBy} from '../@utils';
 
-import {RawConfig} from './raw-config';
+const TYPES_PATH = Path.join(__dirname, '../../../types/index.d.ts');
 
 const yarnGlobalNodeModulesParentDir = getYarnGlobalNodeModulesParentDir();
 
@@ -33,11 +35,37 @@ export interface ComposableFileEntry {
   base: string;
 }
 
-export function resolveTemplateConfig(dir: string): Config {
-  return _resolveTemplateConfig(Path.resolve(dir));
+export {ValidateError};
+
+export async function resolveTemplateConfig(dir: string): Promise<Config> {
+  dir = Path.resolve(dir);
+
+  let {config, optionsDeclarationFilePaths} = _resolveTemplateConfig(dir);
+
+  let types = [TYPES_PATH, ...optionsDeclarationFilePaths].map(path =>
+    path.replace(/\.d\.ts$/, ''),
+  );
+
+  let tiva = new Tiva({
+    compilerOptions: {
+      types,
+      strict: true,
+    },
+  });
+
+  await tiva.validate('Magicspace.TemplateOptions', config.options);
+
+  return config;
 }
 
-function _resolveTemplateConfig(dir: string): Config {
+interface InternalResolveTemplateConfigResult {
+  config: Config;
+  optionsDeclarationFilePaths: string[];
+}
+
+function _resolveTemplateConfig(
+  dir: string,
+): InternalResolveTemplateConfigResult {
   let configFilePath = require.resolve(Path.join(dir, 'template'));
 
   // This is not identical to `dir`.
@@ -49,7 +77,7 @@ function _resolveTemplateConfig(dir: string): Config {
     root: rootDir,
     options = {},
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  } = require(configFilePath) as RawConfig;
+  } = require(configFilePath) as Magicspace.Config;
 
   if (rootDir && !filePatterns) {
     // If root is specified but file patterns are not, make it '**' by default.
@@ -71,11 +99,12 @@ function _resolveTemplateConfig(dir: string): Config {
 
   for (let filePath of filePaths) {
     // Test whether the file has a valid extension name.
-    let pathGroups = /^(.+)\.(?:c?js)$/.exec(filePath);
+    let pathGroups = /^(.+)\.js$/.exec(filePath);
 
     if (pathGroups) {
-      // If we have `foo.js.js`, delete `foo.js` if it presents. So the
-      // template author can safely store a template file side-by-side.
+      // If we have `foo.js.js`, exclude `foo.js` from composables if it
+      // presents. So the template author can safely store a template file
+      // side-by-side.
       filePathSet.delete(pathGroups[1]);
     } else {
       filePathSet.delete(filePath);
@@ -91,6 +120,12 @@ function _resolveTemplateConfig(dir: string): Config {
     },
   );
 
+  let optionsDeclarationFilePath = Path.join(dir, 'template-options.d.ts');
+
+  let optionsDeclarationFilePaths = FS.existsSync(optionsDeclarationFilePath)
+    ? [optionsDeclarationFilePath]
+    : [];
+
   if (typeof superSpecifiers === 'string') {
     superSpecifiers = [superSpecifiers];
   }
@@ -98,6 +133,7 @@ function _resolveTemplateConfig(dir: string): Config {
   if (superSpecifiers && superSpecifiers.length) {
     let superFileEntriesArray: ComposableFileEntry[][] = [];
     let superOptionsArray: Magicspace.TemplateOptions[] = [];
+    let superOptionsDeclarationFilePathsArray: string[][] = [];
 
     for (let specifier of superSpecifiers) {
       let superDir =
@@ -126,12 +162,15 @@ function _resolveTemplateConfig(dir: string): Config {
       }
 
       let {
-        composables: superFileEntries,
-        options: superOptions,
-      } = resolveTemplateConfig(superDir);
+        config: {composables: superFileEntries, options: superOptions},
+        optionsDeclarationFilePaths: superOptionsDeclarationFilePaths,
+      } = _resolveTemplateConfig(superDir);
 
       superFileEntriesArray.push(superFileEntries);
       superOptionsArray.push(superOptions);
+      superOptionsDeclarationFilePathsArray.push(
+        superOptionsDeclarationFilePaths,
+      );
     }
 
     // It is possible that one template has been extended several times, so
@@ -146,10 +185,18 @@ function _resolveTemplateConfig(dir: string): Config {
     } else {
       options = Object.assign({}, ...superOptionsArray, options);
     }
+
+    optionsDeclarationFilePaths = unique([
+      ...superOptionsDeclarationFilePathsArray.flatMap(paths => paths),
+      ...optionsDeclarationFilePaths,
+    ]);
   }
 
   return {
-    composables: fileEntries,
-    options,
+    config: {
+      composables: fileEntries,
+      options,
+    },
+    optionsDeclarationFilePaths,
   };
 }

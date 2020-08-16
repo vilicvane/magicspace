@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@magicspace/core": "^0.2.7",
+    "chalk": "^4.1.0",
     "clime": "^0.5.14",
     "prompts": "^2.3.2",
-    "tslib": "^2.0.1"
+    "tslib": "^2.0.1",
+    "typescript": "^3.9.7"
   },
   "devDependencies": {
     "@types/prompts": "^2.0.8"

@@ -10,14 +10,10 @@
   "types": "bld/library/index.d.ts",
   "files": [
     "src/library/**/*.ts",
+    "types/*.d.ts",
     "bld/library",
     "!*.tsbuildinfo"
   ],
-  "scripts": {
-    "build": "rimraf bld && tsc --project src/library",
-    "lint": "eslint src/library --ext .ts,.js",
-    "test": "yarn build && yarn lint"
-  },
   "dependencies": {
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
@@ -26,6 +22,7 @@
     "module-lens": "^0.1.6",
     "prettier": "^2.0.5",
     "sort-keys": "^4.0.0",
+    "tiva": "^0.2.0",
     "tslang": "^0.1.22",
     "tslib": "^2.0.1",
     "typescript": "^3.9.7",

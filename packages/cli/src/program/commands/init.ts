@@ -1,9 +1,9 @@
 import * as Path from 'path';
 
-import {Project} from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, option, param} from 'clime';
 
 import {CommonOptions} from '../@command';
+import {createDefaultProject} from '../@project';
 
 export class InitOptions extends CommonOptions {
   @option({
@@ -26,7 +26,7 @@ export default class extends Command {
     projectDir: string,
     options: InitOptions,
   ): Promise<string> {
-    let project = Project.createDefaultProject(
+    let project = await createDefaultProject(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.template),
     );

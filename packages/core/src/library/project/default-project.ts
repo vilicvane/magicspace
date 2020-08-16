@@ -1,7 +1,6 @@
 import {BinaryFile, JSONFile, TextFile} from '../@files';
-import {resolveTemplateConfig} from '../config/config';
 
-import {FileObjectCreator, Project} from './project';
+import {FileObjectCreator} from './project';
 
 export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
   string | undefined,
@@ -16,20 +15,3 @@ export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
 export const DEFAULT_EXTENSION_TO_FILE_TYPE_MAP = new Map<string, string>([
   ['.json', 'json'],
 ]);
-
-export function createDefaultProject(
-  projectDir: string,
-  templateDir?: string,
-): Project {
-  let config =
-    typeof templateDir === 'string'
-      ? resolveTemplateConfig(templateDir)
-      : undefined;
-
-  return new Project(
-    DEFAULT_FILE_OBJECT_CREATOR_MAP,
-    DEFAULT_EXTENSION_TO_FILE_TYPE_MAP,
-    projectDir,
-    config,
-  );
-}

@@ -8,7 +8,7 @@
   "overrides": [
     {
       "files": ["**/*.{ts,tsx}"],
-      "extends": ["plugin:@magicspace/default"],
+      "extends": ["plugin:@mufan/default"],
       "parserOptions": {
         "project": "./packages/**/tsconfig.json"
       }

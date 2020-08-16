@@ -1,15 +1,13 @@
 {
   "extends": ["@mufan/code-templates/general"],
   "options": {
-    "project": {
-      "name": "magicspace",
-      "author": "Chengdu Mufan Technology Co., Ltd.",
-      "license": "MIT",
-      "packages": [
-        {"name": "@magicspace/core"},
-        {"name": "magicspace", "dir": "cli"},
-        {"name": "@magicspace/utils"}
-      ]
-    }
+    "name": "magicspace",
+    "author": "Chengdu Mufan Technology Co., Ltd.",
+    "license": "MIT",
+    "packages": [
+      {"name": "@magicspace/core"},
+      {"name": "magicspace", "dir": 1},
+      {"name": "@magicspace/utils"}
+    ]
   }
 }
