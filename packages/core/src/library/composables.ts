@@ -14,12 +14,12 @@ import {
 import {removePathExtension} from './@utils';
 import {File} from './file';
 
-export function text<TMetadata extends object = object>(
+export function text(
+  path: string,
   content: string | File.ComposeFunction<TextFile>,
   options?: TextFileOptions,
 ): File.Composable<string, TextFileOptions>;
-export function text<TMetadata extends object = object>(
-  path: string,
+export function text(
   content: string | File.ComposeFunction<TextFile>,
   options?: TextFileOptions,
 ): File.Composable<string, TextFileOptions>;
@@ -28,7 +28,7 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
   let content: string;
   let options: TextFileOptions;
 
-  if (typeof args[0] === 'string') {
+  if (typeof args[1] === 'string' || typeof args[1] === 'function') {
     [path, content, options] = args;
   } else {
     [content, options] = args;
@@ -51,11 +51,11 @@ export function text(...args: any[]): File.Composable<string, TextFileOptions> {
 }
 
 export function json<TContent>(
+  path: string,
   value: TContent | File.ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
 ): File.Composable<TContent, JSONFileOptions>;
 export function json<TContent>(
-  path: string,
   value: TContent | File.ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
 ): File.Composable<TContent, JSONFileOptions>;
@@ -150,11 +150,11 @@ export interface HandlebarsOptions {
 }
 
 export function handlebars<TData>(
+  path: string,
   data: TData,
   options?: HandlebarsOptions,
 ): File.Composable<string, TextFileOptions>;
 export function handlebars<TData>(
-  path: string,
   data: TData,
   options?: HandlebarsOptions,
 ): File.Composable<string, TextFileOptions>;
