@@ -55,6 +55,8 @@ export async function resolveTemplateConfig(dir: string): Promise<Config> {
 
   await tiva.validate('Magicspace.TemplateOptions', config.options);
 
+  await tiva.dispose();
+
   return config;
 }
 
@@ -111,6 +113,14 @@ function _resolveTemplateConfig(
     }
   }
 
+  if (filePatterns && filePatterns.length > 0 && filePathSet.size === 0) {
+    throw new Error(
+      `No composable module found for patterns ${JSON.stringify(
+        filePatterns,
+      )} in template ${JSON.stringify(configFilePath)}`,
+    );
+  }
+
   let fileEntries = Array.from(filePathSet).map(
     (filePath): ComposableFileEntry => {
       return {
@@ -152,6 +162,8 @@ function _resolveTemplateConfig(
         resolve(specifier, {
           sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
         });
+
+      console.info(`Resolved template ${JSON.stringify(superDir)}.`);
 
       if (!superDir) {
         throw new Error(
