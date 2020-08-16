@@ -94,7 +94,7 @@ function _resolveTemplateConfig(
         absolute: true,
         dot: true,
         onlyFiles: true,
-      })
+      }).map(path => Path.normalize(path))
     : [];
 
   let filePathSet = new Set(filePaths);
