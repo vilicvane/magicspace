@@ -176,7 +176,7 @@ export class Project {
       let moduleDefault = __importDefault(
         // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         require(composableModulePath),
-      ) as ComposableModuleDefault;
+      ).default as ComposableModuleDefault;
 
       let composables =
         typeof moduleDefault === 'function'
@@ -186,6 +186,10 @@ export class Project {
       if (!composables) {
         continue;
       }
+
+      console.info(
+        `Loaded composables from ${JSON.stringify(composableModulePath)}.`,
+      );
 
       if (!Array.isArray(composables)) {
         composables = [composables];
