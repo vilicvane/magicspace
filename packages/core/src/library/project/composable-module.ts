@@ -2,7 +2,7 @@ import {File} from '../file';
 
 import {Context} from './context';
 
-export type ComposableModule =
+export type ComposableModuleDefault =
   | File.Composable<unknown, unknown>
   | File.Composable<unknown, unknown>[]
   | undefined

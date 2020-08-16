@@ -1,12 +1,14 @@
 import * as Path from 'path';
 
+import {__importDefault} from 'tslib';
+
 import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
 import {ProjectGit, Rename, TempGit} from '../@git';
 import {conservativelyMove} from '../@utils';
 import {Config} from '../config';
 import {File} from '../file';
 
-import {ComposableModule} from './composable-module';
+import {ComposableModuleDefault} from './composable-module';
 import {Context} from './context';
 
 export class Project {
@@ -171,11 +173,15 @@ export class Project {
     let context = new Context(this, outputDir);
 
     for (let {path: composableModulePath, base: baseDir} of fileEntries) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-      let module: ComposableModule = require(composableModulePath);
+      let moduleDefault = __importDefault(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        require(composableModulePath),
+      ) as ComposableModuleDefault;
 
       let composables =
-        typeof module === 'function' ? await module(options, context) : module;
+        typeof moduleDefault === 'function'
+          ? await moduleDefault(options, context)
+          : moduleDefault;
 
       if (!composables) {
         continue;
