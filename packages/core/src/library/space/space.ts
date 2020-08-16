@@ -32,14 +32,9 @@ export class Space {
   ) {}
 
   async initialize({
-    force = false,
     ours = false,
   }: ProjectInitializeOptions): Promise<
-    | 'not-repository-root'
-    | 'already-initialized'
-    | 'merge-in-progress'
-    | 'working-directory-not-clean'
-    | true
+    'not-repository-root' | 'already-initialized' | 'merge-in-progress' | true
   > {
     let projectDir = this.dir;
     let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
@@ -53,10 +48,6 @@ export class Space {
 
     if (projectGit.isMerging()) {
       return 'merge-in-progress';
-    }
-
-    if (!force && !projectGit.isWorkingDirectoryClean()) {
-      return 'working-directory-not-clean';
     }
 
     let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
@@ -82,12 +73,9 @@ export class Space {
     return true;
   }
 
-  async update({
-    force = false,
-  }: ProjectUpdateOptions): Promise<
+  async update(): Promise<
     | 'not-repository-root'
     | 'merge-in-progress'
-    | 'working-directory-not-clean'
     | 'not-initialized'
     | 'already-up-to-date'
     | true
@@ -104,10 +92,6 @@ export class Space {
 
     if (projectGit.isMerging()) {
       return 'merge-in-progress';
-    }
-
-    if (!force && !projectGit.isWorkingDirectoryClean()) {
-      return 'working-directory-not-clean';
     }
 
     let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
@@ -257,12 +241,7 @@ export class Space {
 }
 
 export interface ProjectInitializeOptions {
-  force?: boolean;
   ours?: boolean;
-}
-
-export interface ProjectUpdateOptions {
-  force?: boolean;
 }
 
 interface ResolveComposingFilePathOptions {

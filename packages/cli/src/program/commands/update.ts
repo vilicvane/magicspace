@@ -24,7 +24,7 @@ export default class extends Command {
       Path.resolve(projectDir, options.template),
     );
 
-    let result = await space.update(options);
+    let result = await space.update();
 
     switch (result) {
       case true:
@@ -56,8 +56,6 @@ Execute "${
         throw new ExpectedError(
           'A merge is already in progress, please resolve it before continue',
         );
-      case 'working-directory-not-clean':
-        throw new ExpectedError('Working directory not clean');
       case 'not-initialized':
         throw new ExpectedError(
           'This repository has not been initialized with magicspace yet, run `magicspace init` first',

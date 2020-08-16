@@ -8,11 +8,4 @@ export class CommonOptions extends Options {
     default: DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME,
   })
   template!: string;
-
-  @option({
-    toggle: true,
-    description: 'Force operation under dirty working directory',
-    default: false,
-  })
-  force!: boolean;
 }
