@@ -3,13 +3,18 @@
   "private": true,
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "scripts": {
+    "lint": "eslint .",
+    "lint-prettier": "prettier --check .",
+    "test": "yarn lint-prettier && yarn lint"
+  },
   "workspaces": [
     "packages/core",
     "packages/cli",
     "packages/utils"
   ],
   "devDependencies": {
-    "eslint": "^7.6.0",
+    "eslint": "^7.7.0",
     "prettier": "^2.0.5"
   }
 }
