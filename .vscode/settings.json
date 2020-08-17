@@ -1,20 +1,24 @@
 {
-  "[plaintext]": {
-    "files.insertFinalNewline": false
-  },
-  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "editor.tabSize": 2,
+  "editor.rulers": [80],
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "task.autoDetect": "off",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.enable": true,
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [{"mode": "auto"}],
   "cSpell.words": [
     "EDITMSG",
     "Mufan",
