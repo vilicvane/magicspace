@@ -9,7 +9,7 @@ export type ComposableModuleDefault =
   | ComposableModuleFunction;
 
 export type ComposableModuleFunction = (
-  options: Magicspace.TemplateOptions,
+  options: Magicspace.BoilerplateOptions,
   context: Context,
 ) =>
   | Composable<unknown, unknown>

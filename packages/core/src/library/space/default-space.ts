@@ -2,7 +2,7 @@ import {BinaryFile, JSONFile, TextFile} from '../files';
 
 import {FileObjectCreator} from './space';
 
-export const DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME = '.magicspace';
+export const DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME = '.magicspace';
 
 export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
   string | undefined,

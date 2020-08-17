@@ -4,7 +4,7 @@ import {__importDefault} from 'tslib';
 
 import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
 import {conservativelyMove, npmRun} from '../@utils';
-import {Config, TemplateScriptsLifecycleName} from '../config';
+import {Config, BoilerplateScriptsLifecycleName} from '../config';
 import {File, FileContext} from '../file';
 
 import {ProjectGit, Rename, TempGit} from './@git';
@@ -164,7 +164,7 @@ export class Space {
 
   async generate(
     outputDir: string,
-    options?: Magicspace.TemplateOptions,
+    options?: Magicspace.BoilerplateOptions,
   ): Promise<void> {
     let {composables: fileEntries, options: configOptions} = this.config;
 
@@ -221,7 +221,7 @@ export class Space {
   }
 
   async runLifecycleScripts(
-    lifecycle: TemplateScriptsLifecycleName,
+    lifecycle: BoilerplateScriptsLifecycleName,
   ): Promise<void> {
     let scriptEntries = this.config.scripts[lifecycle];
 

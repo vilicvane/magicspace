@@ -20,18 +20,18 @@ export interface Config {
    */
   composables: ComposableModuleEntry[];
   /**
-   * Template lifecycle scripts.
+   * Boilerplate lifecycle scripts.
    */
-  scripts: TemplateScripts;
+  scripts: BoilerplateScripts;
   /**
-   * Merged template options.
+   * Merged boilerplate options.
    */
-  options: Magicspace.TemplateOptions;
+  options: Magicspace.BoilerplateOptions;
 }
 
 export interface ComposableModuleEntry {
   /**
-   * Path to the composable file created by template author.
+   * Path to the composable file created by boilerplate author.
    */
   path: string;
   /*
@@ -40,24 +40,24 @@ export interface ComposableModuleEntry {
   base: string;
 }
 
-export interface TemplateScripts {
-  postgenerate: TemplateScriptEntry[];
+export interface BoilerplateScripts {
+  postgenerate: BoilerplateScriptEntry[];
 }
 
-export type TemplateScriptsLifecycleName = keyof TemplateScripts;
+export type BoilerplateScriptsLifecycleName = keyof BoilerplateScripts;
 
-export interface TemplateScriptEntry {
+export interface BoilerplateScriptEntry {
   configFilePath: string;
   script: string;
 }
 
 export {ValidateError};
 
-export function resolveRawTemplateConfig(
+export function resolveRawBoilerplateConfig(
   specifier: string,
   contextFileName?: string,
 ): Magicspace.Config {
-  let result = _resolveRawTemplateConfig(
+  let result = _resolveRawBoilerplateConfig(
     specifier,
     contextFileName ?? Path.join(process.cwd(), '__placeholder__'),
   );
@@ -65,26 +65,26 @@ export function resolveRawTemplateConfig(
   if (!result) {
     throw new Error(
       contextFileName
-        ? `Cannot resolve template ${JSON.stringify(
+        ? `Cannot resolve boilerplate ${JSON.stringify(
             specifier,
           )} from file ${JSON.stringify(contextFileName)}`
-        : `Cannot resolve template ${JSON.stringify(specifier)}`,
+        : `Cannot resolve boilerplate ${JSON.stringify(specifier)}`,
     );
   }
 
   return result.config;
 }
 
-export interface ResolveTemplateConfigOptions {
+export interface ResolveBoilerplateConfigOptions {
   logger?: ConfigLogger;
 }
 
-export async function resolveTemplateConfig(
+export async function resolveBoilerplateConfig(
   specifier: string,
   contextFileName: string,
-  {logger}: ResolveTemplateConfigOptions = {},
+  {logger}: ResolveBoilerplateConfigOptions = {},
 ): Promise<Config> {
-  let {config, optionsDeclarationFilePaths} = _resolveTemplateConfig(
+  let {config, optionsDeclarationFilePaths} = _resolveBoilerplateConfig(
     specifier,
     contextFileName,
     logger,
@@ -101,7 +101,7 @@ export async function resolveTemplateConfig(
     },
   });
 
-  await tiva.validate('Magicspace.TemplateOptions', config.options);
+  await tiva.validate('Magicspace.BoilerplateOptions', config.options);
 
   await tiva.dispose();
 
@@ -114,7 +114,7 @@ interface InternalResolveRawConfigResult {
   config: Magicspace.Config;
 }
 
-function _resolveRawTemplateConfig(
+function _resolveRawBoilerplateConfig(
   specifier: string,
   contextFileName: string,
 ): InternalResolveRawConfigResult | undefined {
@@ -139,7 +139,7 @@ function _resolveRawTemplateConfig(
     return undefined;
   }
 
-  let configFilePath = require.resolve(Path.join(dir, 'template'));
+  let configFilePath = require.resolve(Path.join(dir, 'boilerplate'));
 
   return {
     dir,
@@ -149,26 +149,26 @@ function _resolveRawTemplateConfig(
   };
 }
 
-interface InternalResolveTemplateConfigResult {
+interface InternalResolveBoilerplateConfigResult {
   config: Config;
   optionsDeclarationFilePaths: string[];
 }
 
-function _resolveTemplateConfig(
+function _resolveBoilerplateConfig(
   specifier: string,
   contextFileName: string,
   logger: ConfigLogger | undefined,
-): InternalResolveTemplateConfigResult {
+): InternalResolveBoilerplateConfigResult {
   logger?.info({
-    type: 'resolve-template',
+    type: 'resolve-boilerplate',
     path: specifier,
   });
 
-  let rawResult = _resolveRawTemplateConfig(specifier, contextFileName);
+  let rawResult = _resolveRawBoilerplateConfig(specifier, contextFileName);
 
   if (!rawResult) {
     throw new Error(
-      `Cannot resolve template ${JSON.stringify(
+      `Cannot resolve boilerplate ${JSON.stringify(
         specifier,
       )} from file ${JSON.stringify(contextFileName)}`,
     );
@@ -213,7 +213,7 @@ function _resolveTemplateConfig(
 
     if (pathGroups) {
       // If we have `foo.js.js`, exclude `foo.js` from composables if it
-      // presents. So the template author can safely store a template file
+      // presents. So the boilerplate author can safely store a boilerplate file
       // side-by-side.
       composableModulePathSet.delete(pathGroups[1]);
     } else {
@@ -229,7 +229,7 @@ function _resolveTemplateConfig(
     throw new Error(
       `No composable module found for patterns ${JSON.stringify(
         composablePatterns,
-      )} in template ${JSON.stringify(configFilePath)}`,
+      )} in boilerplate ${JSON.stringify(configFilePath)}`,
     );
   }
 
@@ -242,7 +242,7 @@ function _resolveTemplateConfig(
     },
   );
 
-  let scripts: TemplateScripts = {
+  let scripts: BoilerplateScripts = {
     postgenerate: rawScripts.postgenerate
       ? [
           {
@@ -253,7 +253,7 @@ function _resolveTemplateConfig(
       : [],
   };
 
-  let optionsDeclarationFilePath = Path.join(dir, 'template-options.d.ts');
+  let optionsDeclarationFilePath = Path.join(dir, 'boilerplate-options.d.ts');
 
   let optionsDeclarationFilePaths = FS.existsSync(optionsDeclarationFilePath)
     ? [optionsDeclarationFilePath]
@@ -265,8 +265,8 @@ function _resolveTemplateConfig(
 
   if (superSpecifiers && superSpecifiers.length) {
     let superComposableModuleEntriesArray: ComposableModuleEntry[][] = [];
-    let superScriptsArray: TemplateScripts[] = [];
-    let superOptionsArray: Magicspace.TemplateOptions[] = [];
+    let superScriptsArray: BoilerplateScripts[] = [];
+    let superOptionsArray: Magicspace.BoilerplateOptions[] = [];
     let superOptionsDeclarationFilePathsArray: string[][] = [];
 
     for (let specifier of superSpecifiers) {
@@ -277,7 +277,7 @@ function _resolveTemplateConfig(
           options: superOptions,
         },
         optionsDeclarationFilePaths: superOptionsDeclarationFilePaths,
-      } = _resolveTemplateConfig(specifier, configFilePath, logger);
+      } = _resolveBoilerplateConfig(specifier, configFilePath, logger);
 
       superComposableModuleEntriesArray.push(superComposableModuleEntries);
       superScriptsArray.push(superScripts);
@@ -287,7 +287,7 @@ function _resolveTemplateConfig(
       );
     }
 
-    // It is possible that one template has been extended several times, so
+    // It is possible that one boilerplate has been extended several times, so
     // filter out the duplicated files.
     composableModuleEntries = _.unionBy(
       superComposableModuleEntriesArray.flatMap(paths => paths),
@@ -296,8 +296,8 @@ function _resolveTemplateConfig(
     );
 
     for (let [key, scriptEntries] of Object.entries(scripts) as [
-      TemplateScriptsLifecycleName,
-      TemplateScriptEntry[],
+      BoilerplateScriptsLifecycleName,
+      BoilerplateScriptEntry[],
     ][]) {
       scripts[key] = _.unionBy(
         superScriptsArray.flatMap(superScripts => superScripts[key]),

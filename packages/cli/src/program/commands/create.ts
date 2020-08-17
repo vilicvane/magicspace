@@ -1,8 +1,8 @@
 import * as Path from 'path';
 
 import {
-  DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME,
-  resolveRawTemplateConfig,
+  DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME,
+  resolveRawBoilerplateConfig,
 } from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import * as FSExtra from 'fs-extra';
@@ -15,22 +15,22 @@ export default class extends Command {
   @metadata
   async execute(
     @param({
-      description: 'Template specifier',
+      description: 'Boilerplate specifier',
       required: true,
     })
-    template: string,
+    boilerplate: string,
   ): Promise<string | void> {
-    let magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME);
+    let magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME);
 
     if (FSExtra.existsSync(magicspaceDir)) {
       throw new ExpectedError(
         `Folder ${JSON.stringify(
-          DEFAULT_MAGICSPACE_TEMPLATE_DIRNAME,
+          DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME,
         )} already exists`,
       );
     }
 
-    let {examples} = resolveRawTemplateConfig(template);
+    let {examples} = resolveRawBoilerplateConfig(boilerplate);
 
     let example: Magicspace.DefaultExampleOptions | Magicspace.ExampleOptions;
 
@@ -39,7 +39,7 @@ export default class extends Command {
         await prompts({
           type: 'select',
           name: 'example',
-          message: 'Select a template example configuration',
+          message: 'Select a boilerplate example configuration',
           instructions: false,
           choices: examples.map(example => {
             return {
@@ -58,11 +58,14 @@ export default class extends Command {
       example = examples?.[0] ?? {};
     }
 
-    let configFilePath = Path.join(magicspaceDir, 'template.json');
+    let configFilePath = Path.join(magicspaceDir, 'boilerplate.json');
 
-    let extendsSpecifier = /^[.]{1,2}[\\/]/.test(template)
-      ? Path.relative(magicspaceDir, Path.resolve(template)).replace(/\\/g, '/')
-      : template;
+    let extendsSpecifier = /^[.]{1,2}[\\/]/.test(boilerplate)
+      ? Path.relative(magicspaceDir, Path.resolve(boilerplate)).replace(
+          /\\/g,
+          '/',
+        )
+      : boilerplate;
 
     await FSExtra.outputFile(
       configFilePath,

@@ -11,15 +11,15 @@ import {
   SpaceLogger,
   SpaceLoggerEvent,
   ValidateError,
-  resolveTemplateConfig,
+  resolveBoilerplateConfig,
 } from '@magicspace/core';
 import Chalk from 'chalk';
 
 const CONFIG_LOGGER: ConfigLogger = {
   info(event: ConfigLoggerEvent) {
     switch (event.type) {
-      case 'resolve-template':
-        log('config', 'info', `resolving template ${event.path}`);
+      case 'resolve-boilerplate':
+        log('config', 'info', `resolving boilerplate ${event.path}`);
         break;
     }
   },
@@ -50,25 +50,25 @@ function log(type: 'config' | 'space', _level: 'info', message: string): void {
 export async function createDefaultSpace(projectDir: string): Promise<Space>;
 export async function createDefaultSpace(
   projectDir: string,
-  templateDir: string,
-): Promise<'template-dir-not-exists' | Space>;
+  boilerplateDir: string,
+): Promise<'boilerplate-dir-not-exists' | Space>;
 export async function createDefaultSpace(
   projectDir: string,
-  templateDir?: string,
-): Promise<'template-dir-not-exists' | Space> {
+  boilerplateDir?: string,
+): Promise<'boilerplate-dir-not-exists' | Space> {
   let config: Config | undefined;
 
-  if (typeof templateDir === 'string') {
+  if (typeof boilerplateDir === 'string') {
     try {
-      templateDir = Path.resolve(templateDir);
+      boilerplateDir = Path.resolve(boilerplateDir);
 
-      if (!FS.existsSync(templateDir)) {
-        return 'template-dir-not-exists';
+      if (!FS.existsSync(boilerplateDir)) {
+        return 'boilerplate-dir-not-exists';
       }
 
-      config = await resolveTemplateConfig(
-        templateDir,
-        // The context file name does not matter as the template specifier is a
+      config = await resolveBoilerplateConfig(
+        boilerplateDir,
+        // The context file name does not matter as the boilerplate specifier is a
         // full path.
         Path.join(process.cwd(), '__placeholder__'),
         {
@@ -78,7 +78,7 @@ export async function createDefaultSpace(
     } catch (error) {
       if (error instanceof ValidateError) {
         // eslint-disable-next-line no-throw-literal
-        throw `Error validating template options:
+        throw `Error validating boilerplate options:
 ${error.diagnostics.join('\n').replace(/^(?=.)/gm, '  ')}`;
       } else {
         throw error;

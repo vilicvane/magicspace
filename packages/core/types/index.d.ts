@@ -1,14 +1,14 @@
 declare namespace Magicspace {
   interface Config {
     /**
-     * Path to other magicspace template packages or directories containing
-     * `template.json` or `template.js` file.
+     * Path to other magicspace boilerplate packages or directories containing
+     * `boilerplate.json` or `boilerplate.js` file.
      *
      * E.g.:
      *
-     * - `@mufan/code-templates/general`
-     * - `awesome-template`
-     * - `../my-template`
+     * - `@mufan/code-boilerplates/general`
+     * - `awesome-boilerplate`
+     * - `../my-boilerplate`
      *
      * @link https://github.com/vilic/module-lens
      */
@@ -24,41 +24,41 @@ declare namespace Magicspace {
      */
     composables?: string[];
     /**
-     * Template lifecycle scripts.
+     * Boilerplate lifecycle scripts.
      */
-    scripts?: TemplateScripts;
+    scripts?: BoilerplateScripts;
     /**
      * Options are merged using `...` operator, otherwise use a function to handle it manually.
      */
-    options?: TemplateOptions | TemplateOptionsMerger;
+    options?: BoilerplateOptions | BoilerplateOptionsMerger;
     /**
      * Example configurations for `magicspace create` command.
      */
     examples?: [DefaultExampleOptions, ...ExampleOptions[]];
   }
 
-  interface TemplateScripts {
+  interface BoilerplateScripts {
     /**
      * Script to run after generating files during magicspace branch preparation.
      */
     postgenerate?: string;
   }
 
-  interface TemplateOptions {}
+  interface BoilerplateOptions {}
 
   interface DefaultExampleOptions {
     name?: string;
     description?: string;
-    options?: TemplateOptions;
+    options?: BoilerplateOptions;
   }
 
   interface ExampleOptions {
     name: string;
     description?: string;
-    options?: TemplateOptions;
+    options?: BoilerplateOptions;
   }
 
-  type TemplateOptionsMerger = (
-    optionsArray: TemplateOptions[],
-  ) => TemplateOptions;
+  type BoilerplateOptionsMerger = (
+    optionsArray: BoilerplateOptions[],
+  ) => BoilerplateOptions;
 }

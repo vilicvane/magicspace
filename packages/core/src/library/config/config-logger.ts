@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type ConfigLoggerEvent = {
-  type: 'resolve-template';
+  type: 'resolve-boilerplate';
   path: string;
 };
 
