@@ -2,17 +2,13 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
-import globalNodeModulesDir from 'global-modules';
 import _ from 'lodash';
 import {resolve} from 'module-lens';
 import {Tiva, ValidateError} from 'tiva';
-import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
 
 import {ConfigLogger} from './config-logger';
 
 const TYPES_PATH = Path.join(__dirname, '../../../types.d.ts');
-
-const yarnGlobalNodeModulesParentDir = getYarnGlobalNodeModulesParentDir();
 
 export interface Config {
   /**
@@ -124,15 +120,6 @@ function _resolveRawBoilerplateConfig(
     }) ??
     resolve(specifier, {
       sourceFileName: __filename,
-    }) ??
-    resolve(specifier, {
-      sourceFileName: Path.join(
-        yarnGlobalNodeModulesParentDir,
-        '__placeholder__',
-      ),
-    }) ??
-    resolve(specifier, {
-      sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
     });
 
   if (!dir) {

@@ -17,7 +17,6 @@
   "dependencies": {
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
-    "global-modules": "^2.0.0",
     "handlebars": "^4.7.6",
     "lodash": "^4.17.20",
     "module-lens": "^0.1.6",
@@ -26,12 +25,10 @@
     "tiva": "^0.2.1",
     "tslang": "^0.1.22",
     "tslib": "^2.0.1",
-    "typescript": "^3.9.7",
-    "yarn-global-modules": "^1.0.1"
+    "typescript": "^3.9.7"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
-    "@types/global-modules": "^2.0.0",
     "@types/lodash": "^4.14.159"
   }
 }
