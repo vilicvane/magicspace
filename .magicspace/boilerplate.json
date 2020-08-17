@@ -1,13 +1,23 @@
 {
-  "extends": ["@mufan/code-boilerplates/general"],
+  "extends": ["@mufan/code-boilerplates/typescript"],
   "options": {
     "name": "magicspace",
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "license": "MIT",
     "packages": [
-      {"name": "@magicspace/core"},
-      {"name": "magicspace", "dir": "cli"},
-      {"name": "@magicspace/utils"}
+      {
+        "name": "@magicspace/core",
+        "tsProjects": [{"name": "library"}]
+      },
+      {
+        "name": "magicspace",
+        "dir": "cli",
+        "tsProjects": [{"name": "program"}]
+      },
+      {
+        "name": "@magicspace/utils",
+        "tsProjects": [{"name": "library"}, {"name": "test"}]
+      }
     ]
   }
 }

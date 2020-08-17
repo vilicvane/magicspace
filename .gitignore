@@ -1,11 +1,9 @@
-# general
+# General
 .DS_Store
 *.tgz
 node_modules/
 yarn-error.log
 npm-debug.log
-# typescript
+# TypeScript Build Artifacts
 bld/
-# test
-/test.*
-/test-*
+.bld-cache/

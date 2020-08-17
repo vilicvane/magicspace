@@ -1,5 +1,6 @@
 {
   "root": true,
+  "ignorePatterns": ["bld", ".bld-cache", "core/.magicspace"],
   "extends": ["eslint:recommended"],
   "env": {
     "node": true,
@@ -14,10 +15,14 @@
       }
     },
     {
-      "files": ["packages/core/**/*.{ts,tsx}"],
+      "files": ["packages/core/src/library/**/*.{ts,tsx}"],
       "rules": {
         "no-console": ["error", {}]
       }
+    },
+    {
+      "files": ["packages/utils/src/test/**/*.{ts,tsx}"],
+      "extends": ["plugin:@mufan/override-dev"]
     }
   ]
 }
