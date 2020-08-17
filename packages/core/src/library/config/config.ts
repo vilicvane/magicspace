@@ -51,10 +51,10 @@ export function resolveRawTemplateConfig(
   if (!result) {
     throw new Error(
       contextFileName
-        ? `Cannot resolve template ${JSON.stringify(specifier)}`
-        : `Cannot resolve template ${JSON.stringify(
+        ? `Cannot resolve template ${JSON.stringify(
             specifier,
-          )} from file ${JSON.stringify(contextFileName)}`,
+          )} from file ${JSON.stringify(contextFileName)}`
+        : `Cannot resolve template ${JSON.stringify(specifier)}`,
     );
   }
 
