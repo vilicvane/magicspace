@@ -36,6 +36,15 @@ export class ProjectGit extends Git {
     }
   }
 
+  isEmpty(): boolean {
+    try {
+      spawnSync(this.dir, 'git', ['log', '-1']);
+      return false;
+    } catch {
+      return true;
+    }
+  }
+
   isMerging(): boolean {
     let mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 

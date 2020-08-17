@@ -27,9 +27,23 @@ declare namespace Magicspace {
      * Options are merged using `...` operator, otherwise use a function to handle it manually.
      */
     options?: TemplateOptions | TemplateOptionsMerger;
+
+    examples?: [DefaultExampleOptions, ...ExampleOptions[]];
   }
 
   interface TemplateOptions {}
+
+  interface DefaultExampleOptions {
+    name?: string;
+    description?: string;
+    options?: TemplateOptions;
+  }
+
+  interface ExampleOptions {
+    name: string;
+    description?: string;
+    options?: TemplateOptions;
+  }
 
   type TemplateOptionsMerger = (
     optionsArray: TemplateOptions[],

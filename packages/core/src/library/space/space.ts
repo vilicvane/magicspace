@@ -34,7 +34,11 @@ export class Space {
   async initialize({
     ours = false,
   }: ProjectInitializeOptions): Promise<
-    'not-repository-root' | 'already-initialized' | 'merge-in-progress' | true
+    | 'not-repository-root'
+    | 'merge-in-progress'
+    | 'empty-repository'
+    | 'already-initialized'
+    | true
   > {
     let projectDir = this.dir;
     let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
@@ -48,6 +52,10 @@ export class Space {
 
     if (projectGit.isMerging()) {
       return 'merge-in-progress';
+    }
+
+    if (projectGit.isEmpty()) {
+      return 'empty-repository';
     }
 
     let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
@@ -76,6 +84,7 @@ export class Space {
   async update(): Promise<
     | 'not-repository-root'
     | 'merge-in-progress'
+    | 'empty-repository'
     | 'not-initialized'
     | 'already-up-to-date'
     | true
@@ -92,6 +101,10 @@ export class Space {
 
     if (projectGit.isMerging()) {
       return 'merge-in-progress';
+    }
+
+    if (projectGit.isEmpty()) {
+      return 'empty-repository';
     }
 
     let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();

@@ -39,8 +39,26 @@ export interface ComposableFileEntry {
 
 export {ValidateError};
 
-export function resolveRawTemplateConfig(dir: string): Magicspace.Config {
-  return _resolveRawTemplateConfig(Path.resolve(dir)).config;
+export function resolveRawTemplateConfig(
+  specifier: string,
+  contextFileName?: string,
+): Magicspace.Config {
+  let result = _resolveRawTemplateConfig(
+    specifier,
+    contextFileName ?? Path.join(process.cwd(), '__placeholder__'),
+  );
+
+  if (!result) {
+    throw new Error(
+      contextFileName
+        ? `Cannot resolve template ${JSON.stringify(specifier)}`
+        : `Cannot resolve template ${JSON.stringify(
+            specifier,
+          )} from file ${JSON.stringify(contextFileName)}`,
+    );
+  }
+
+  return result.config;
 }
 
 export interface ResolveTemplateConfigOptions {
@@ -48,13 +66,13 @@ export interface ResolveTemplateConfigOptions {
 }
 
 export async function resolveTemplateConfig(
-  dir: string,
+  specifier: string,
+  contextFileName: string,
   {logger}: ResolveTemplateConfigOptions = {},
 ): Promise<Config> {
-  dir = Path.resolve(dir);
-
   let {config, optionsDeclarationFilePaths} = _resolveTemplateConfig(
-    dir,
+    specifier,
+    contextFileName,
     logger,
   );
 
@@ -77,16 +95,40 @@ export async function resolveTemplateConfig(
 }
 
 interface InternalResolveRawConfigResult {
+  dir: string;
   configFilePath: string;
   config: Magicspace.Config;
 }
 
 function _resolveRawTemplateConfig(
-  dir: string,
-): InternalResolveRawConfigResult {
+  specifier: string,
+  contextFileName: string,
+): InternalResolveRawConfigResult | undefined {
+  let dir =
+    resolve(specifier, {
+      sourceFileName: contextFileName,
+    }) ??
+    resolve(specifier, {
+      sourceFileName: __filename,
+    }) ??
+    resolve(specifier, {
+      sourceFileName: Path.join(
+        yarnGlobalNodeModulesParentDir,
+        '__placeholder__',
+      ),
+    }) ??
+    resolve(specifier, {
+      sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
+    });
+
+  if (!dir) {
+    return undefined;
+  }
+
   let configFilePath = require.resolve(Path.join(dir, 'template'));
 
   return {
+    dir,
     configFilePath,
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     config: require(configFilePath),
@@ -99,24 +141,35 @@ interface InternalResolveTemplateConfigResult {
 }
 
 function _resolveTemplateConfig(
-  dir: string,
+  specifier: string,
+  contextFileName: string,
   logger: ConfigLogger | undefined,
 ): InternalResolveTemplateConfigResult {
   logger?.info({
     type: 'resolve-template',
-    path: dir,
+    path: specifier,
   });
 
+  let rawResult = _resolveRawTemplateConfig(specifier, contextFileName);
+
+  if (!rawResult) {
+    throw new Error(
+      `Cannot resolve template ${JSON.stringify(
+        specifier,
+      )} from file ${JSON.stringify(contextFileName)}`,
+    );
+  }
+
   let {
+    dir,
     configFilePath,
     config: {
       extends: superSpecifiers,
       composables: filePatterns,
       root: rootDir,
       options = {},
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
     },
-  } = _resolveRawTemplateConfig(dir);
+  } = rawResult;
 
   // This is not identical to `dir`.
   let configFileDir = Path.dirname(configFilePath);
@@ -186,35 +239,10 @@ function _resolveTemplateConfig(
     let superOptionsDeclarationFilePathsArray: string[][] = [];
 
     for (let specifier of superSpecifiers) {
-      let superDir =
-        resolve(specifier, {
-          sourceFileName: configFilePath,
-        }) ??
-        resolve(specifier, {
-          sourceFileName: __filename,
-        }) ??
-        resolve(specifier, {
-          sourceFileName: Path.join(
-            yarnGlobalNodeModulesParentDir,
-            '__placeholder__',
-          ),
-        }) ??
-        resolve(specifier, {
-          sourceFileName: Path.join(globalNodeModulesDir, '../__placeholder__'),
-        });
-
-      if (!superDir) {
-        throw new Error(
-          `Cannot resolve template ${JSON.stringify(
-            specifier,
-          )} specified in ${JSON.stringify(configFilePath)}`,
-        );
-      }
-
       let {
         config: {composables: superFileEntries, options: superOptions},
         optionsDeclarationFilePaths: superOptionsDeclarationFilePaths,
-      } = _resolveTemplateConfig(superDir, logger);
+      } = _resolveTemplateConfig(specifier, configFilePath, logger);
 
       superFileEntriesArray.push(superFileEntries);
       superOptionsArray.push(superOptions);

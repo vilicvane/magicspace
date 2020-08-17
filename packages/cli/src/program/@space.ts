@@ -1,3 +1,6 @@
+import * as FS from 'fs';
+import * as Path from 'path';
+
 import {
   Config,
   ConfigLogger,
@@ -44,17 +47,34 @@ function log(type: 'config' | 'space', _level: 'info', message: string): void {
   console.info(label, message);
 }
 
+export async function createDefaultSpace(projectDir: string): Promise<Space>;
 export async function createDefaultSpace(
   projectDir: string,
-  templateDir: string | undefined,
-): Promise<Space> {
+  templateDir: string,
+): Promise<'template-dir-not-exists' | Space>;
+export async function createDefaultSpace(
+  projectDir: string,
+  templateDir?: string,
+): Promise<'template-dir-not-exists' | Space> {
   let config: Config | undefined;
 
   if (typeof templateDir === 'string') {
     try {
-      config = await resolveTemplateConfig(templateDir, {
-        logger: CONFIG_LOGGER,
-      });
+      templateDir = Path.resolve(templateDir);
+
+      if (!FS.existsSync(templateDir)) {
+        return 'template-dir-not-exists';
+      }
+
+      config = await resolveTemplateConfig(
+        templateDir,
+        // The context file name does not matter as the template specifier is a
+        // full path.
+        Path.join(process.cwd(), '__placeholder__'),
+        {
+          logger: CONFIG_LOGGER,
+        },
+      );
     } catch (error) {
       if (error instanceof ValidateError) {
         // eslint-disable-next-line no-throw-literal

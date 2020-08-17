@@ -17,7 +17,7 @@ export default class extends Command {
     })
     projectDir: string,
   ): Promise<string> {
-    let space = await createDefaultSpace(Path.resolve(projectDir), undefined);
+    let space = await createDefaultSpace(Path.resolve(projectDir));
 
     if (!space.isRepositoryRoot()) {
       throw new ExpectedError(
@@ -37,20 +37,22 @@ export default class extends Command {
       return 'No pending possible directory renames detected.';
     }
 
-    let {renames: selectedRenames} = (await prompts([
-      {
-        type: 'multiselect',
-        name: 'renames',
-        message: 'hello',
-        instructions: false,
-        choices: renames.map(rename => {
-          return {
-            title: `${rename.from} -> ${rename.to}`,
-            value: rename,
-          };
-        }),
-      },
-    ])) as {renames: PossibleDirectorRename[]};
+    let selectedRenames = (
+      await prompts([
+        {
+          type: 'multiselect',
+          name: 'renames',
+          message: 'Select directory renames to apply',
+          instructions: false,
+          choices: renames.map(rename => {
+            return {
+              title: `${rename.from} -> ${rename.to}`,
+              value: rename,
+            };
+          }),
+        },
+      ])
+    ).renames as PossibleDirectorRename[];
 
     if (selectedRenames.length) {
       space.renameDirectories(selectedRenames);

@@ -31,6 +31,10 @@ export default class extends Command {
       Path.resolve(projectDir, options.template),
     );
 
+    if (space === 'template-dir-not-exists') {
+      throw new ExpectedError('Magicspace configuration not found');
+    }
+
     let result = await space.initialize(options);
 
     switch (result) {
@@ -49,6 +53,10 @@ Otherwise, you can use "git merge --abort" to cancel this initialization and sta
       case 'merge-in-progress':
         throw new ExpectedError(
           'A merge is already in progress, please resolve it before continue',
+        );
+      case 'empty-repository':
+        throw new ExpectedError(
+          'You need to make an initial commit before initialize the repository with magicspace',
         );
       case 'already-initialized':
         throw new ExpectedError(

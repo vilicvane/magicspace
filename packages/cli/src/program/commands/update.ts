@@ -24,6 +24,10 @@ export default class extends Command {
       Path.resolve(projectDir, options.template),
     );
 
+    if (space === 'template-dir-not-exists') {
+      throw new ExpectedError('Magicspace configuration not found');
+    }
+
     let result = await space.update();
 
     switch (result) {
@@ -55,6 +59,10 @@ Execute "${
       case 'merge-in-progress':
         throw new ExpectedError(
           'A merge is already in progress, please resolve it before continue',
+        );
+      case 'empty-repository':
+        throw new ExpectedError(
+          'You need to make an initial commit and initialize the repository with magicspace',
         );
       case 'not-initialized':
         throw new ExpectedError(
