@@ -11,9 +11,9 @@ export const MAGICSPACE_INITIALIZE_COMMIT_MESSAGE = '(magicspace-initialize)';
 export const MAGICSPACE_UPDATE_COMMIT_MESSAGE = '(magicspace-update)';
 
 export const MAGICSPACE_INITIALIZE_MERGE_MESSAGE =
-  'Merge magicspace content (initialize)';
+  'Merge magicspace changes (initialize)';
 export const MAGICSPACE_UPDATE_MERGE_MESSAGE =
-  'Merge magicspace content (update)';
+  'Merge magicspace changes (update)';
 
 export const MAGIC_COMMIT_MESSAGE_REGEX_STRING = '\\(magicspace-.*\\)';
 
