@@ -102,6 +102,31 @@ test('`extendObjectProperties` should work with `after` option', () => {
           c: 3,
         },
         {
+          d: 4,
+        },
+        {
+          after: 'b',
+        },
+      ),
+    ),
+  ).toEqual(
+    json({
+      a: 1,
+      b: 2,
+      d: 4,
+      c: 3,
+    }),
+  );
+
+  expect(
+    json(
+      extendObjectProperties(
+        {
+          a: 1,
+          b: 2,
+          c: 3,
+        },
+        {
           b: 4,
           a: 5,
         },

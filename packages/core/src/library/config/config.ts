@@ -10,7 +10,7 @@ import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
 
 import {ConfigLogger} from './config-logger';
 
-const TYPES_PATH = Path.join(__dirname, '../../../types/index.d.ts');
+const TYPES_PATH = Path.join(__dirname, '../../../types.d.ts');
 
 const yarnGlobalNodeModulesParentDir = getYarnGlobalNodeModulesParentDir();
 
@@ -253,7 +253,7 @@ function _resolveBoilerplateConfig(
       : [],
   };
 
-  let optionsDeclarationFilePath = Path.join(dir, 'boilerplate-options.d.ts');
+  let optionsDeclarationFilePath = Path.join(dir, 'boilerplate.d.ts');
 
   let optionsDeclarationFilePaths = FS.existsSync(optionsDeclarationFilePath)
     ? [optionsDeclarationFilePath]
