@@ -43,7 +43,7 @@ export default class extends Command {
 Magicspace initialization started, please review and commit changes to complete the initialize merge.
 
 Please avoid resetting the on-going merge if you want to continue and complete this initialization.
-Otherwise, you can use "git merge --abort" to cancel this initialization and start over again.`;
+Otherwise, you can use \`git merge --abort\` to cancel this initialization and start over again.`;
       case 'not-repository-root':
         throw new ExpectedError(
           `Project directory ${JSON.stringify(

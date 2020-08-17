@@ -76,8 +76,10 @@ export default class extends Command {
       )}\n`,
     );
 
-    return `Created magicspace configuration at ${JSON.stringify(
+    return `\
+Created magicspace configuration at ${JSON.stringify(
       Path.relative('.', configFilePath),
-    )}.`;
+    )}.
+Please review/edit the configuration file and run \`magicspace init\` to initialize.`;
   }
 }

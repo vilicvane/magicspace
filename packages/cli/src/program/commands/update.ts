@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import {Command, Context, ExpectedError, command, metadata, param} from 'clime';
+import {Command, ExpectedError, command, metadata, param} from 'clime';
 
 import {CommonOptions} from '../@command';
 import {createDefaultSpace} from '../@space';
@@ -17,7 +17,6 @@ export default class extends Command {
     })
     projectDir: string,
     options: CommonOptions,
-    context: Context,
   ): Promise<string> {
     let space = await createDefaultSpace(
       Path.resolve(projectDir),
@@ -39,16 +38,14 @@ export default class extends Command {
 Update applied, please review and commit changes to complete the update merge.
 
 Please avoid resetting the on-going merge if you want to continue and complete this update.
-Otherwise, you can use "git merge --abort" to cancel this update and start over again.`,
+Otherwise, you can use \`git merge --abort\` to cancel this update and start over again.`,
           renames.length &&
             `\
 Possible renamed directories detected:
 
 ${renames.map(({from, to}) => `  - ${from} -> ${to}`).join('\n')}
 
-Execute "${
-              context.commands[0]
-            } update-dirs" to update those directories interactively.`,
+Execute \`magicspace update-dirs\` to update those directories interactively.`,
         ]).join('\n\n');
       case 'not-repository-root':
         throw new ExpectedError(
