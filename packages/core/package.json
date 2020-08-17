@@ -9,8 +9,8 @@
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "files": [
+    "types.d.ts",
     "src/library/**/*.ts",
-    "types/*.d.ts",
     "bld/library",
     "!*.tsbuildinfo"
   ],
