@@ -3,8 +3,8 @@ import * as Path from 'path';
 import {__importDefault} from 'tslib';
 
 import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
-import {conservativelyMove} from '../@utils';
-import {Config} from '../config';
+import {conservativelyMove, npmRun} from '../@utils';
+import {Config, TemplateScriptsLifecycleName} from '../config';
 import {File, FileContext} from '../file';
 
 import {ProjectGit, Rename, TempGit} from './@git';
@@ -70,6 +70,8 @@ export class Space {
 
     await this.generate(tempDir);
 
+    await this.runLifecycleScripts('postgenerate');
+
     tempGit.addAndCommitChanges('initialize');
 
     projectGit.addOrUpdateMagicspaceRemote(tempDir);
@@ -118,6 +120,8 @@ export class Space {
     tempGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
 
     await this.generate(tempDir);
+
+    await this.runLifecycleScripts('postgenerate');
 
     if (tempGit.isWorkingDirectoryClean()) {
       return 'already-up-to-date';
@@ -214,6 +218,33 @@ export class Space {
     }
 
     await context.generate();
+  }
+
+  async runLifecycleScripts(
+    lifecycle: TemplateScriptsLifecycleName,
+  ): Promise<void> {
+    let scriptEntries = this.config.scripts[lifecycle];
+
+    for (let {configFilePath, script} of scriptEntries) {
+      let subprocess = await npmRun(script, {
+        pathCWD: Path.dirname(configFilePath),
+        cwd: TEMP_MAGIC_REPOSITORY_DIR,
+      });
+
+      await new Promise((resolve, reject) => {
+        subprocess.on('exit', code => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(
+              new Error(
+                `Script ${JSON.stringify(script)} exited with code ${code}`,
+              ),
+            );
+          }
+        });
+      });
+    }
   }
 
   createFileObject(

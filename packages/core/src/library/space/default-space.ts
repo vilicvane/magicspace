@@ -1,4 +1,4 @@
-import {BinaryFile, JSONFile, TextFile} from '../@files';
+import {BinaryFile, JSONFile, TextFile} from '../files';
 
 import {FileObjectCreator} from './space';
 

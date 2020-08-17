@@ -5,3 +5,4 @@ export * from './file';
 export * from './composables';
 export * from './config';
 export * from './space';
+export * from './files';

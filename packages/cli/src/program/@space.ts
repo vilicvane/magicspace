@@ -33,11 +33,11 @@ const SPACE_LOGGER: SpaceLogger = {
         break;
     }
   },
-  stdout(text) {
-    process.stdout.write(Chalk.dim(text));
+  stdout(data) {
+    process.stdout.write(data);
   },
-  stderr(text) {
-    process.stderr.write(Chalk.red(text));
+  stderr(data) {
+    process.stderr.write(data);
   },
 };
 

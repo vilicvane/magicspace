@@ -6,6 +6,6 @@ export type SpaceLoggerEvent = {
 
 export interface SpaceLogger {
   info(event: SpaceLoggerEvent): void;
-  stdout(text: string): void;
-  stderr(text: string): void;
+  stdout(text: string | Buffer): void;
+  stderr(text: string | Buffer): void;
 }

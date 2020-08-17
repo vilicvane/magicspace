@@ -2,27 +2,7 @@ import * as ChildProcess from 'child_process';
 import * as Path from 'path';
 
 import * as FSExtra from 'fs-extra';
-
-export function unique<T>(values: T[]): T[] {
-  return Array.from(new Set(values));
-}
-
-export function uniqueBy<T, TKey>(
-  values: T[],
-  keyCallback: (value: T) => TKey,
-): T[] {
-  let map = new Map<TKey, T>();
-
-  for (let value of values) {
-    let key = keyCallback(value);
-
-    if (!map.has(key)) {
-      map.set(key, value);
-    }
-  }
-
-  return Array.from(map.values());
-}
+import npmPath from 'npm-path';
 
 export class SpawnSyncFailure {
   constructor(
@@ -54,6 +34,34 @@ export function spawnSync(
   }
 
   return stdout;
+}
+
+export interface NPMRunOptions {
+  pathCWD: string;
+  cwd: string;
+}
+
+export async function npmRun(
+  script: string,
+  {pathCWD, cwd}: NPMRunOptions,
+): Promise<ChildProcess.ChildProcess> {
+  let path = await new Promise<string>((resolve, reject) =>
+    npmPath.get({cwd: pathCWD}, (error: any, path: string) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(path);
+      }
+    }),
+  );
+
+  return ChildProcess.exec(script, {
+    cwd,
+    env: {
+      ...process.env,
+      [npmPath.PATH]: path,
+    },
+  });
 }
 
 /**

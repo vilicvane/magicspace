@@ -3,11 +3,10 @@ import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
 import globalNodeModulesDir from 'global-modules';
+import _ from 'lodash';
 import {resolve} from 'module-lens';
 import {Tiva, ValidateError} from 'tiva';
 import getYarnGlobalNodeModulesParentDir from 'yarn-global-modules';
-
-import {unique, uniqueBy} from '../@utils';
 
 import {ConfigLogger} from './config-logger';
 
@@ -19,14 +18,18 @@ export interface Config {
   /**
    * Composable file entries to be resolved.
    */
-  composables: ComposableFileEntry[];
+  composables: ComposableModuleEntry[];
+  /**
+   * Template lifecycle scripts.
+   */
+  scripts: TemplateScripts;
   /**
    * Merged template options.
    */
   options: Magicspace.TemplateOptions;
 }
 
-export interface ComposableFileEntry {
+export interface ComposableModuleEntry {
   /**
    * Path to the composable file created by template author.
    */
@@ -35,6 +38,17 @@ export interface ComposableFileEntry {
    * Base directory of files that will generated, this is a relative path.
    */
   base: string;
+}
+
+export interface TemplateScripts {
+  postgenerate: TemplateScriptEntry[];
+}
+
+export type TemplateScriptsLifecycleName = keyof TemplateScripts;
+
+export interface TemplateScriptEntry {
+  configFilePath: string;
+  script: string;
 }
 
 export {ValidateError};
@@ -165,7 +179,8 @@ function _resolveTemplateConfig(
     configFilePath,
     config: {
       extends: superSpecifiers,
-      composables: filePatterns,
+      composables: composablePatterns,
+      scripts: rawScripts = {},
       root: rootDir,
       options = {},
     },
@@ -174,15 +189,15 @@ function _resolveTemplateConfig(
   // This is not identical to `dir`.
   let configFileDir = Path.dirname(configFilePath);
 
-  if (rootDir && !filePatterns) {
+  if (rootDir && !composablePatterns) {
     // If root is specified but file patterns are not, make it '**' by default.
-    filePatterns = ['**'];
+    composablePatterns = ['**'];
   }
 
   rootDir = rootDir ? Path.resolve(configFileDir, rootDir) : configFileDir;
 
-  let filePaths = filePatterns
-    ? FastGlob.sync(filePatterns, {
+  let composableModulePaths = composablePatterns
+    ? FastGlob.sync(composablePatterns, {
         cwd: rootDir,
         absolute: true,
         dot: true,
@@ -190,38 +205,53 @@ function _resolveTemplateConfig(
       }).map(path => Path.normalize(path))
     : [];
 
-  let filePathSet = new Set(filePaths);
+  let composableModulePathSet = new Set(composableModulePaths);
 
-  for (let filePath of filePaths) {
+  for (let composableModulePath of composableModulePaths) {
     // Test whether the file has a valid extension name.
-    let pathGroups = /^(.+)\.js$/.exec(filePath);
+    let pathGroups = /^(.+)\.js$/.exec(composableModulePath);
 
     if (pathGroups) {
       // If we have `foo.js.js`, exclude `foo.js` from composables if it
       // presents. So the template author can safely store a template file
       // side-by-side.
-      filePathSet.delete(pathGroups[1]);
+      composableModulePathSet.delete(pathGroups[1]);
     } else {
-      filePathSet.delete(filePath);
+      composableModulePathSet.delete(composableModulePath);
     }
   }
 
-  if (filePatterns && filePatterns.length > 0 && filePathSet.size === 0) {
+  if (
+    composablePatterns &&
+    composablePatterns.length > 0 &&
+    composableModulePathSet.size === 0
+  ) {
     throw new Error(
       `No composable module found for patterns ${JSON.stringify(
-        filePatterns,
+        composablePatterns,
       )} in template ${JSON.stringify(configFilePath)}`,
     );
   }
 
-  let fileEntries = Array.from(filePathSet).map(
-    (filePath): ComposableFileEntry => {
+  let composableModuleEntries = Array.from(composableModulePathSet).map(
+    (path): ComposableModuleEntry => {
       return {
-        path: filePath,
-        base: Path.relative(rootDir!, Path.dirname(filePath)),
+        path,
+        base: Path.relative(rootDir!, Path.dirname(path)),
       };
     },
   );
+
+  let scripts: TemplateScripts = {
+    postgenerate: rawScripts.postgenerate
+      ? [
+          {
+            configFilePath,
+            script: rawScripts.postgenerate,
+          },
+        ]
+      : [],
+  };
 
   let optionsDeclarationFilePath = Path.join(dir, 'template-options.d.ts');
 
@@ -234,17 +264,23 @@ function _resolveTemplateConfig(
   }
 
   if (superSpecifiers && superSpecifiers.length) {
-    let superFileEntriesArray: ComposableFileEntry[][] = [];
+    let superComposableModuleEntriesArray: ComposableModuleEntry[][] = [];
+    let superScriptsArray: TemplateScripts[] = [];
     let superOptionsArray: Magicspace.TemplateOptions[] = [];
     let superOptionsDeclarationFilePathsArray: string[][] = [];
 
     for (let specifier of superSpecifiers) {
       let {
-        config: {composables: superFileEntries, options: superOptions},
+        config: {
+          composables: superComposableModuleEntries,
+          scripts: superScripts,
+          options: superOptions,
+        },
         optionsDeclarationFilePaths: superOptionsDeclarationFilePaths,
       } = _resolveTemplateConfig(specifier, configFilePath, logger);
 
-      superFileEntriesArray.push(superFileEntries);
+      superComposableModuleEntriesArray.push(superComposableModuleEntries);
+      superScriptsArray.push(superScripts);
       superOptionsArray.push(superOptions);
       superOptionsDeclarationFilePathsArray.push(
         superOptionsDeclarationFilePaths,
@@ -253,10 +289,22 @@ function _resolveTemplateConfig(
 
     // It is possible that one template has been extended several times, so
     // filter out the duplicated files.
-    fileEntries = uniqueBy(
-      [...superFileEntriesArray.flatMap(paths => paths), ...fileEntries],
-      fileEntry => fileEntry.path,
+    composableModuleEntries = _.unionBy(
+      superComposableModuleEntriesArray.flatMap(paths => paths),
+      composableModuleEntries,
+      entry => entry.path,
     );
+
+    for (let [key, scriptEntries] of Object.entries(scripts) as [
+      TemplateScriptsLifecycleName,
+      TemplateScriptEntry[],
+    ][]) {
+      scripts[key] = _.unionBy(
+        superScriptsArray.flatMap(superScripts => superScripts[key]),
+        scriptEntries,
+        entry => entry.configFilePath,
+      );
+    }
 
     if (typeof options === 'function') {
       options = options(superOptionsArray);
@@ -264,15 +312,16 @@ function _resolveTemplateConfig(
       options = Object.assign({}, ...superOptionsArray, options);
     }
 
-    optionsDeclarationFilePaths = unique([
-      ...superOptionsDeclarationFilePathsArray.flatMap(paths => paths),
-      ...optionsDeclarationFilePaths,
-    ]);
+    optionsDeclarationFilePaths = _.union(
+      superOptionsDeclarationFilePathsArray.flatMap(paths => paths),
+      optionsDeclarationFilePaths,
+    );
   }
 
   return {
     config: {
-      composables: fileEntries,
+      composables: composableModuleEntries,
+      scripts,
       options,
     },
     optionsDeclarationFilePaths,

@@ -4,15 +4,15 @@ import * as Path from 'path';
 import * as FastGlob from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
+import {removePathExtension} from './@utils';
+import {Composable, ComposeFunction} from './file';
 import {
   BinaryFileOptions,
   JSONFile,
   JSONFileOptions,
   TextFile,
   TextFileOptions,
-} from './@files';
-import {removePathExtension} from './@utils';
-import {Composable, ComposeFunction} from './file';
+} from './files';
 
 export function text(
   path: string,

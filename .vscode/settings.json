@@ -25,6 +25,7 @@
     "globby",
     "magicspace",
     "multiselect",
+    "postgenerate",
     "subcommands",
     "tiva",
     "tsbuildinfo",

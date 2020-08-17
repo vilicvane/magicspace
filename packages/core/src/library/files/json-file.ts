@@ -2,7 +2,9 @@ import {FileContext} from '../file';
 
 import {StructuredFile, StructuredFileOptions} from './structured-file';
 
-export interface JSONFileOptions extends StructuredFileOptions {}
+export interface JSONFileOptions extends StructuredFileOptions {
+  space?: string | number;
+}
 
 export class JSONFile<TContent> extends StructuredFile<
   TContent | undefined,
@@ -15,6 +17,8 @@ export class JSONFile<TContent> extends StructuredFile<
   }
 
   protected stringify(content: TContent | undefined): string {
-    return JSON.stringify(content, undefined, 2);
+    let {space} = this.options;
+
+    return JSON.stringify(content, undefined, space);
   }
 }

@@ -1,6 +1,7 @@
 import * as Path from 'path';
 
 import * as FSExtra from 'fs-extra';
+import _ from 'lodash';
 
 import {
   DIRECTORY_DETECTION_FIND_RENAMES_THRESHOLD,
@@ -13,7 +14,7 @@ import {
   MAGIC_COMMIT_MESSAGE_REGEX_STRING,
   PULL_FIND_RENAMES_THRESHOLD,
 } from '../@constants';
-import {SpawnSyncFailure, spawnSync, uniqueBy} from '../@utils';
+import {SpawnSyncFailure, spawnSync} from '../@utils';
 
 import {SpaceLogger} from './space-logger';
 
@@ -233,7 +234,7 @@ export class ProjectGit extends Git {
       })
       .filter((rename): rename is Rename => !!rename);
 
-    return uniqueBy(renames, ({from, to}) =>
+    return _.uniqBy(renames, ({from, to}) =>
       JSON.stringify({from, to}),
     ).filter(rename => FSExtra.existsSync(rename.from));
   }

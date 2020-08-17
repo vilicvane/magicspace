@@ -16,10 +16,7 @@ export abstract class StructuredFile<
   protected abstract stringify(content: TContent): string;
 
   toText(): string {
-    let {sortKeys: sortKeysOptions}: TOptions = Object.assign(
-      {},
-      ...this.composables.map(composable => composable.options),
-    );
+    let {sortKeys: sortKeysOptions} = this.options;
 
     let content = this.content;
 

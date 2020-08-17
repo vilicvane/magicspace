@@ -24,11 +24,24 @@ declare namespace Magicspace {
      */
     composables?: string[];
     /**
+     * Template lifecycle scripts.
+     */
+    scripts?: TemplateScripts;
+    /**
      * Options are merged using `...` operator, otherwise use a function to handle it manually.
      */
     options?: TemplateOptions | TemplateOptionsMerger;
-
+    /**
+     * Example configurations for `magicspace create` command.
+     */
     examples?: [DefaultExampleOptions, ...ExampleOptions[]];
+  }
+
+  interface TemplateScripts {
+    /**
+     * Script to run after generating files during magicspace branch preparation.
+     */
+    postgenerate?: string;
   }
 
   interface TemplateOptions {}
