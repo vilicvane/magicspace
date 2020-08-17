@@ -16,12 +16,14 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "latest-version": "^5.1.0",
+    "lodash": "^4.17.20",
     "micromatch": "^4.0.2",
     "sort-keys": "^4.0.0",
     "tslang": "^0.1.22"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",
+    "@types/lodash": "^4.14.159",
     "@types/micromatch": "^4.0.1",
     "jest": "^26.4.0"
   }

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import {ExtendObjectPropertiesOptions, extendObjectProperties} from './object';
 
 export function extendPackageScript(
@@ -15,10 +17,10 @@ export function extendPackageScript(
 
   let existingCommands = script.split('&&').map(command => command.trim());
 
-  let existingCommandDict = Object.fromEntries(
+  let existingCommandDict = _.fromPairs(
     existingCommands.map(command => [command, true]),
   );
-  let extendingCommandDict = Object.fromEntries(
+  let extendingCommandDict = _.fromPairs(
     commands.map(command => [command, true]),
   );
 

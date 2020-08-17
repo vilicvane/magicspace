@@ -1,4 +1,5 @@
 import latestVersion from 'latest-version';
+import _ from 'lodash';
 import {Dict} from 'tslang';
 
 import {logger} from './@logger';
@@ -20,7 +21,7 @@ export async function fetchPackageVersions(
       .join('\n'),
   );
 
-  return Object.fromEntries(
+  return _.fromPairs(
     await Promise.all(
       Object.entries(versionRangeDict).map(async ([name, versionRange]) => [
         name,

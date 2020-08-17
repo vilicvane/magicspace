@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as Micromatch from 'micromatch';
 import sortObjectKeys from 'sort-keys';
 import {Dict} from 'tslang';
@@ -48,7 +49,7 @@ export function extendObjectProperties(
 
   object = {
     ...object,
-    ...Object.fromEntries(settingEntries),
+    ..._.fromPairs(settingEntries),
   };
 
   if (addingEntries.length === 0) {
@@ -116,7 +117,7 @@ export function extendObjectProperties(
     entries.push(...addingEntries);
   }
 
-  return Object.fromEntries(entries);
+  return _.fromPairs(entries);
 }
 
 export {sortObjectKeys};
