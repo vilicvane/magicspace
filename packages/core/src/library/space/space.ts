@@ -4,7 +4,7 @@ import {__importDefault} from 'tslib';
 
 import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
 import {conservativelyMove, npmRun} from '../@utils';
-import {Config, BoilerplateScriptsLifecycleName} from '../config';
+import {BoilerplateScriptsLifecycleName, Config} from '../config';
 import {File, FileContext} from '../file';
 
 import {ProjectGit, Rename, TempGit} from './@git';
