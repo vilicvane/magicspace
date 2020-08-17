@@ -71,7 +71,7 @@ Checkout `Magicspace.Config` in [types](./packages/core/types.d.ts) for more inf
 
 ### Options declaration file
 
-Declare the options of your boilerplate with `boilerplates.d.ts` file:
+Declare the options of your boilerplate with `boilerplate.d.ts` file:
 
 ```ts
 declare namespace Magicspace {
