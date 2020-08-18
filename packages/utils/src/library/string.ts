@@ -1,11 +1,28 @@
 import _ from 'lodash';
+import * as Micromatch from 'micromatch';
 
-import {ExtendObjectPropertiesOptions, extendObjectProperties} from './object';
+import {addElementsToSequentialArray} from './array';
+
+export interface ExtendPackageScriptOptions {
+  /**
+   * Add after command that matches this pattern presents (it will skips continuous
+   * match).
+   *
+   * @link https://github.com/micromatch/micromatch
+   */
+  after?: string;
+  /**
+   * Add before command that matches this pattern presents.
+   *
+   * @link https://github.com/micromatch/micromatch
+   */
+  before?: string;
+}
 
 export function extendPackageScript(
   script: string | undefined,
   commands: string | string[],
-  options?: ExtendObjectPropertiesOptions,
+  {after: afterPattern, before: beforePattern}: ExtendPackageScriptOptions = {},
 ): string {
   if (typeof commands === 'string') {
     commands = [commands];
@@ -17,16 +34,12 @@ export function extendPackageScript(
 
   let existingCommands = script.split('&&').map(command => command.trim());
 
-  let existingCommandDict = _.fromPairs(
-    existingCommands.map(command => [command, true]),
-  );
-  let extendingCommandDict = _.fromPairs(
-    commands.map(command => [command, true]),
-  );
-
-  return Object.entries(
-    extendObjectProperties(existingCommandDict, extendingCommandDict, options),
-  )
-    .map(([command]) => command)
-    .join(' && ');
+  return addElementsToSequentialArray(existingCommands, commands, {
+    isAfterAnchor: afterPattern
+      ? command => Micromatch.isMatch(command, afterPattern)
+      : undefined,
+    isBeforeAnchor: beforePattern
+      ? command => Micromatch.isMatch(command, beforePattern)
+      : undefined,
+  }).join(' && ');
 }
