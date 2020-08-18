@@ -35,6 +35,7 @@
     "tiva",
     "tsbuildinfo",
     "tslang",
-    "tslib"
+    "tslib",
+    "underlaying"
   ]
 }
