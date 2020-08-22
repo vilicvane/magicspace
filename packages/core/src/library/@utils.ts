@@ -23,6 +23,10 @@ export function spawnSync(
   let {error, status, stdout, stderr} = ChildProcess.spawnSync(command, args, {
     cwd,
     encoding: 'utf8',
+    env: {
+      LANG: 'C',
+      LC_ALL: 'C',
+    },
   });
 
   if (error) {
