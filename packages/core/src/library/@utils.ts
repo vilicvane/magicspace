@@ -24,11 +24,9 @@ export function spawnSync(
     cwd,
     encoding: 'utf8',
     env: {
-      /**
-       * Make git's output in English
-       * https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
-       * https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html#The-LANGUAGE-variable
-       */
+      // Make sure Git write console in English
+      // https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+      // https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html#The-LANGUAGE-variable
       LC_ALL: 'C',
     },
   });
