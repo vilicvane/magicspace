@@ -17,7 +17,7 @@ export class JSONFile<TContent> extends StructuredFile<
   }
 
   protected stringify(content: TContent | undefined): string {
-    let {space} = this.options;
+    let {space = 2} = this.options;
 
     return JSON.stringify(content, undefined, space);
   }
