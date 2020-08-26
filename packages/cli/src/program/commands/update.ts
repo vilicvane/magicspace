@@ -1,5 +1,6 @@
 import * as Path from 'path';
 
+import Chalk from 'chalk';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 
 import {CommonOptions} from '../@command';
@@ -38,14 +39,18 @@ export default class extends Command {
 Update applied, please review and commit changes to complete the update merge.
 
 Please avoid resetting the on-going merge if you want to continue and complete this update.
-Otherwise, you can use \`git merge --abort\` to cancel this update and start over again.`,
+Otherwise, you can use ${Chalk.yellow(
+            'git merge --abort',
+          )} to cancel this update and start over again.`,
           renames.length &&
             `\
 Possible renamed directories detected:
 
 ${renames.map(({from, to}) => `  - ${from} -> ${to}`).join('\n')}
 
-Execute \`magicspace update-dirs\` to update those directories interactively.`,
+Execute ${Chalk.yellow(
+              'magicspace update-dirs',
+            )} to update those directories interactively.`,
         ]).join('\n\n');
       case 'not-repository-root':
         throw new ExpectedError(
