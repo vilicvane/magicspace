@@ -95,9 +95,11 @@ export function conservativelyMove(from: string, to: string): boolean {
     } else {
       return false;
     }
-  } else {
+  } else if (Path.relative(from, to).startsWith(`..${Path.sep}`)) {
     FSExtra.moveSync(from, to);
     return true;
+  } else {
+    return false;
   }
 }
 
