@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/core",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "publishConfig": {
     "access": "public"
   },
@@ -22,8 +22,8 @@
     "module-lens": "^0.1.6",
     "npm-path": "^2.0.4",
     "sort-keys": "^4.0.0",
-    "tmp": "^0.2.1",
     "tiva": "^0.2.1",
+    "tmp": "^0.2.1",
     "tslang": "^0.1.22",
     "tslib": "^2.0.1",
     "typescript": "^3.9.7"
