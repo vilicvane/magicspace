@@ -226,10 +226,21 @@ export class Space {
     let scriptEntries = this.config.scripts[lifecycle];
 
     for (let {configFilePath, script} of scriptEntries) {
+      let logger = this.logger;
+
+      logger?.info({
+        type: 'run-lifecycle-script',
+        lifecycle,
+        script,
+      });
+
       let subprocess = await npmRun(script, {
         pathCWD: Path.dirname(configFilePath),
         cwd: TEMP_MAGIC_REPOSITORY_DIR,
       });
+
+      subprocess.stdout!.on('data', chunk => logger?.stdout(chunk));
+      subprocess.stderr!.on('data', chunk => logger?.stderr(chunk));
 
       await new Promise((resolve, reject) => {
         subprocess.on('exit', code => {

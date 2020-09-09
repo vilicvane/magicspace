@@ -31,6 +31,13 @@ const SPACE_LOGGER: SpaceLogger = {
       case 'loaded-composable-module':
         log('space', 'info', `loaded composable module ${event.path}`);
         break;
+      case 'run-lifecycle-script':
+        log(
+          'space',
+          'info',
+          `run ${event.lifecycle} script:\n  ${event.script}`,
+        );
+        break;
     }
   },
   stdout(data) {
@@ -42,9 +49,9 @@ const SPACE_LOGGER: SpaceLogger = {
 };
 
 function log(type: 'config' | 'space', _level: 'info', message: string): void {
-  let label = Chalk.blue(`[${type}]`);
+  let prefix = Chalk.blue(`[${type}] `);
 
-  console.info(label, message);
+  console.info(message.replace(/^/gm, prefix));
 }
 
 export async function createDefaultSpace(projectDir: string): Promise<Space>;
