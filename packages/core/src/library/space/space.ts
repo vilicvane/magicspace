@@ -1,8 +1,9 @@
 import * as Path from 'path';
 
+import Tmp from 'tmp';
 import {__importDefault} from 'tslib';
 
-import {TEMP_MAGIC_REPOSITORY_DIR} from '../@constants';
+import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants';
 import {conservativelyMove, npmRun} from '../@utils';
 import {BoilerplateScriptsLifecycleName, Config} from '../config';
 import {File, FileContext} from '../file';
@@ -40,47 +41,55 @@ export class Space {
     | 'already-initialized'
     | true
   > {
-    let projectDir = this.dir;
-    let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
+    let {name: tempDir, removeCallback: tempDirRemoveCallback} = Tmp.dirSync({
+      prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
+      unsafeCleanup: true,
+    });
 
-    let projectGit = new ProjectGit(projectDir);
-    let tempGit = new TempGit(tempDir);
+    try {
+      let projectDir = this.dir;
 
-    if (!projectGit.isRepositoryRoot()) {
-      return 'not-repository-root';
+      let projectGit = new ProjectGit(projectDir);
+      let tempGit = new TempGit(tempDir);
+
+      if (!projectGit.isRepositoryRoot()) {
+        return 'not-repository-root';
+      }
+
+      if (projectGit.isMerging()) {
+        return 'merge-in-progress';
+      }
+
+      if (projectGit.isEmpty()) {
+        return 'empty-repository';
+      }
+
+      let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
+
+      if (lastMagicspaceCommit) {
+        return 'already-initialized';
+      }
+
+      tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
+
+      tempGit.checkoutOrphanMagicspaceBranch();
+
+      await this.generate(tempDir);
+
+      await this.runLifecycleScripts('postgenerate', tempDir);
+
+      tempGit.addAndCommitChanges('initialize');
+
+      projectGit.addOrUpdateMagicspaceRemote(tempDir);
+
+      projectGit.pullMagicspaceChangesWithoutCommit('initialize', ours);
+
+      projectGit.removeMagicspaceRemote();
+
+      return true;
+    } finally {
+      tempDirRemoveCallback();
     }
-
-    if (projectGit.isMerging()) {
-      return 'merge-in-progress';
-    }
-
-    if (projectGit.isEmpty()) {
-      return 'empty-repository';
-    }
-
-    let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
-
-    if (lastMagicspaceCommit) {
-      return 'already-initialized';
-    }
-
-    tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
-
-    tempGit.checkoutOrphanMagicspaceBranch();
-
-    await this.generate(tempDir);
-
-    await this.runLifecycleScripts('postgenerate');
-
-    tempGit.addAndCommitChanges('initialize');
-
-    projectGit.addOrUpdateMagicspaceRemote(tempDir);
-
-    projectGit.pullMagicspaceChangesWithoutCommit('initialize', ours);
-
-    projectGit.removeMagicspaceRemote();
-
-    return true;
   }
 
   async update(): Promise<
@@ -91,51 +100,59 @@ export class Space {
     | 'already-up-to-date'
     | true
   > {
-    let projectDir = this.dir;
-    let tempDir = TEMP_MAGIC_REPOSITORY_DIR;
+    let {name: tempDir, removeCallback: tempDirRemoveCallback} = Tmp.dirSync({
+      prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
+      unsafeCleanup: true,
+    });
 
-    let projectGit = new ProjectGit(projectDir);
-    let tempGit = new TempGit(tempDir);
+    try {
+      let projectDir = this.dir;
 
-    if (!projectGit.isRepositoryRoot()) {
-      return 'not-repository-root';
+      let projectGit = new ProjectGit(projectDir);
+      let tempGit = new TempGit(tempDir);
+
+      if (!projectGit.isRepositoryRoot()) {
+        return 'not-repository-root';
+      }
+
+      if (projectGit.isMerging()) {
+        return 'merge-in-progress';
+      }
+
+      if (projectGit.isEmpty()) {
+        return 'empty-repository';
+      }
+
+      let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
+
+      if (!lastMagicspaceCommit) {
+        return 'not-initialized';
+      }
+
+      tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
+
+      tempGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
+
+      await this.generate(tempDir);
+
+      await this.runLifecycleScripts('postgenerate', tempDir);
+
+      if (tempGit.isWorkingDirectoryClean()) {
+        return 'already-up-to-date';
+      }
+
+      tempGit.addAndCommitChanges('update');
+
+      projectGit.addOrUpdateMagicspaceRemote(tempDir);
+
+      projectGit.pullMagicspaceChangesWithoutCommit('update');
+
+      projectGit.removeMagicspaceRemote();
+
+      return true;
+    } finally {
+      tempDirRemoveCallback();
     }
-
-    if (projectGit.isMerging()) {
-      return 'merge-in-progress';
-    }
-
-    if (projectGit.isEmpty()) {
-      return 'empty-repository';
-    }
-
-    let lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
-
-    if (!lastMagicspaceCommit) {
-      return 'not-initialized';
-    }
-
-    tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
-
-    tempGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
-
-    await this.generate(tempDir);
-
-    await this.runLifecycleScripts('postgenerate');
-
-    if (tempGit.isWorkingDirectoryClean()) {
-      return 'already-up-to-date';
-    }
-
-    tempGit.addAndCommitChanges('update');
-
-    projectGit.addOrUpdateMagicspaceRemote(tempDir);
-
-    projectGit.pullMagicspaceChangesWithoutCommit('update');
-
-    projectGit.removeMagicspaceRemote();
-
-    return true;
   }
 
   isRepositoryRoot(): boolean {
@@ -222,6 +239,7 @@ export class Space {
 
   async runLifecycleScripts(
     lifecycle: BoilerplateScriptsLifecycleName,
+    cwd: string,
   ): Promise<void> {
     let scriptEntries = this.config.scripts[lifecycle];
 
@@ -236,7 +254,7 @@ export class Space {
 
       let subprocess = await npmRun(script, {
         pathCWD: Path.dirname(configFilePath),
-        cwd: TEMP_MAGIC_REPOSITORY_DIR,
+        cwd,
       });
 
       subprocess.stdout!.on('data', chunk => logger?.stdout(chunk));

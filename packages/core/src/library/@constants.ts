@@ -2,7 +2,7 @@ import * as Path from 'path';
 
 export const PACKAGE_DIR = Path.join(__dirname, '../..');
 
-export const TEMP_MAGIC_REPOSITORY_DIR = Path.join(PACKAGE_DIR, '.magicspace');
+export const TEMP_MAGIC_REPOSITORY_DIR_PREFIX = 'magicspace';
 
 export const MAGICSPACE_REMOTE = 'magicspace';
 export const MAGICSPACE_BRANCH = 'magicspace';

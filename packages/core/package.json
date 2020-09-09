@@ -22,6 +22,7 @@
     "module-lens": "^0.1.6",
     "npm-path": "^2.0.4",
     "sort-keys": "^4.0.0",
+    "tmp": "^0.2.1",
     "tiva": "^0.2.1",
     "tslang": "^0.1.22",
     "tslib": "^2.0.1",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
-    "@types/lodash": "^4.14.159"
+    "@types/lodash": "^4.14.159",
+    "@types/tmp": "^0.2.0"
   }
 }
