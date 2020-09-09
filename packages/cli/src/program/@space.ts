@@ -35,7 +35,7 @@ const SPACE_LOGGER: SpaceLogger = {
         log(
           'space',
           'info',
-          `run ${event.lifecycle} script:\n  ${event.script}`,
+          `run ${event.lifecycle} script ${JSON.stringify(event.script)}`,
         );
         break;
     }
