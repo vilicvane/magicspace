@@ -4,6 +4,7 @@ import {
   DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME,
   resolveRawBoilerplateConfig,
 } from '@magicspace/core';
+import Chalk from 'chalk';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import * as FSExtra from 'fs-extra';
 import prompts from 'prompts';
@@ -83,6 +84,8 @@ export default class extends Command {
 Created magicspace configuration at ${JSON.stringify(
       Path.relative('.', configFilePath),
     )}.
-Please review/edit the configuration file and run \`magicspace init\` to initialize.`;
+Please review/edit the configuration file and run ${Chalk.yellow(
+      'magicspace init',
+    )} to initialize.`;
   }
 }

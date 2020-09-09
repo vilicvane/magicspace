@@ -68,7 +68,9 @@ Execute ${Chalk.yellow(
         );
       case 'not-initialized':
         throw new ExpectedError(
-          'This repository has not been initialized with magicspace yet, run `magicspace init` first',
+          `This repository has not been initialized with magicspace yet, run ${Chalk.yellow(
+            'magicspace init',
+          )} first`,
         );
       case 'already-up-to-date':
         return 'Already up-to-date.';

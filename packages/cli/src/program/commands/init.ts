@@ -63,7 +63,9 @@ Otherwise, you can use ${Chalk.yellow(
         );
       case 'already-initialized':
         throw new ExpectedError(
-          'This repository has already been initialized with magicspace, run `magicspace update` instead',
+          `This repository has already been initialized with magicspace, run ${Chalk.yellow(
+            'magicspace update',
+          )} instead`,
         );
     }
   }
