@@ -147,12 +147,12 @@ export interface HandlebarsOptions {
   noEscape?: boolean;
 }
 
-export function handlebars<TData>(
+export function handlebars<TData extends object>(
   path: string,
   data: TData,
   options?: HandlebarsOptions,
 ): Composable<string, TextFileOptions>;
-export function handlebars<TData>(
+export function handlebars<TData extends object>(
   data: TData,
   options?: HandlebarsOptions,
 ): Composable<string, TextFileOptions>;
