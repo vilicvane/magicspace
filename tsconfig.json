@@ -1,9 +1,17 @@
 {
   "references": [
-    {"path": "packages/core/src/library"},
-    {"path": "packages/cli/src/program"},
-    {"path": "packages/utils/src/library"},
-    {"path": "packages/utils/src/test"}
+    {
+      "path": "packages/core/src/library"
+    },
+    {
+      "path": "packages/cli/src/program"
+    },
+    {
+      "path": "packages/utils/src/library"
+    },
+    {
+      "path": "packages/utils/src/test"
+    }
   ],
   "files": []
 }
