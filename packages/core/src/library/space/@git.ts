@@ -112,9 +112,21 @@ export class ProjectGit extends Git {
       }
 
       if (!/^CONFLICT/m.test(error.stdout)) {
+        this.logger?.stderr(error.stderr);
+
         if (/^error: Your local changes/m.test(error.stderr)) {
           throw new Error(
             'Cannot merge magicspace changes, conflict with local changes',
+          );
+        }
+
+        if (
+          /^error: The following untracked working tree files would be overwritten by merge:/m.test(
+            error.stderr,
+          )
+        ) {
+          throw new Error(
+            'Cannot merge magicspace changes, conflict with untracked files',
           );
         }
 
