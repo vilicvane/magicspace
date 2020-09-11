@@ -6,5 +6,6 @@
     "types": ["node"],
 
     "outDir": "../../bld/library"
-  }
+  },
+  "references": [{"path": "../../../utils/src/library"}]
 }

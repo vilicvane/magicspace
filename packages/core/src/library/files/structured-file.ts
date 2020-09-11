@@ -1,12 +1,10 @@
-import sortKeys from 'sort-keys';
+import {GeneralSortObjectKeysOptions, sortObjectKeys} from '@magicspace/utils';
+import _ from 'lodash';
 
 import {File} from '../file';
 
 export interface StructuredFileOptions {
-  /**
-   * Sort content keys. A string array can be specified as a shortcut of `top`.
-   */
-  sortKeys?: StructuredFileSortKeysOptions | string[];
+  sortKeys?: GeneralSortObjectKeysOptions;
 }
 
 export abstract class StructuredFile<
@@ -20,55 +18,10 @@ export abstract class StructuredFile<
 
     let content = this.content;
 
-    if (sortKeysOptions) {
-      if (Array.isArray(sortKeysOptions)) {
-        sortKeysOptions = {top: sortKeysOptions};
-      }
-
-      let {top, bottom, compare, deep} = sortKeysOptions;
-
-      let topKeyToIndexMap = new Map(top?.map((key, index) => [key, index]));
-      let bottomKeyToIndexMap = new Map(
-        bottom?.map((key, index) => [key, index]),
-      );
-
-      content = sortKeys(content, {
-        compare(left, right) {
-          if (topKeyToIndexMap.has(left)) {
-            if (topKeyToIndexMap.has(right)) {
-              return topKeyToIndexMap.get(left)! - topKeyToIndexMap.get(right)!;
-            }
-
-            return -1;
-          } else if (topKeyToIndexMap.has(right)) {
-            return 1;
-          }
-
-          if (bottomKeyToIndexMap.has(left)) {
-            if (bottomKeyToIndexMap.has(right)) {
-              return (
-                bottomKeyToIndexMap.get(left)! - bottomKeyToIndexMap.get(right)!
-              );
-            }
-
-            return 1;
-          } else if (bottomKeyToIndexMap.has(right)) {
-            return -1;
-          }
-
-          return compare ? compare(left, right) : 0;
-        },
-        deep,
-      });
+    if (sortKeysOptions && _.isPlainObject(content)) {
+      content = sortObjectKeys(content as any, sortKeysOptions);
     }
 
     return this.stringify(content);
   }
-}
-
-export interface StructuredFileSortKeysOptions {
-  top?: string[];
-  bottom?: string[];
-  compare?(left: string, right: string): number;
-  deep?: boolean;
 }

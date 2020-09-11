@@ -18,7 +18,6 @@
     "latest-version": "^5.1.0",
     "lodash": "^4.17.20",
     "micromatch": "^4.0.2",
-    "sort-keys": "^4.0.0",
     "tslang": "^0.1.22"
   },
   "devDependencies": {

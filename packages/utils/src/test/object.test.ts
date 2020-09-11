@@ -1,4 +1,4 @@
-import {extendObjectProperties} from '../library';
+import {extendObjectProperties, sortObjectKeys} from '../library';
 
 test('`extendObjectProperties` should work without specify `after`/`before` option', () => {
   expect(
@@ -173,6 +173,141 @@ test('`extendObjectProperties` should work with `after` option', () => {
       f: 8,
       g: 9,
       c: 4,
+    }),
+  );
+});
+
+test('`sortObjectKeys` should work', () => {
+  expect(
+    json(
+      sortObjectKeys(
+        {
+          foo: 1,
+          yo: 'a',
+          bar: 2,
+          ha: 'b',
+        },
+        ['foo', 'bar'],
+      ),
+    ),
+  ).toEqual(
+    json({
+      foo: 1,
+      bar: 2,
+      yo: 'a',
+      ha: 'b',
+    }),
+  );
+
+  expect(
+    json(
+      sortObjectKeys(
+        {
+          foo: 1,
+          yo: 'a',
+          bar: 2,
+          ha: 'b',
+        },
+        ['yo', 'ha'],
+      ),
+    ),
+  ).toEqual(
+    json({
+      yo: 'a',
+      ha: 'b',
+      foo: 1,
+      bar: 2,
+    }),
+  );
+
+  expect(
+    json(
+      sortObjectKeys(
+        {
+          foo: 1,
+          yo: 'a',
+          bar: 2,
+          ha: 'b',
+        },
+        {
+          top: ['yo'],
+          bottom: ['bar'],
+        },
+      ),
+    ),
+  ).toEqual(
+    json({
+      yo: 'a',
+      foo: 1,
+      ha: 'b',
+      bar: 2,
+    }),
+  );
+
+  expect(
+    json(
+      sortObjectKeys(
+        {
+          foo: 1,
+          yo: {
+            a: 'a',
+            b: 'b',
+          },
+          bar: 2,
+          ha: 'b',
+        },
+        {
+          top: ['yo'],
+          bottom: ['bar'],
+        },
+      ),
+    ),
+  ).toEqual(
+    json({
+      yo: {
+        a: 'a',
+        b: 'b',
+      },
+      foo: 1,
+      ha: 'b',
+      bar: 2,
+    }),
+  );
+
+  expect(
+    json(
+      sortObjectKeys(
+        {
+          foo: 1,
+          yo: {
+            a: 'a',
+            b: 'b',
+          },
+          bar: 2,
+          ha: 'b',
+        },
+        {
+          top: [
+            {
+              key: 'yo',
+              subKeys: {
+                bottom: ['a'],
+              },
+            },
+          ],
+          bottom: ['bar'],
+        },
+      ),
+    ),
+  ).toEqual(
+    json({
+      yo: {
+        b: 'b',
+        a: 'a',
+      },
+      foo: 1,
+      ha: 'b',
+      bar: 2,
     }),
   );
 });
