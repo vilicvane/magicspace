@@ -13,7 +13,7 @@
       "path": "packages/utils/src/test"
     },
     {
-      "path": "packages/boilerplate-repository/src/composables"
+      "path": "packages/boilerplate-url/src/composables"
     }
   ],
   "files": []

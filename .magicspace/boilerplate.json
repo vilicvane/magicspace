@@ -35,7 +35,12 @@
         ]
       },
       {
-        "name": "@magicspace/boilerplate-repository"
+        "name": "@magicspace/boilerplate-url",
+        "tsProjects": [
+          {
+            "name": "composables"
+          }
+        ]
       }
     ]
   }
