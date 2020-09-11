@@ -41,6 +41,14 @@
             "name": "composables"
           }
         ]
+      },
+      {
+        "name": "@magicspace/boilerplate-url-resolver",
+        "tsProjects": [
+          {
+            "name": "program"
+          }
+        ]
       }
     ]
   }

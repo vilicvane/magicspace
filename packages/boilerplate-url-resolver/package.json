@@ -1,0 +1,10 @@
+{
+  "name": "@magicspace/boilerplate-url-resolver",
+  "version": "0.0.0",
+  "repository": "https://github.com/makeflow/magicspace.git",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "dependencies": {
+    "tslib": "^2.0.1"
+  }
+}

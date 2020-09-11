@@ -15,7 +15,8 @@
     "packages/core",
     "packages/cli",
     "packages/utils",
-    "packages/boilerplate-url"
+    "packages/boilerplate-url",
+    "packages/boilerplate-url-resolver"
   ],
   "devDependencies": {
     "@mufan/code": "^0.2.5",
