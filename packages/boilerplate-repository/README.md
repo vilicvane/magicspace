@@ -1,4 +1,4 @@
-# magicspace
+# @magicspace/boilerplate-repository
 
 Just another awesome magic.
 

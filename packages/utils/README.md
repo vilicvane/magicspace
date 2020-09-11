@@ -1,4 +1,4 @@
-# magicspace
+# @magicspace/utils
 
 Just another awesome magic.
 
