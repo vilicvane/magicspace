@@ -1,10 +1,7 @@
 {
-  "name": "magicspace",
   "private": true,
-  "license": "MIT",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
-    "build": "rimraf 'packages/*/{bld,.bld-cache}' && tsc --build",
+    "build": "rimraf '{,!(node_modules)/**/}{bld,.bld-cache}' && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
@@ -14,9 +11,6 @@
     "packages/cli",
     "packages/utils"
   ],
-  "dependencies": {
-    "tslib": "^2.0.1"
-  },
   "devDependencies": {
     "@mufan/code": "^0.2.5",
     "@mufan/eslint-plugin": "^0.1.35",

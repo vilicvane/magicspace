@@ -2,5 +2,8 @@
   "name": "magicspace",
   "version": "0.0.0",
   "license": "MIT",
-  "author": "Chengdu Mufan Technology Co., Ltd."
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "dependencies": {
+    "tslib": "^2.0.1"
+  }
 }
