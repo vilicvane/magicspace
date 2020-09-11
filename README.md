@@ -63,7 +63,8 @@ npm install --global makeflow/mufan-code-boilerplates
 
 ### Examples
 
-https://github.com/makeflow/mufan-code-boilerplates
+- [Boilerplate URL](packages/boilerplate-url)
+- [Mufan Code Boilerplates](https://github.com/makeflow/mufan-code-boilerplates)
 
 ### Configuration file
 

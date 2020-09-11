@@ -1,6 +1,6 @@
 # @magicspace/boilerplate-url-resolver
 
-Just another awesome magic.
+Used by [@magicspace/boilerplate-url](../boilerplate-url) internally to download and extract boilerplate from given URL.
 
 ## License
 

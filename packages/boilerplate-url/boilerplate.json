@@ -7,7 +7,7 @@
   "examples": [
     {
       "name": "github",
-      "description": "https://github.com/<organization>/<project>",
+      "description": "GitHub Boilerplate",
       "options": {
         "url": "https://github.com/<organization>/<project>/archive/master.zip",
         "strip": 1
