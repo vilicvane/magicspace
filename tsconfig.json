@@ -11,6 +11,9 @@
     },
     {
       "path": "packages/utils/src/test"
+    },
+    {
+      "path": "packages/boilerplate-repository/src/composables"
     }
   ],
   "files": []
