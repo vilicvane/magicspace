@@ -2,7 +2,9 @@
   "packages": [
     "packages/core",
     "packages/cli",
-    "packages/utils"
+    "packages/utils",
+    "packages/boilerplate-url",
+    "packages/boilerplate-url-resolver"
   ],
   "version": "0.2.28"
 }
