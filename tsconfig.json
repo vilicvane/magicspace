@@ -14,6 +14,9 @@
     },
     {
       "path": "packages/boilerplate-url/src/composables"
+    },
+    {
+      "path": "packages/boilerplate-url-resolver/src/program"
     }
   ],
   "files": []
