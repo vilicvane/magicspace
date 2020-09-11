@@ -1,4 +1,4 @@
-# magicspace
+# magicspace-packages
 
 Just another awesome magic.
 

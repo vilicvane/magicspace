@@ -1,7 +1,11 @@
 {
+  "name": "magicspace-packages",
   "private": true,
+  "repository": "https://github.com/makeflow/magicspace.git",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
-    "build": "rimraf 'packages/*/{bld,.bld-cache}' && tsc --build",
+    "build": "rimraf packages/*/bld && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
@@ -9,7 +13,8 @@
   "workspaces": [
     "packages/core",
     "packages/cli",
-    "packages/utils"
+    "packages/utils",
+    "packages/boilerplate-repository"
   ],
   "devDependencies": {
     "@mufan/code": "^0.2.5",
