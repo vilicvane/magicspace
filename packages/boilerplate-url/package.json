@@ -1,10 +1,22 @@
 {
   "name": "@magicspace/boilerplate-url",
   "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "files": [
+    "boilerplate.*",
+    "src/composables/**/*.ts",
+    "bld/composables",
+    "!*.tsbuildinfo"
+  ],
   "dependencies": {
+    "@magicspace/boilerplate-url-resolver": "^0.0.0",
+    "@magicspace/core": "^0.2.27",
+    "rimraf": "^3.0.2",
     "tslib": "^2.0.1"
   }
 }

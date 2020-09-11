@@ -1,0 +1,25 @@
+{
+  "root": "bld/composables",
+  "composables": ["(?!@)*.js"],
+  "scripts": {
+    "postgenerate": "boilerplate-url-resolver && rimraf .boilerplate-options.json"
+  },
+  "examples": [
+    {
+      "name": "github",
+      "description": "https://github.com/<organization>/<project>",
+      "options": {
+        "url": "https://github.com/<organization>/<project>/archive/master.zip",
+        "strip": 1
+      }
+    },
+    {
+      "name": "react-boilerplate",
+      "description": "https://github.com/react-boilerplate/react-boilerplate",
+      "options": {
+        "url": "https://github.com/react-boilerplate/react-boilerplate/archive/master.zip",
+        "strip": 1
+      }
+    }
+  ]
+}

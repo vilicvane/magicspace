@@ -1,10 +1,30 @@
 {
   "name": "@magicspace/boilerplate-url-resolver",
   "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "bin": "bld/program/main.js",
+  "files": [
+    "src/program/**/*.ts",
+    "bld/program",
+    "!*.tsbuildinfo"
+  ],
   "dependencies": {
-    "tslib": "^2.0.1"
+    "duplexer2": "^0.1.4",
+    "fstream": "^1.0.12",
+    "main-function": "^0.1.2",
+    "node-fetch": "^2.6.1",
+    "proxy-agent": "^3.1.1",
+    "tslib": "^2.0.1",
+    "unzipper": "^0.10.11"
+  },
+  "devDependencies": {
+    "@types/duplexer2": "^0.1.2",
+    "@types/node-fetch": "^2.5.7",
+    "@types/unzipper": "^0.10.3"
   }
 }
