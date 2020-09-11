@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/utils",
-  "version": "0.2.27",
+  "version": "0.2.29",
   "publishConfig": {
     "access": "public"
   },

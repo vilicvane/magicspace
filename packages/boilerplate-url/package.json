@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/boilerplate-url",
-  "version": "0.0.0",
+  "version": "0.2.29",
   "publishConfig": {
     "access": "public"
   },
@@ -14,8 +14,8 @@
     "!*.tsbuildinfo"
   ],
   "dependencies": {
-    "@magicspace/boilerplate-url-resolver": "^0.0.0",
-    "@magicspace/core": "^0.2.27",
+    "@magicspace/boilerplate-url-resolver": "^0.2.29",
+    "@magicspace/core": "^0.2.29",
     "rimraf": "^3.0.2",
     "tslib": "^2.0.1"
   }
