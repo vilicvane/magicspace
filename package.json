@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "rimraf '{,!(node_modules)/**/}{bld,.bld-cache}' && tsc --build",
+    "build": "rimraf 'packages/*/{bld,.bld-cache}' && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
