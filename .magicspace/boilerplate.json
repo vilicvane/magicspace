@@ -1,22 +1,41 @@
 {
   "extends": ["@mufan/code-boilerplates/typescript"],
   "options": {
-    "name": "magicspace",
+    "name": "magicspace-packages",
+    "repository": "https://github.com/makeflow/magicspace.git",
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "license": "MIT",
     "packages": [
       {
         "name": "@magicspace/core",
-        "tsProjects": [{"name": "library"}]
+        "tsProjects": [
+          {
+            "name": "library"
+          }
+        ]
       },
       {
         "name": "magicspace",
         "dir": "cli",
-        "tsProjects": [{"name": "program"}]
+        "tsProjects": [
+          {
+            "name": "program"
+          }
+        ]
       },
       {
         "name": "@magicspace/utils",
-        "tsProjects": [{"name": "library"}, {"name": "test"}]
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@magicspace/boilerplate-repository"
       }
     ]
   }

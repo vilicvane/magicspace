@@ -1,6 +1,7 @@
 {
   "name": "magicspace",
   "version": "0.2.28",
+  "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "files": [

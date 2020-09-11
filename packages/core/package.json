@@ -4,6 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "main": "bld/library/index.js",

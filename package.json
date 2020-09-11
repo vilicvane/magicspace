@@ -6,7 +6,7 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
-    "build": "rimraf 'packages/*/{bld,.bld-cache}' && tsc --build",
+    "build": "rimraf packages/*/bld && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint && jest"
@@ -14,7 +14,8 @@
   "workspaces": [
     "packages/core",
     "packages/cli",
-    "packages/utils"
+    "packages/utils",
+    "packages/boilerplate-repository"
   ],
   "devDependencies": {
     "@mufan/code": "^0.2.5",
