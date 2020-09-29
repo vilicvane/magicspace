@@ -1,4 +1,4 @@
-import {BinaryFile, JSONFile, TextFile} from '../files';
+import {BinaryFile, JSONFile, TextFile, YAMLFile} from '../files';
 
 import {FileObjectCreator} from './space';
 
@@ -12,8 +12,11 @@ export const DEFAULT_FILE_OBJECT_CREATOR_MAP = new Map<
   ['text', (path, context) => new TextFile(path, context)],
   ['binary', (path, context) => new BinaryFile(path, context)],
   ['json', (path, context) => new JSONFile(path, context)],
+  ['yaml', (path, context) => new YAMLFile(path, context)],
 ]);
 
 export const DEFAULT_EXTENSION_TO_FILE_TYPE_MAP = new Map<string, string>([
   ['.json', 'json'],
+  ['.yaml', 'yaml'],
+  ['.yml', 'yaml'],
 ]);

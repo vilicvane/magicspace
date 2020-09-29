@@ -12,6 +12,8 @@ import {
   JSONFileOptions,
   TextFile,
   TextFileOptions,
+  YAMLFile,
+  YAMLFileOptions,
 } from './files';
 
 export function text(
@@ -80,6 +82,42 @@ export function json(...args: any[]): Composable<unknown, JSONFileOptions> {
 
   return {
     type: 'json',
+    path,
+    compose: composer,
+    options,
+  };
+}
+
+export function yaml<TContent>(
+  path: string,
+  value: TContent | ComposeFunction<YAMLFile<TContent>>,
+  options?: YAMLFileOptions,
+): Composable<TContent, YAMLFileOptions>;
+export function yaml<TContent>(
+  value: TContent | ComposeFunction<YAMLFile<TContent>>,
+  options?: YAMLFileOptions,
+): Composable<TContent, YAMLFileOptions>;
+export function yaml(...args: any[]): Composable<unknown, YAMLFileOptions> {
+  let path: string | undefined;
+  let value: unknown;
+  let options: YAMLFileOptions;
+
+  if (typeof args[0] === 'string') {
+    [path, value, options] = args;
+  } else {
+    [value, options] = args;
+  }
+
+  let composer: ComposeFunction<YAMLFile<unknown>>;
+
+  if (typeof value === 'function') {
+    composer = value as ComposeFunction<YAMLFile<unknown>>;
+  } else {
+    composer = () => value;
+  }
+
+  return {
+    type: 'yaml',
     path,
     compose: composer,
     options,
