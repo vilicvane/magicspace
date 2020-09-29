@@ -27,7 +27,8 @@
     "tmp": "^0.2.1",
     "tslang": "^0.1.22",
     "tslib": "^2.0.1",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "yaml": "^1.10.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
