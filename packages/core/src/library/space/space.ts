@@ -260,7 +260,7 @@ export class Space {
       subprocess.stdout!.on('data', chunk => logger?.stdout(chunk));
       subprocess.stderr!.on('data', chunk => logger?.stderr(chunk));
 
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         subprocess.on('exit', code => {
           if (code === 0) {
             resolve();
