@@ -12,7 +12,6 @@
   "files.trimTrailingWhitespace": true,
   "task.autoDetect": "off",
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.enable": true,
   "eslint.validate": [
     "javascript",
     "javascriptreact",
