@@ -70,7 +70,7 @@ export class ProjectGit extends Git {
         throw error;
       }
 
-      if (!/fatal: No such remote:/.test(error.stderr)) {
+      if (!/(?:error|fatal): No such remote:/.test(error.stderr)) {
         this.logger?.stderr(error.stderr);
 
         throw new Error('Error removing magicspace remote');
