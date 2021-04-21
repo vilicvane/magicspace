@@ -5,6 +5,6 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.2.0"
   }
 }
