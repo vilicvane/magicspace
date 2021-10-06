@@ -5,6 +5,7 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
+    "magicspace": "node packages/cli/bld/program/main.js",
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/bld && tsc --build",
     "lint": "eslint .",
