@@ -59,7 +59,7 @@ Otherwise, you can use ${Chalk.yellow(
         );
       case 'empty-repository':
         throw new ExpectedError(
-          'You need to make an initial commit before initialize the repository with magicspace',
+          'You need to make an initial commit before initializing the repository with magicspace',
         );
       case 'already-initialized':
         throw new ExpectedError(
