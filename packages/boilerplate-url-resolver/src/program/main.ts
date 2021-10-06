@@ -12,7 +12,7 @@ import {Extract} from './@utils';
 const {HTTP_PROXY} = process.env;
 
 const agent = HTTP_PROXY
-  ? ((new ProxyAgent(HTTP_PROXY) as unknown) as HTTP.Agent)
+  ? (new ProxyAgent(HTTP_PROXY) as unknown as HTTP.Agent)
   : undefined;
 
 main(async () => {

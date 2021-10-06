@@ -246,9 +246,9 @@ export class ProjectGit extends Git {
       })
       .filter((rename): rename is Rename => !!rename);
 
-    return _.uniqBy(renames, ({from, to}) =>
-      JSON.stringify({from, to}),
-    ).filter(rename => FSExtra.existsSync(rename.from));
+    return _.uniqBy(renames, ({from, to}) => JSON.stringify({from, to})).filter(
+      rename => FSExtra.existsSync(rename.from),
+    );
   }
 }
 

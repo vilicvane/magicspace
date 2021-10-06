@@ -26,7 +26,7 @@ export interface ExtendObjectPropertiesOptions {
 
 export function extendObjectProperties<
   T extends object,
-  TExtension extends object
+  TExtension extends object,
 >(
   object: T | undefined,
   extension: TExtension,
