@@ -89,9 +89,10 @@ export function conservativelyMove(from: string, to: string): boolean {
 
       if (completelyMoved) {
         FSExtra.rmdirSync(from);
+        return true;
+      } else {
+        return false;
       }
-
-      return true;
     } else {
       return false;
     }
