@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/core",
-  "version": "0.2.33",
+  "version": "0.2.34",
   "publishConfig": {
     "access": "public"
   },
@@ -16,7 +16,7 @@
     "!*.tsbuildinfo"
   ],
   "dependencies": {
-    "@magicspace/utils": "^0.2.32",
+    "@magicspace/utils": "^0.2.34",
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
     "handlebars": "^4.7.6",
