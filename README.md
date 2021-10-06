@@ -12,8 +12,8 @@ Toolkit for living boilerplate.
 ```bash
 npm install --global magicspace
 
-# Install boilerplate package, in this example from GitHub.
-npm install --global makeflow/mufan-code-boilerplates
+# Install a boilerplate package
+npm install --global @mufan/code-boilerplates
 ```
 
 ## Usage
