@@ -8,7 +8,7 @@
     "magicspace": "node packages/cli/bld/program/main.js",
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/bld && tsc --build",
-    "lint": "eslint .",
+    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint && jest"
   },
@@ -20,15 +20,16 @@
     "packages/boilerplate-url-resolver"
   ],
   "devDependencies": {
-    "@mufan/code": "^0.2.9",
-    "@mufan/eslint-plugin": "^0.1.41",
+    "@mufan/code": "^0.2.10",
+    "@mufan/eslint-plugin": "^0.1.54",
     "@types/jest": "^26.0.10",
     "@types/node": "^14.0.14",
-    "eslint": "^7.32.0",
+    "eslint": "^8.12.0",
     "jest": "^26.4.0",
     "lerna": "^3.22.1",
-    "prettier": "^2.4.1",
+    "prettier": "^2.6.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.3"
+    "run-in-every": "^0.2.0",
+    "typescript": "^4.6.3"
   }
 }

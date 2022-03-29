@@ -1,28 +1,21 @@
 {
   "root": true,
-  "ignorePatterns": ["bld", ".bld-cache", "core/.magicspace"],
+  "ignorePatterns": [
+    "/packages/core/.magicspace",
+    "/packages/core/src/",
+    "/packages/core/bld/",
+    "/packages/cli/src/",
+    "/packages/cli/bld/",
+    "/packages/utils/src/",
+    "/packages/utils/bld/",
+    "/packages/boilerplate-url/src/",
+    "/packages/boilerplate-url/bld/",
+    "/packages/boilerplate-url-resolver/src/",
+    "/packages/boilerplate-url-resolver/bld/"
+  ],
   "extends": ["eslint:recommended"],
   "env": {
     "node": true,
     "es2020": true
-  },
-  "overrides": [
-    {
-      "files": ["**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/default"],
-      "parserOptions": {
-        "project": "**/tsconfig.json"
-      }
-    },
-    {
-      "files": ["packages/core/src/library/**/*.{ts,tsx}"],
-      "rules": {
-        "no-console": ["error", {}]
-      }
-    },
-    {
-      "files": ["packages/utils/src/test/**/*.{ts,tsx}"],
-      "extends": ["plugin:@mufan/override-dev"]
-    }
-  ]
+  }
 }

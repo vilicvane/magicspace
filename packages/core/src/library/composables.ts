@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import * as FastGlob from 'fast-glob';
+import FastGlob from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
 import {removePathExtension} from './@utils';
