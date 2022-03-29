@@ -11,6 +11,15 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.workingDirectories": [
+    ".",
+    "packages/core/src/library",
+    "packages/cli/src/program",
+    "packages/utils/src/library",
+    "packages/utils/src/test",
+    "packages/boilerplate-url/src/composables",
+    "packages/boilerplate-url-resolver/src/program"
+  ],
   "eslint.validate": [
     "javascript",
     "javascriptreact",

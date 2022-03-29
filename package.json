@@ -6,7 +6,7 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
     "build": "rimraf packages/*/bld && tsc --build",
-    "lint": "eslint .",
+    "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint"
   },
@@ -18,11 +18,12 @@
     "packages/boilerplate-url-resolver"
   ],
   "devDependencies": {
-    "@mufan/code": "^0.2.9",
-    "@mufan/eslint-plugin": "^0.1.41",
-    "eslint": "^7.32.0",
-    "prettier": "^2.4.1",
+    "@mufan/code": "^0.2.10",
+    "@mufan/eslint-plugin": "^0.1.54",
+    "eslint": "^8.12.0",
+    "prettier": "^2.6.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.3"
+    "run-in-every": "^0.2.0",
+    "typescript": "^4.6.3"
   }
 }
