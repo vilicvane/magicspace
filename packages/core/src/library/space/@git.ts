@@ -97,6 +97,7 @@ export class ProjectGit extends Git {
       let stdout = spawnSync(this.dir, 'git', [
         'pull',
         '--no-commit',
+        '--no-rebase',
         '--allow-unrelated-histories',
         ...(ours ? ['--strategy=ours'] : []),
         '--strategy-option=patience',
