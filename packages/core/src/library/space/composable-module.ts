@@ -1,6 +1,6 @@
-import {Composable} from '../file';
+import type {Composable} from '../file';
 
-import {Context} from './context';
+import type {Context} from './context';
 
 export type ComposableModuleDefault =
   | Composable<unknown, unknown>

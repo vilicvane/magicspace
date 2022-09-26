@@ -1,4 +1,5 @@
-import {File, FileContext} from '../file';
+import type {FileContext} from '../file';
+import {File} from '../file';
 
 export interface TextFileOptions {}
 
@@ -9,7 +10,7 @@ export class TextFile extends File<string, TextFileOptions> {
     super('text', path, context);
   }
 
-  toText(): string {
+  override toText(): string {
     return this.content;
   }
 }

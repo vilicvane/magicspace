@@ -1,4 +1,5 @@
-import {GeneralSortObjectKeysOptions, sortObjectKeys} from '@magicspace/utils';
+import type {GeneralSortObjectKeysOptions} from '@magicspace/utils';
+import {sortObjectKeys} from '@magicspace/utils';
 import _ from 'lodash';
 
 import {File} from '../file';
@@ -13,8 +14,8 @@ export abstract class StructuredFile<
 > extends File<TContent, TOptions> {
   protected abstract stringify(content: TContent): string;
 
-  toText(): string {
-    let {sortKeys: sortKeysOptions} = this.options;
+  override toText(): string {
+    const {sortKeys: sortKeysOptions} = this.options;
 
     let content = this.content;
 

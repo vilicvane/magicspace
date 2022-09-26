@@ -21,7 +21,7 @@ export default class extends Command {
     })
     boilerplate: string,
   ): Promise<string | void> {
-    let magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME);
+    const magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME);
 
     if (FSExtra.existsSync(magicspaceDir)) {
       throw new ExpectedError(
@@ -31,7 +31,7 @@ export default class extends Command {
       );
     }
 
-    let {examples} = resolveRawBoilerplateConfig(boilerplate);
+    const {examples} = resolveRawBoilerplateConfig(boilerplate);
 
     let example: Magicspace.DefaultExampleOptions | Magicspace.ExampleOptions;
 
@@ -59,9 +59,9 @@ export default class extends Command {
       example = examples?.[0] ?? {};
     }
 
-    let configFilePath = Path.join(magicspaceDir, 'boilerplate.json');
+    const configFilePath = Path.join(magicspaceDir, 'boilerplate.json');
 
-    let extendsSpecifier = /^[.]{1,2}[\\/]/.test(boilerplate)
+    const extendsSpecifier = /^[.]{1,2}[\\/]/.test(boilerplate)
       ? Path.relative(magicspaceDir, Path.resolve(boilerplate)).replace(
           /\\/g,
           '/',

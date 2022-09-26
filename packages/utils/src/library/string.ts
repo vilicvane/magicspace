@@ -32,7 +32,7 @@ export function extendPackageScript(
     return commands.join(' && ');
   }
 
-  let existingCommands = script.split('&&').map(command => command.trim());
+  const existingCommands = script.split('&&').map(command => command.trim());
 
   return addElementsToSequentialArray(existingCommands, commands, {
     isAfterAnchor: afterPattern

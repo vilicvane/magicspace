@@ -1,6 +1,6 @@
 import * as FSExtra from 'fs-extra';
 
-import {Composable} from './composable';
+import type {Composable} from './composable';
 
 export abstract class File<TContent, TComposeOptions> {
   abstract content: TContent;

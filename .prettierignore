@@ -1,5 +1,4 @@
 # TypeScript Build Artifacts
 bld/
-.bld-cache/
 # Lerna
 lerna.json

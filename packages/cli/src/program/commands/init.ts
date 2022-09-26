@@ -27,7 +27,7 @@ export default class extends Command {
     projectDir: string,
     options: InitOptions,
   ): Promise<string> {
-    let space = await createDefaultSpace(
+    const space = await createDefaultSpace(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.boilerplate),
     );
@@ -36,7 +36,7 @@ export default class extends Command {
       throw new ExpectedError('Magicspace configuration not found');
     }
 
-    let result = await space.initialize(options);
+    const result = await space.initialize(options);
 
     switch (result) {
       case true:

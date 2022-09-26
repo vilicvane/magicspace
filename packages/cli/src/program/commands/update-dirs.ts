@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import {PossibleDirectorRename} from '@magicspace/core';
+import type {PossibleDirectorRename} from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import prompts from 'prompts';
 
@@ -17,7 +17,7 @@ export default class extends Command {
     })
     projectDir: string,
   ): Promise<string> {
-    let space = await createDefaultSpace(Path.resolve(projectDir));
+    const space = await createDefaultSpace(Path.resolve(projectDir));
 
     if (!space.isRepositoryRoot()) {
       throw new ExpectedError(
@@ -31,13 +31,13 @@ export default class extends Command {
       throw new ExpectedError('This project is not actively merging');
     }
 
-    let renames = space.listPendingPossibleDirectoryRenames();
+    const renames = space.listPendingPossibleDirectoryRenames();
 
     if (!renames.length) {
       return 'No pending possible directory renames detected.';
     }
 
-    let selectedRenames = (
+    const selectedRenames = (
       await prompts([
         {
           type: 'multiselect',

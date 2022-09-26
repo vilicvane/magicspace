@@ -1,8 +1,8 @@
 import * as Path from 'path';
 
-import {Composable, File} from '../file';
+import type {Composable, File} from '../file';
 
-import {Space} from './space';
+import type {Space} from './space';
 
 export class Context {
   private fileMap = new Map<string, File<unknown, unknown>>();
@@ -17,9 +17,9 @@ export class Context {
     path: string,
     composable: Composable<unknown, unknown>,
   ): File<unknown, unknown> {
-    let space = this.space;
+    const space = this.space;
 
-    let fileMap = this.fileMap;
+    const fileMap = this.fileMap;
 
     let file = fileMap.get(path);
 
@@ -44,7 +44,7 @@ export class Context {
   }
 
   async generate(): Promise<void> {
-    for (let file of this.fileMap.values()) {
+    for (const file of this.fileMap.values()) {
       await file.save();
     }
   }

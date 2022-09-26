@@ -16,7 +16,7 @@ import {
 } from '../@constants';
 import {SpawnSyncFailure, spawnSync} from '../@utils';
 
-import {SpaceLogger} from './space-logger';
+import type {SpaceLogger} from './space-logger';
 
 export class Git {
   constructor(readonly dir: string, protected logger?: SpaceLogger) {}
@@ -47,7 +47,7 @@ export class ProjectGit extends Git {
   }
 
   isMerging(): boolean {
-    let mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
+    const mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 
     return FSExtra.existsSync(mergeHeadFilePath);
   }
@@ -94,7 +94,7 @@ export class ProjectGit extends Git {
     ours = false,
   ): void {
     try {
-      let stdout = spawnSync(this.dir, 'git', [
+      const stdout = spawnSync(this.dir, 'git', [
         'pull',
         '--no-commit',
         '--no-rebase',
@@ -146,15 +146,15 @@ export class ProjectGit extends Git {
   }
 
   listPossibleDirectoryRenames(): Rename[] {
-    let mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
+    const mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 
     if (!FSExtra.existsSync(mergeHeadFilePath)) {
       throw new Error('Expecting .git/MERGE_HEAD to be present');
     }
 
-    let mergeHead = FSExtra.readFileSync(mergeHeadFilePath, 'utf8').trim();
+    const mergeHead = FSExtra.readFileSync(mergeHeadFilePath, 'utf8').trim();
 
-    let diff = spawnSync(this.dir, 'git', [
+    const diff = spawnSync(this.dir, 'git', [
       'show',
       '--diff-filter=R',
       `--find-renames=${DIRECTORY_DETECTION_FIND_RENAMES_THRESHOLD}`,
@@ -164,7 +164,7 @@ export class ProjectGit extends Git {
 
     let renames: Rename[] = [];
 
-    let diffRenameRegex = /^rename from (.+)\r?\n^rename to (.+)/gm;
+    const diffRenameRegex = /^rename from (.+)\r?\n^rename to (.+)/gm;
     let diffRenameGroups: RegExpExecArray | null;
 
     // eslint-disable-next-line no-cond-assign
@@ -227,8 +227,8 @@ export class ProjectGit extends Git {
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          let nextFromDir = Path.dirname(fromDir);
-          let nextToDir = Path.dirname(toDir);
+          const nextFromDir = Path.dirname(fromDir);
+          const nextToDir = Path.dirname(toDir);
 
           if (
             Path.basename(fromDir) !== Path.basename(toDir) ||

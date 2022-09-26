@@ -1,6 +1,6 @@
 import {BinaryFile, JSONFile, TextFile, YAMLFile} from '../files';
 
-import {FileObjectCreator} from './space';
+import type {FileObjectCreator} from './space';
 
 export const DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME = '.magicspace';
 

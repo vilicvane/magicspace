@@ -1,4 +1,5 @@
-import {File, FileContext} from '../file';
+import type {FileContext} from '../file';
+import {File} from '../file';
 
 export interface BinaryFileOptions {}
 
@@ -9,7 +10,7 @@ export class BinaryFile extends File<Buffer, BinaryFileOptions> {
     super('binary', path, context);
   }
 
-  toBuffer(): Buffer {
+  override toBuffer(): Buffer {
     return this.content;
   }
 }

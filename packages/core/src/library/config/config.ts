@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {resolve} from 'module-lens';
 import {Tiva, ValidateError} from 'tiva';
 
-import {ConfigLogger} from './config-logger';
+import type {ConfigLogger} from './config-logger';
 
 const TYPES_PATH = Path.join(__dirname, '../../../types.d.ts');
 
@@ -53,7 +53,7 @@ export function resolveRawBoilerplateConfig(
   specifier: string,
   contextFileName?: string,
 ): Magicspace.Config {
-  let result = _resolveRawBoilerplateConfig(
+  const result = _resolveRawBoilerplateConfig(
     specifier,
     contextFileName ?? Path.join(process.cwd(), '__placeholder__'),
   );
@@ -80,17 +80,17 @@ export async function resolveBoilerplateConfig(
   contextFileName: string,
   {logger}: ResolveBoilerplateConfigOptions = {},
 ): Promise<Config> {
-  let {config, optionsDeclarationFilePaths} = _resolveBoilerplateConfig(
+  const {config, optionsDeclarationFilePaths} = _resolveBoilerplateConfig(
     specifier,
     contextFileName,
     logger,
   );
 
-  let types = [TYPES_PATH, ...optionsDeclarationFilePaths].map(path =>
+  const types = [TYPES_PATH, ...optionsDeclarationFilePaths].map(path =>
     path.replace(/\.d\.ts$/, ''),
   );
 
-  let tiva = new Tiva({
+  const tiva = new Tiva({
     compilerOptions: {
       types,
       strict: true,
@@ -114,7 +114,7 @@ function _resolveRawBoilerplateConfig(
   specifier: string,
   contextFileName: string,
 ): InternalResolveRawConfigResult | undefined {
-  let dir =
+  const dir =
     resolve(specifier, {
       sourceFileName: contextFileName,
     }) ??
@@ -126,7 +126,7 @@ function _resolveRawBoilerplateConfig(
     return undefined;
   }
 
-  let configFilePath = require.resolve(Path.join(dir, 'boilerplate'));
+  const configFilePath = require.resolve(Path.join(dir, 'boilerplate'));
 
   return {
     dir,
@@ -151,7 +151,7 @@ function _resolveBoilerplateConfig(
     path: specifier,
   });
 
-  let rawResult = _resolveRawBoilerplateConfig(specifier, contextFileName);
+  const rawResult = _resolveRawBoilerplateConfig(specifier, contextFileName);
 
   if (!rawResult) {
     throw new Error(
@@ -174,7 +174,7 @@ function _resolveBoilerplateConfig(
   } = rawResult;
 
   // This is not identical to `dir`.
-  let configFileDir = Path.dirname(configFilePath);
+  const configFileDir = Path.dirname(configFilePath);
 
   if (rootDir && !composablePatterns) {
     // If root is specified but file patterns are not, make it '**' by default.
@@ -183,7 +183,7 @@ function _resolveBoilerplateConfig(
 
   rootDir = rootDir ? Path.resolve(configFileDir, rootDir) : configFileDir;
 
-  let composableModulePaths = composablePatterns
+  const composableModulePaths = composablePatterns
     ? FastGlob.sync(composablePatterns, {
         cwd: rootDir,
         absolute: true,
@@ -192,11 +192,11 @@ function _resolveBoilerplateConfig(
       }).map(path => Path.normalize(path))
     : [];
 
-  let composableModulePathSet = new Set(composableModulePaths);
+  const composableModulePathSet = new Set(composableModulePaths);
 
-  for (let composableModulePath of composableModulePaths) {
+  for (const composableModulePath of composableModulePaths) {
     // Test whether the file has a valid extension name.
-    let pathGroups = /^(.+)\.js$/.exec(composableModulePath);
+    const pathGroups = /^(.+)\.js$/.exec(composableModulePath);
 
     if (pathGroups) {
       // If we have `foo.js.js`, exclude `foo.js` from composables if it
@@ -229,7 +229,7 @@ function _resolveBoilerplateConfig(
     },
   );
 
-  let scripts: BoilerplateScripts = {
+  const scripts: BoilerplateScripts = {
     postgenerate: rawScripts.postgenerate
       ? [
           {
@@ -240,7 +240,7 @@ function _resolveBoilerplateConfig(
       : [],
   };
 
-  let optionsDeclarationFilePath = Path.join(dir, 'boilerplate.d.ts');
+  const optionsDeclarationFilePath = Path.join(dir, 'boilerplate.d.ts');
 
   let optionsDeclarationFilePaths = FS.existsSync(optionsDeclarationFilePath)
     ? [optionsDeclarationFilePath]
@@ -251,13 +251,13 @@ function _resolveBoilerplateConfig(
   }
 
   if (superSpecifiers && superSpecifiers.length) {
-    let superComposableModuleEntriesArray: ComposableModuleEntry[][] = [];
-    let superScriptsArray: BoilerplateScripts[] = [];
-    let superOptionsArray: Magicspace.BoilerplateOptions[] = [];
-    let superOptionsDeclarationFilePathsArray: string[][] = [];
+    const superComposableModuleEntriesArray: ComposableModuleEntry[][] = [];
+    const superScriptsArray: BoilerplateScripts[] = [];
+    const superOptionsArray: Magicspace.BoilerplateOptions[] = [];
+    const superOptionsDeclarationFilePathsArray: string[][] = [];
 
-    for (let specifier of superSpecifiers) {
-      let {
+    for (const specifier of superSpecifiers) {
+      const {
         config: {
           composables: superComposableModuleEntries,
           scripts: superScripts,
@@ -282,7 +282,7 @@ function _resolveBoilerplateConfig(
       entry => entry.path,
     );
 
-    for (let [key, scriptEntries] of Object.entries(scripts) as [
+    for (const [key, scriptEntries] of Object.entries(scripts) as [
       BoilerplateScriptsLifecycleName,
       BoilerplateScriptEntry[],
     ][]) {

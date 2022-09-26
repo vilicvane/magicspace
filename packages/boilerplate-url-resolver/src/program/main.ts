@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as HTTP from 'http';
+import type * as HTTP from 'http';
 import * as Path from 'path';
 
 import {main} from 'main-function';
@@ -17,13 +17,13 @@ const agent = HTTP_PROXY
 
 main(async () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  let {url, strip = 0} = require(Path.resolve(
+  const {url, strip = 0} = require(Path.resolve(
     '.boilerplate-options.json',
   )) as Magicspace.BoilerplateOptions;
 
-  let response = await fetch(url, {agent});
+  const response = await fetch(url, {agent});
 
-  let extractStream = Extract(
+  const extractStream = Extract(
     {
       path: '.',
       strip,

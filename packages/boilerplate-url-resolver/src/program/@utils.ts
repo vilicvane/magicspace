@@ -3,7 +3,8 @@ import {Writable} from 'stream';
 
 import duplexer2 from 'duplexer2';
 import {Writer} from 'fstream';
-import {Parse, ParseStream} from 'unzipper';
+import type {ParseStream} from 'unzipper';
+import {Parse} from 'unzipper';
 
 export interface ExtractOptions {
   path: string;
@@ -14,9 +15,9 @@ export function Extract(
   {path, strip = 0}: ExtractOptions,
   onEntry: (path: string) => void,
 ): ParseStream {
-  let parser = Parse();
+  const parser = Parse();
 
-  let outStream = new Writable({objectMode: true});
+  const outStream = new Writable({objectMode: true});
 
   outStream._write = function (entry, _encoding, callback) {
     if (entry.type === 'Directory') {
@@ -24,18 +25,18 @@ export function Extract(
       return;
     }
 
-    let strippedPath = entry.path.split('/').slice(strip).join('/');
+    const strippedPath = entry.path.split('/').slice(strip).join('/');
 
     onEntry(strippedPath);
 
-    let extractPath = Path.join(path, strippedPath);
+    const extractPath = Path.join(path, strippedPath);
 
-    let writer = Writer({path: extractPath});
+    const writer = Writer({path: extractPath});
 
     entry.pipe(writer).on('error', callback).on('close', callback);
   };
 
-  let extract = duplexer2(parser, outStream as any) as ParseStream;
+  const extract = duplexer2(parser, outStream as any) as ParseStream;
 
   parser.once('crx-header', function (crxHeader) {
     (extract as any).crxHeader = crxHeader;

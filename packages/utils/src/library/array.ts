@@ -17,14 +17,14 @@ export function addElementsToSequentialArray<T>(
     replace: toReplace = false,
   }: AddElementsToSequentialArrayOptions<T> = {},
 ): T[] {
-  let existingKeyToElementMap = new Map(
+  const existingKeyToElementMap = new Map(
     array.map(element => [getKey(element), element]),
   );
 
-  let newElements: T[] = [];
+  const newElements: T[] = [];
 
-  for (let element of elements) {
-    let key = getKey(element);
+  for (const element of elements) {
+    const key = getKey(element);
 
     if (existingKeyToElementMap.has(key)) {
       if (toReplace) {
@@ -35,7 +35,7 @@ export function addElementsToSequentialArray<T>(
     }
   }
 
-  let existingElements = Array.from(existingKeyToElementMap.values());
+  const existingElements = Array.from(existingKeyToElementMap.values());
 
   if (newElements.length === 0) {
     return existingElements;
@@ -44,12 +44,12 @@ export function addElementsToSequentialArray<T>(
   let afterHitIndex = -1;
   let beforeHitIndex = -1;
 
-  for (let [index, element] of existingElements.entries()) {
+  for (const [index, element] of existingElements.entries()) {
     // If `after` option is present, and if there's no after hit yet
     // (afterHitIndex < 0) or if the last after hit is just the former entry
     // (index - afterHitIndex === 1).
     if (isAfterAnchor && (afterHitIndex < 0 || index - afterHitIndex === 1)) {
-      let afterHit = isAfterAnchor(element);
+      const afterHit = isAfterAnchor(element);
 
       if (afterHit) {
         afterHitIndex = index;
@@ -61,7 +61,7 @@ export function addElementsToSequentialArray<T>(
     }
 
     if (isBeforeAnchor && beforeHitIndex < 0) {
-      let beforeHit = isBeforeAnchor(element);
+      const beforeHit = isBeforeAnchor(element);
 
       if (beforeHit) {
         beforeHitIndex = index;
@@ -71,22 +71,22 @@ export function addElementsToSequentialArray<T>(
   }
 
   if (afterHitIndex >= 0) {
-    let matchingElements: T[] = [];
+    const matchingElements: T[] = [];
 
-    let remainingNewElements = [...newElements];
-    let remainingAfterAnchorElements = existingElements.slice(
+    const remainingNewElements = [...newElements];
+    const remainingAfterAnchorElements = existingElements.slice(
       afterHitIndex + 1,
     );
 
-    let candidateElementsArray = [
+    const candidateElementsArray = [
       remainingNewElements,
       remainingAfterAnchorElements,
     ];
 
-    outer: for (let element of elements) {
-      let key = getKey(element);
+    outer: for (const element of elements) {
+      const key = getKey(element);
 
-      for (let candidateElements of candidateElementsArray) {
+      for (const candidateElements of candidateElementsArray) {
         if (
           candidateElements.length > 0 &&
           getKey(candidateElements[0]) === key

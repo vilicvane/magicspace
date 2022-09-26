@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as Micromatch from 'micromatch';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
 import {addElementsToSequentialArray} from './array';
 
@@ -41,7 +41,7 @@ export function extendObjectProperties(
     replace: toReplace = true,
   }: ExtendObjectPropertiesOptions = {},
 ): object {
-  let entries = addElementsToSequentialArray(
+  const entries = addElementsToSequentialArray(
     Object.entries(object),
     Object.entries(extension),
     {
@@ -106,21 +106,21 @@ export function sortObjectKeys(
     options = {top: options};
   }
 
-  let {top = [], bottom = [], rest = [], compare, deep} = options;
+  const {top = [], bottom = [], rest = [], compare, deep} = options;
 
-  let topKeyToIndexMap = new Map(
+  const topKeyToIndexMap = new Map(
     top.map((keyOptions, index) => [
       typeof keyOptions === 'string' ? keyOptions : keyOptions.key,
       index,
     ]),
   );
-  let bottomKeyToIndexMap = new Map(
+  const bottomKeyToIndexMap = new Map(
     bottom.map((keyOptions, index) => [
       typeof keyOptions === 'string' ? keyOptions : keyOptions.key,
       index,
     ]),
   );
-  let keyToOptionsMap = new Map(
+  const keyToOptionsMap = new Map(
     [...top, ...bottom, ...rest].map(keyOptions => {
       if (typeof keyOptions === 'string') {
         keyOptions = {key: keyOptions};
@@ -130,7 +130,7 @@ export function sortObjectKeys(
     }),
   );
 
-  let entries = Object.entries(object)
+  const entries = Object.entries(object)
     .map(([key, value]) => {
       if (_.isPlainObject(value)) {
         let keyOptions = keyToOptionsMap.get(key);

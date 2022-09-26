@@ -1,4 +1,5 @@
 *
-!/src/composables/**/*.ts
+!/src/composables/**/*.{ts,tsx}
 !/bld/composables/**
+!/boilerplate.*
 *.tsbuildinfo

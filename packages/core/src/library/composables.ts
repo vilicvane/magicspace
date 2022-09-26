@@ -5,8 +5,8 @@ import FastGlob from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
 import {removePathExtension} from './@utils';
-import {Composable, ComposeFunction} from './file';
-import {
+import type {Composable, ComposeFunction} from './file';
+import type {
   BinaryFileOptions,
   JSONFile,
   JSONFileOptions,
@@ -150,7 +150,7 @@ export function copy(
     patterns = [patterns];
   }
 
-  let paths = FastGlob.sync(patterns, {
+  const paths = FastGlob.sync(patterns, {
     cwd: dir,
     dot: true,
     onlyFiles: true,
@@ -211,10 +211,10 @@ export function handlebars(
     type: 'text',
     path,
     compose(_content, {composableModulePath}) {
-      let templatePath =
+      const templatePath =
         options.template ?? `${removePathExtension(composableModulePath)}.hbs`;
 
-      let template = FS.readFileSync(templatePath, 'utf8');
+      const template = FS.readFileSync(templatePath, 'utf8');
 
       return Handlebars.compile(template, {
         noEscape: options.noEscape,

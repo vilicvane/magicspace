@@ -1,6 +1,6 @@
 import latestVersion from 'latest-version';
 import _ from 'lodash';
-import {Dict} from 'tslang';
+import type {Dict} from 'tslang';
 
 import {logger} from './@logger';
 

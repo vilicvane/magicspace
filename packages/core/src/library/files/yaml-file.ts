@@ -1,8 +1,9 @@
 import * as YAML from 'yaml';
 
-import {FileContext} from '../file';
+import type {FileContext} from '../file';
 
-import {StructuredFile, StructuredFileOptions} from './structured-file';
+import type {StructuredFileOptions} from './structured-file';
+import {StructuredFile} from './structured-file';
 
 export interface YAMLFileOptions extends StructuredFileOptions {
   space?: number;
@@ -19,7 +20,7 @@ export class YAMLFile<TContent> extends StructuredFile<
   }
 
   protected stringify(content: TContent | undefined): string {
-    let {space = 2} = this.options;
+    const {space = 2} = this.options;
 
     return YAML.stringify(content, {indent: space});
   }

@@ -1,15 +1,17 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import {
+import type {
   Config,
   ConfigLogger,
   ConfigLoggerEvent,
+  SpaceLogger,
+  SpaceLoggerEvent,
+} from '@magicspace/core';
+import {
   DEFAULT_EXTENSION_TO_FILE_TYPE_MAP,
   DEFAULT_FILE_OBJECT_CREATOR_MAP,
   Space,
-  SpaceLogger,
-  SpaceLoggerEvent,
   ValidateError,
   resolveBoilerplateConfig,
 } from '@magicspace/core';
@@ -49,7 +51,7 @@ const SPACE_LOGGER: SpaceLogger = {
 };
 
 function log(type: 'config' | 'space', _level: 'info', message: string): void {
-  let prefix = Chalk.blue(`[${type}] `);
+  const prefix = Chalk.blue(`[${type}] `);
 
   console.info(message.replace(/^/gm, prefix));
 }

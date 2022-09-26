@@ -1,12 +1,5 @@
-import {
-  Command,
-  HelpInfo,
-  Options,
-  SubcommandDefinition,
-  command,
-  metadata,
-  option,
-} from 'clime';
+import type {HelpInfo, SubcommandDefinition} from 'clime';
+import {Command, Options, command, metadata, option} from 'clime';
 
 export const subcommands: SubcommandDefinition[] = [
   {name: 'create'},

@@ -19,7 +19,7 @@ export default class extends Command {
     projectDir: string,
     options: CommonOptions,
   ): Promise<string> {
-    let space = await createDefaultSpace(
+    const space = await createDefaultSpace(
       Path.resolve(projectDir),
       Path.resolve(projectDir, options.boilerplate),
     );
@@ -28,11 +28,11 @@ export default class extends Command {
       throw new ExpectedError('Magicspace configuration not found');
     }
 
-    let result = await space.update();
+    const result = await space.update();
 
     switch (result) {
       case true:
-        let renames = space.listPendingPossibleDirectoryRenames();
+        const renames = space.listPendingPossibleDirectoryRenames();
 
         return compact([
           `\

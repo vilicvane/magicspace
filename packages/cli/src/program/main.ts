@@ -9,9 +9,9 @@ import 'global-agent/bootstrap';
 
 import {CLI, Shim} from 'clime';
 
-let cli = new CLI('magicspace', Path.join(__dirname, 'commands'));
+const cli = new CLI('magicspace', Path.join(__dirname, 'commands'));
 
-let shim = new Shim(cli);
+const shim = new Shim(cli);
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 shim.execute(process.argv);
