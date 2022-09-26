@@ -16,8 +16,11 @@ const agent = HTTP_PROXY
   : undefined;
 
 main(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const {url, strip = 0} = require(Path.resolve(
+  const {
+    url,
+    strip = 0,
+    path = '.',
+  } = require(Path.resolve(
     '.boilerplate-options.json',
   )) as Magicspace.BoilerplateOptions;
 
@@ -25,7 +28,7 @@ main(async () => {
 
   const extractStream = Extract(
     {
-      path: '.',
+      path,
       strip,
     },
     console.info,
