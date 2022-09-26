@@ -19,7 +19,7 @@ main(async () => {
   const {
     url,
     strip = 0,
-    path = '.',
+    dir,
   } = require(Path.resolve(
     '.boilerplate-options.json',
   )) as Magicspace.BoilerplateOptions;
@@ -28,8 +28,9 @@ main(async () => {
 
   const extractStream = Extract(
     {
-      path,
+      outDir: '.',
       strip,
+      dir,
     },
     console.info,
   );

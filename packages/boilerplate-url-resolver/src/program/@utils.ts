@@ -7,12 +7,13 @@ import type {ParseStream} from 'unzipper';
 import {Parse} from 'unzipper';
 
 export interface ExtractOptions {
-  path: string;
+  outDir: string;
   strip?: number;
+  dir?: string;
 }
 
 export function Extract(
-  {path, strip = 0}: ExtractOptions,
+  {outDir, strip = 0, dir = '.'}: ExtractOptions,
   onEntry: (path: string) => void,
 ): ParseStream {
   const parser = Parse();
@@ -25,11 +26,14 @@ export function Extract(
       return;
     }
 
-    const strippedPath = entry.path.split('/').slice(strip).join('/');
+    const path = Path.relative(
+      dir,
+      entry.path.split('/').slice(strip).join('/'),
+    );
 
-    onEntry(strippedPath);
+    onEntry(path);
 
-    const extractPath = Path.join(path, strippedPath);
+    const extractPath = Path.join(outDir, path);
 
     const writer = Writer({path: extractPath});
 
