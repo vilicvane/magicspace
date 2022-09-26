@@ -31,6 +31,11 @@ export function Extract(
       entry.path.split('/').slice(strip).join('/'),
     );
 
+    if (path.startsWith('../')) {
+      callback();
+      return;
+    }
+
     onEntry(path);
 
     const extractPath = Path.join(outDir, path);
