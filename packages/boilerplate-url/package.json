@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/boilerplate-url",
-  "version": "0.2.37",
+  "version": "0.2.38",
   "publishConfig": {
     "access": "public"
   },
@@ -8,7 +8,7 @@
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "dependencies": {
-    "@magicspace/boilerplate-url-resolver": "^0.2.37",
+    "@magicspace/boilerplate-url-resolver": "^0.2.38",
     "@magicspace/core": "^0.2.36",
     "rimraf": "^3.0.2",
     "tslib": "^2.4.0"
