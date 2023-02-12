@@ -17,7 +17,7 @@
     "lodash": "^4.17.20",
     "micromatch": "^4.0.2",
     "tslang": "^0.1.22",
-    "tslib": "^2.4.0"
+    "tslib": "^2.5.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",
