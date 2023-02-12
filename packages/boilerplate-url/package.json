@@ -10,7 +10,7 @@
   "dependencies": {
     "@magicspace/boilerplate-url-resolver": "^0.2.38",
     "@magicspace/core": "^0.2.36",
-    "rimraf": "^3.0.2",
+    "rimraf": "^4.1.2",
     "tslib": "^2.5.0"
   }
 }
