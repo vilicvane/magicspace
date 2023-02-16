@@ -39,7 +39,23 @@
         "name": "@magicspace/boilerplate-url",
         "tsProjects": [
           {
-            "name": "composables"
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicspace/core",
+                "project": "library"
+              }
+            ]
+          },
+          {
+            "name": "composables",
+            "references": [
+              "library",
+              {
+                "package": "@magicspace/core",
+                "project": "library"
+              }
+            ]
           }
         ]
       },

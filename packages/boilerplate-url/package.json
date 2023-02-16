@@ -7,6 +7,10 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "exports": {
+    "types": "./bld/library/index.d.ts",
+    "require": "./bld/library/index.js"
+  },
   "dependencies": {
     "@magicspace/boilerplate-url-resolver": "^0.2.38",
     "@magicspace/core": "^0.2.36",

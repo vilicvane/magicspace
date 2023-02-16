@@ -18,6 +18,7 @@
     "packages/cli/src/program",
     "packages/utils/src/library",
     "packages/utils/src/test",
+    "packages/boilerplate-url/src/library",
     "packages/boilerplate-url/src/composables",
     "packages/boilerplate-url-resolver/src/program"
   ],
