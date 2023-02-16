@@ -1,5 +1,5 @@
 {
-  "extends": ["@mufan/code-boilerplates/typescript"],
+  "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "magicspace-packages",
     "repository": "https://github.com/makeflow/magicspace.git",
