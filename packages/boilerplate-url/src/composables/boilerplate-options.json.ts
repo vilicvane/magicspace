@@ -1,7 +1,7 @@
-import type {ComposableBuilder} from '@magicspace/core';
-import {json} from '@magicspace/core';
+import {composable, json} from '@magicspace/core';
 
-const composable: ComposableBuilder = options =>
-  json('.boilerplate-options.json', options);
+import type {Options} from '../library';
 
-export default composable;
+export default composable<Options>(options =>
+  json('.boilerplate-options.json', options),
+);
