@@ -13,6 +13,9 @@
       "path": "packages/utils/src/test"
     },
     {
+      "path": "packages/boilerplate-url/src/library"
+    },
+    {
       "path": "packages/boilerplate-url/src/composables"
     },
     {

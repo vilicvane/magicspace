@@ -4,7 +4,12 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "exports": {
+    "types": "./bld/library/index.d.ts",
+    "require": "./bld/library/index.js"
+  },
   "dependencies": {
+    "@magicspace/core": "*",
     "tslib": "^2.5.0"
   }
 }
