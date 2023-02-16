@@ -6,7 +6,7 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "scripts": {
     "magicspace": "node packages/cli/bld/program/main.js",
-    "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
+    "lerna:publish": "lerna publish prerelease --registry=https://registry.npmjs.org",
     "build": "rimraf packages/*/bld && tsc --build",
     "lint": "run-in-every eslint-project --parallel --echo -- eslint --config {configFileName} --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
