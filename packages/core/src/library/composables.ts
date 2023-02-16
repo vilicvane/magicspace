@@ -5,7 +5,7 @@ import FastGlob from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
 import {removePathExtension} from './@utils';
-import type {Composable, ComposeFunction} from './file';
+import type {Composable, ComposeFunction, File} from './file';
 import type {
   BinaryFileOptions,
   JSONFile,
@@ -20,12 +20,12 @@ export function text(
   path: string,
   content: string | ComposeFunction<TextFile>,
   options?: TextFileOptions,
-): Composable<string, TextFileOptions>;
+): Composable<TextFile>;
 export function text(
   content: string | ComposeFunction<TextFile>,
   options?: TextFileOptions,
-): Composable<string, TextFileOptions>;
-export function text(...args: any[]): Composable<string, TextFileOptions> {
+): Composable<TextFile>;
+export function text(...args: any[]): Composable<TextFile> {
   let path: string | undefined;
   let content: string;
   let options: TextFileOptions;
@@ -56,12 +56,12 @@ export function json<TContent>(
   path: string,
   value: TContent | ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
-): Composable<TContent, JSONFileOptions>;
+): Composable<JSONFile<TContent>>;
 export function json<TContent>(
   value: TContent | ComposeFunction<JSONFile<TContent>>,
   options?: JSONFileOptions,
-): Composable<TContent, JSONFileOptions>;
-export function json(...args: any[]): Composable<unknown, JSONFileOptions> {
+): Composable<JSONFile<TContent>>;
+export function json(...args: any[]): Composable<JSONFile<unknown>> {
   let path: string | undefined;
   let value: unknown;
   let options: JSONFileOptions;
@@ -92,12 +92,12 @@ export function yaml<TContent>(
   path: string,
   value: TContent | ComposeFunction<YAMLFile<TContent>>,
   options?: YAMLFileOptions,
-): Composable<TContent, YAMLFileOptions>;
+): Composable<YAMLFile<TContent>>;
 export function yaml<TContent>(
   value: TContent | ComposeFunction<YAMLFile<TContent>>,
   options?: YAMLFileOptions,
-): Composable<TContent, YAMLFileOptions>;
-export function yaml(...args: any[]): Composable<unknown, YAMLFileOptions> {
+): Composable<YAMLFile<TContent>>;
+export function yaml(...args: any[]): Composable<YAMLFile<unknown>> {
   let path: string | undefined;
   let value: unknown;
   let options: YAMLFileOptions;
@@ -135,17 +135,17 @@ export function copy(
   dir: string,
   patterns: string | string[],
   options?: CopyOptions & {binary: false},
-): Composable<string, TextFileOptions>[];
+): Composable<TextFile>[];
 export function copy(
   dir: string,
   patterns: string | string[],
   options: CopyOptions & {binary: true},
-): Composable<Buffer, BinaryFileOptions>[];
+): Composable<File<Buffer, BinaryFileOptions>>[];
 export function copy(
   dir: string,
   patterns: string | string[],
   {binary = false}: CopyOptions = {},
-): Composable<Buffer | string, BinaryFileOptions | TextFileOptions>[] {
+): Composable<File<Buffer | string, BinaryFileOptions | TextFileOptions>>[] {
   if (!Array.isArray(patterns)) {
     patterns = [patterns];
   }
@@ -189,14 +189,12 @@ export function handlebars<TData extends object>(
   path: string,
   data: TData,
   options?: HandlebarsOptions,
-): Composable<string, TextFileOptions>;
+): Composable<TextFile>;
 export function handlebars<TData extends object>(
   data: TData,
   options?: HandlebarsOptions,
-): Composable<string, TextFileOptions>;
-export function handlebars(
-  ...args: any[]
-): Composable<string, TextFileOptions> {
+): Composable<TextFile>;
+export function handlebars(...args: any[]): Composable<TextFile> {
   let path: string | undefined;
   let data: unknown;
   let options: HandlebarsOptions;

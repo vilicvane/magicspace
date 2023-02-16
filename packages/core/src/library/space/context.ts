@@ -1,22 +1,20 @@
 import * as Path from 'path';
 
-import type {Composable, File} from '../file';
+import type {BoilerplateComposable} from '../boilerplate';
+import type {File} from '../file';
 
 import type {Space} from './space';
 
 export class Context {
-  private fileMap = new Map<string, File<unknown, unknown>>();
+  private fileMap = new Map<string, File>();
 
   constructor(readonly space: Space, readonly dir: string) {}
 
-  getFile(path: string): File<unknown, unknown> | undefined {
+  getFile(path: string): File | undefined {
     return this.fileMap.get(path);
   }
 
-  ensureFile(
-    path: string,
-    composable: Composable<unknown, unknown>,
-  ): File<unknown, unknown> {
+  ensureFile(path: string, composable: BoilerplateComposable): File {
     const space = this.space;
 
     const fileMap = this.fileMap;

@@ -1,21 +1,20 @@
 import * as Path from 'path';
 
 import Tmp from 'tmp';
-import {__importDefault} from 'tslib';
 
 import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants';
 import {conservativelyMove, npmRun} from '../@utils';
-import type {BoilerplateScriptsLifecycleName, Config} from '../config';
+import type {BoilerplateScriptsLifecycleName} from '../boilerplate';
+import type {MagicspaceConfig} from '../config';
 import type {File, FileContext} from '../file';
 
 import type {Rename} from './@git';
 import {ProjectGit, TempGit} from './@git';
-import type {ComposableModuleDefault} from './composable-module';
 import {Context} from './context';
 import type {SpaceLogger} from './space-logger';
 
 export class Space {
-  get config(): Config {
+  get config(): MagicspaceConfig {
     const config = this._config;
 
     if (!config) {
@@ -29,7 +28,7 @@ export class Space {
     private fileObjectCreatorMap: Map<string | undefined, FileObjectCreator>,
     private extensionToFileTypeMap: Map<string, string>,
     readonly dir: string,
-    private _config?: Config,
+    private _config?: MagicspaceConfig,
     private logger?: SpaceLogger,
   ) {}
 
@@ -180,59 +179,18 @@ export class Space {
     }
   }
 
-  async generate(
-    outputDir: string,
-    options?: Magicspace.BoilerplateOptions,
-  ): Promise<void> {
-    const {composables: fileEntries, options: configOptions} = this.config;
-
-    options = {
-      ...configOptions,
-      ...options,
-    };
+  async generate(outputDir: string): Promise<void> {
+    const {composables} = this.config;
 
     const context = new Context(this, outputDir);
 
-    for (const {path: composableModulePath, base: baseDir} of fileEntries) {
-      const moduleDefault = __importDefault(
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        require(composableModulePath),
-      ).default as ComposableModuleDefault;
+    for (const composable of composables) {
+      const file = context.ensureFile(
+        Path.join(outputDir, composable.target),
+        composable,
+      );
 
-      let composables =
-        typeof moduleDefault === 'function'
-          ? await moduleDefault(options, context)
-          : moduleDefault;
-
-      if (!composables) {
-        continue;
-      }
-
-      this.logger?.info({
-        type: 'loaded-composable-module',
-        path: composableModulePath,
-      });
-
-      if (!Array.isArray(composables)) {
-        composables = [composables];
-      }
-
-      for (const composable of composables) {
-        if (typeof composable.compose !== 'function') {
-          throw new Error(`Invalid composable in "${composableModulePath}"`);
-        }
-
-        const path = resolveComposingFilePath({
-          composingFilePath: composable.path,
-          composableModulePath,
-          outputDir,
-          baseDir,
-        });
-
-        const file = context.ensureFile(path, composable);
-
-        await file.compose(composable, {composableModulePath});
-      }
+      await file.compose(composable);
     }
 
     await context.generate();
@@ -244,7 +202,7 @@ export class Space {
   ): Promise<void> {
     const scriptEntries = this.config.scripts[lifecycle];
 
-    for (const {configFilePath, script} of scriptEntries) {
+    for (const {source: configPath, script} of scriptEntries) {
       const logger = this.logger;
 
       logger?.info({
@@ -254,7 +212,7 @@ export class Space {
       });
 
       const subprocess = await npmRun(script, {
-        pathCWD: Path.dirname(configFilePath),
+        pathCWD: Path.dirname(configPath),
         cwd,
       });
 
@@ -281,7 +239,7 @@ export class Space {
     path: string,
     context: FileContext,
     type = this.extensionToFileTypeMap.get(Path.dirname(path)),
-  ): File<unknown, unknown> {
+  ): File {
     if (!type) {
       throw new Error(
         `Cannot infer composable file type from path ${JSON.stringify(path)}`,
@@ -297,11 +255,7 @@ export class Space {
     return creator(path, context);
   }
 
-  assertFileObject(
-    file: File<unknown, unknown>,
-    path: string,
-    type: string | undefined,
-  ): void {
+  assertFileObject(file: File, path: string, type: string | undefined): void {
     if (type && file.type !== type) {
       throw new Error(
         `File ${JSON.stringify(
@@ -318,33 +272,7 @@ export interface ProjectInitializeOptions {
   ours?: boolean;
 }
 
-interface ResolveComposingFilePathOptions {
-  composingFilePath: string | undefined;
-  composableModulePath: string;
-  outputDir: string;
-  baseDir: string;
-}
-
-function resolveComposingFilePath({
-  composingFilePath,
-  composableModulePath,
-  outputDir,
-  baseDir,
-}: ResolveComposingFilePathOptions): string {
-  if (typeof composingFilePath !== 'string') {
-    composingFilePath = Path.basename(
-      composableModulePath,
-      Path.extname(composableModulePath),
-    );
-  }
-
-  return Path.resolve(outputDir, baseDir, composingFilePath);
-}
-
-export type FileObjectCreator = (
-  path: string,
-  context: FileContext,
-) => File<unknown, unknown>;
+export type FileObjectCreator = (path: string, context: FileContext) => File;
 
 /**
  * Possible directory rename from and to, relative path.

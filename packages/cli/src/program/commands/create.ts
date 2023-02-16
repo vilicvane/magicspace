@@ -1,8 +1,9 @@
 import * as Path from 'path';
 
+import type {BoilerplateExample} from '@magicspace/core';
 import {
-  DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME,
-  resolveRawBoilerplateConfig,
+  DEFAULT_MAGICSPACE_DIRNAME,
+  resolveBoilerplateModule,
 } from '@magicspace/core';
 import Chalk from 'chalk';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
@@ -21,19 +22,17 @@ export default class extends Command {
     })
     boilerplate: string,
   ): Promise<string | void> {
-    const magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME);
+    const magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_DIRNAME);
 
     if (FSExtra.existsSync(magicspaceDir)) {
       throw new ExpectedError(
-        `Folder ${JSON.stringify(
-          DEFAULT_MAGICSPACE_BOILERPLATE_DIRNAME,
-        )} already exists`,
+        `Folder ${JSON.stringify(DEFAULT_MAGICSPACE_DIRNAME)} already exists`,
       );
     }
 
-    const {examples} = resolveRawBoilerplateConfig(boilerplate);
+    const {examples} = resolveBoilerplateModule(boilerplate, process.cwd());
 
-    let example: Magicspace.DefaultExampleOptions | Magicspace.ExampleOptions;
+    let example: BoilerplateExample | undefined;
 
     if (examples && examples.length > 1) {
       example = (
@@ -56,7 +55,7 @@ export default class extends Command {
         return;
       }
     } else {
-      example = examples?.[0] ?? {};
+      example = examples?.[0];
     }
 
     const configFilePath = Path.join(magicspaceDir, 'boilerplate.json');
@@ -72,8 +71,8 @@ export default class extends Command {
       configFilePath,
       `${JSON.stringify(
         {
-          extends: extendsSpecifier,
-          options: example.options,
+          boilerplate: extendsSpecifier,
+          options: example?.options ?? {},
         },
         undefined,
         2,

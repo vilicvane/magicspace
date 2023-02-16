@@ -1,7 +1,7 @@
-import type {ComposableModuleFunction} from '@magicspace/core';
+import type {ComposableBuilder} from '@magicspace/core';
 import {json} from '@magicspace/core';
 
-const composable: ComposableModuleFunction = options =>
+const composable: ComposableBuilder = options =>
   json('.boilerplate-options.json', options);
 
 export default composable;

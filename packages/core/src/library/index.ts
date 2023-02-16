@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types.d.ts" />
-
+export * as x from 'x-value';
 export * from './file';
 export * from './composables';
-export * from './config';
 export * from './space';
 export * from './files';
+export * from './boilerplate';
+export * from './config';

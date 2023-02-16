@@ -1,11 +1,11 @@
 import * as FSExtra from 'fs-extra';
 
-import type {Composable} from './composable';
+import type {BoilerplateComposable} from '../boilerplate';
 
-export abstract class File<TContent, TComposeOptions> {
+export abstract class File<TContent = unknown, TComposeOptions = unknown> {
   abstract content: TContent;
 
-  composables: Composable<TContent, TComposeOptions>[] = [];
+  composables: BoilerplateComposable<File<TContent, TComposeOptions>>[] = [];
 
   /**
    * Shallowly merged options from composables.
@@ -24,14 +24,14 @@ export abstract class File<TContent, TComposeOptions> {
   ) {}
 
   async compose(
-    composable: Composable<TContent, TComposeOptions>,
-    context: FileComposeContext,
+    composable: BoilerplateComposable<File<TContent, TComposeOptions>>,
   ): Promise<void> {
     this.composables.push(composable);
+
     this.content = await composable.compose(this.content, {
       file: this,
+      composableModulePath: composable.source,
       ...this.context,
-      ...context,
     });
   }
 
@@ -63,3 +63,14 @@ export interface FileContext {
 export interface FileComposeContext {
   composableModulePath: string;
 }
+
+export type FileContent<TFile extends File> = TFile extends File<infer TContent>
+  ? TContent
+  : never;
+
+export type FileOptions<TFile extends File> = TFile extends File<
+  unknown,
+  infer TOptions
+>
+  ? TOptions
+  : never;

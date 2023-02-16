@@ -29,10 +29,10 @@ export default class extends Command {
   ): Promise<string> {
     const space = await createDefaultSpace(
       Path.resolve(projectDir),
-      Path.resolve(projectDir, options.boilerplate),
+      Path.resolve(projectDir, options.magicspace),
     );
 
-    if (space === 'boilerplate-dir-not-exists') {
+    if (space === 'magicspace-dir-not-exists') {
       throw new ExpectedError('Magicspace configuration not found');
     }
 

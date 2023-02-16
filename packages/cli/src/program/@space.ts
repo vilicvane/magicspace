@@ -2,9 +2,7 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import type {
-  Config,
-  ConfigLogger,
-  ConfigLoggerEvent,
+  MagicspaceConfig,
   SpaceLogger,
   SpaceLoggerEvent,
 } from '@magicspace/core';
@@ -12,20 +10,10 @@ import {
   DEFAULT_EXTENSION_TO_FILE_TYPE_MAP,
   DEFAULT_FILE_OBJECT_CREATOR_MAP,
   Space,
-  ValidateError,
-  resolveBoilerplateConfig,
+  resolveMagicspaceConfig,
 } from '@magicspace/core';
 import Chalk from 'chalk';
-
-const CONFIG_LOGGER: ConfigLogger = {
-  info(event: ConfigLoggerEvent) {
-    switch (event.type) {
-      case 'resolve-boilerplate':
-        log('config', 'info', `resolving boilerplate ${event.path}`);
-        break;
-    }
-  },
-};
+import * as x from 'x-value';
 
 const SPACE_LOGGER: SpaceLogger = {
   info(event: SpaceLoggerEvent) {
@@ -59,36 +47,26 @@ function log(type: 'config' | 'space', _level: 'info', message: string): void {
 export async function createDefaultSpace(projectDir: string): Promise<Space>;
 export async function createDefaultSpace(
   projectDir: string,
-  boilerplateDir: string,
-): Promise<'boilerplate-dir-not-exists' | Space>;
+  magicspaceDir: string,
+): Promise<'magicspace-dir-not-exists' | Space>;
 export async function createDefaultSpace(
   projectDir: string,
-  boilerplateDir?: string,
-): Promise<'boilerplate-dir-not-exists' | Space> {
-  let config: Config | undefined;
+  magicspaceDir?: string,
+): Promise<'magicspace-dir-not-exists' | Space> {
+  let config: MagicspaceConfig | undefined;
 
-  if (typeof boilerplateDir === 'string') {
+  if (typeof magicspaceDir === 'string') {
     try {
-      boilerplateDir = Path.resolve(boilerplateDir);
+      magicspaceDir = Path.resolve(magicspaceDir);
 
-      if (!FS.existsSync(boilerplateDir)) {
-        return 'boilerplate-dir-not-exists';
+      if (!FS.existsSync(magicspaceDir)) {
+        return 'magicspace-dir-not-exists';
       }
 
-      config = await resolveBoilerplateConfig(
-        boilerplateDir,
-        // The context file name does not matter as the boilerplate specifier is a
-        // full path.
-        Path.join(process.cwd(), '__placeholder__'),
-        {
-          logger: CONFIG_LOGGER,
-        },
-      );
+      config = await resolveMagicspaceConfig(magicspaceDir);
     } catch (error) {
-      if (error instanceof ValidateError) {
-        // eslint-disable-next-line no-throw-literal
-        throw `Error validating boilerplate options:
-${error.diagnostics.join('\n').replace(/^(?=.)/gm, '  ')}`;
+      if (error instanceof x.TypeConstraintError) {
+        throw `Error validating boilerplate options:\n${error.message}`;
       } else {
         throw error;
       }
