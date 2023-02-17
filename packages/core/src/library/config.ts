@@ -124,10 +124,7 @@ export async function resolveMagicspaceConfig(
     extractBoilerplates(boilerplate);
   }
 
-  const composables = _.uniqBy(
-    aggregatedBoilerplateComposables,
-    composable => `${composable.source}:${composable.target}`,
-  );
+  const composables = _.uniq(aggregatedBoilerplateComposables);
 
   const scripts = Object.fromEntries(
     aggregatedScriptsEntries.map(([name, entries]) => [name, _.uniq(entries)]),
