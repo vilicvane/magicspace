@@ -43,12 +43,23 @@ export interface MagicspaceConfigScript {
   script: string;
 }
 
-export function resolveMagicspaceBoilerplateModule(magicspaceDir: string): {
+export async function resolveMagicspaceBoilerplateModule(
+  magicspaceDir: string,
+): Promise<{
   path: string;
   module: MagicspaceBoilerplateConfig | MagicspaceBoilerplateConfig[];
-} {
+}> {
   const path = require.resolve(Path.join(magicspaceDir, 'boilerplate'));
-  return {path, module: __importDefault(require(path)).default};
+
+  let module: MagicspaceBoilerplateConfig | MagicspaceBoilerplateConfig[];
+
+  try {
+    module = __importDefault(require(path)).default;
+  } catch {
+    module = (await import(path)).default;
+  }
+
+  return {path, module};
 }
 
 export function resolveBoilerplateModule(
@@ -75,7 +86,7 @@ export async function resolveMagicspaceConfig(
   magicspaceDir: string,
 ): Promise<MagicspaceConfig> {
   const {path: configPath, module: configExport} =
-    resolveMagicspaceBoilerplateModule(magicspaceDir);
+    await resolveMagicspaceBoilerplateModule(magicspaceDir);
 
   const configs = Array.isArray(configExport) ? configExport : [configExport];
 
