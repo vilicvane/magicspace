@@ -4,6 +4,7 @@ import resolve from 'enhanced-resolve';
 import _ from 'lodash';
 import {__importDefault} from 'tslib';
 import * as x from 'x-value';
+import type {JSONSchema} from 'x-value';
 
 import type {
   Boilerplate,
@@ -43,7 +44,7 @@ export interface MagicspaceConfigScript {
   script: string;
 }
 
-export async function resolveMagicspaceBoilerplateModule(
+export async function resolveMagicspaceBoilerplateConfig(
   magicspaceDir: string,
 ): Promise<{
   path: string;
@@ -86,7 +87,7 @@ export async function resolveMagicspaceConfig(
   magicspaceDir: string,
 ): Promise<MagicspaceConfig> {
   const {path: configPath, module: configExport} =
-    await resolveMagicspaceBoilerplateModule(magicspaceDir);
+    await resolveMagicspaceBoilerplateConfig(magicspaceDir);
 
   const configs = Array.isArray(configExport) ? configExport : [configExport];
 
@@ -170,4 +171,15 @@ export async function resolveMagicspaceConfig(
       }
     }
   }
+}
+
+export function buildConfigSchema(Options: x.XTypeOfValue<object>): JSONSchema {
+  return x
+    .object({
+      $schema: x.string,
+      boilerplate: x.string,
+      options: Options,
+    })
+    .exact()
+    .toJSONSchema();
 }
