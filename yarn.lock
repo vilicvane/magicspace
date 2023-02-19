@@ -7745,10 +7745,10 @@ write-pkg@^4.0.0:
     type-fest "^0.4.1"
     write-json-file "^3.2.0"
 
-x-value@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/x-value/-/x-value-0.1.7.tgz#74199ad32780ccc3937d4810de964c34beaf0121"
-  integrity sha512-K4Ez0YrPJ1ESbOAbNofBsKrRGUaxUjQ2nbw0ufTgAYG96nnxvD4hB0NgkdmgTHASFAu/M2awOHgsAKdXj85ACg==
+x-value@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/x-value/-/x-value-0.1.8.tgz#aed6c128abd916f7ccde0d5b05f48a6942e7b78b"
+  integrity sha512-rHJUlrs+eexg34BOIezX22fLWdJkm9e7yUyZ1TCUOAF2EhetSmhScHaIVANBq9phe6q+1P9K+KB5lB+xQmqSAw==
   dependencies:
     lodash.isequal "^4.5.0"
     tslib "^2.5.0"
