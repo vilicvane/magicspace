@@ -1,6 +1,6 @@
 {
   "name": "magicspace",
-  "version": "0.3.0-alpha.3",
+  "version": "0.3.0-alpha.4",
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
@@ -8,7 +8,7 @@
     "magicspace": "bld/program/main.js"
   },
   "dependencies": {
-    "@magicspace/core": "^0.3.0-alpha.3",
+    "@magicspace/core": "^0.3.0-alpha.4",
     "chalk": "4",
     "clime": "^0.5.14",
     "fs-extra": "^11.1.0",
