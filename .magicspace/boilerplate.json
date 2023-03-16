@@ -8,7 +8,7 @@
     "packages": [
       {
         "name": "@magicspace/core",
-        "tsProjects": [
+        "projects": [
           {
             "name": "library"
           }
@@ -17,7 +17,7 @@
       {
         "name": "magicspace",
         "dir": "cli",
-        "tsProjects": [
+        "projects": [
           {
             "name": "program"
           }
@@ -25,7 +25,7 @@
       },
       {
         "name": "@magicspace/utils",
-        "tsProjects": [
+        "projects": [
           {
             "name": "library"
           },
@@ -37,7 +37,7 @@
       },
       {
         "name": "@magicspace/boilerplate-url",
-        "tsProjects": [
+        "projects": [
           {
             "name": "library",
             "references": [
@@ -61,7 +61,7 @@
       },
       {
         "name": "@magicspace/boilerplate-url-resolver",
-        "tsProjects": [
+        "projects": [
           {
             "name": "program"
           }
