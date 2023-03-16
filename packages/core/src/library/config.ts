@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import resolve from 'enhanced-resolve';
+import EnhancedResolve from 'enhanced-resolve';
 import _ from 'lodash';
 import {__importDefault} from 'tslib';
 import * as x from 'x-value';
@@ -14,6 +14,10 @@ import type {
 } from './boilerplate';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+const resolve = EnhancedResolve.create.sync({
+  conditionNames: ['node', 'require'],
+});
 
 export const MagicspaceBoilerplateConfig = x.object({
   boilerplate: x.string,
@@ -68,9 +72,9 @@ export function resolveBoilerplateModule(
   dir: string,
 ): BoilerplateModule {
   const boilerplateModulePath =
-    resolve.sync(dir, specifier) ||
+    resolve(dir, specifier) ||
     // Fallback to magicspace installation location.
-    resolve.sync(__dirname, specifier);
+    resolve(__dirname, specifier);
 
   if (!boilerplateModulePath) {
     throw new Error(
