@@ -22,12 +22,12 @@ export type ComposableBuilder<
  */
 export function composable<TFile extends File>(
   composable: Composable<TFile>,
-): typeof composable;
+): Composable<TFile>;
 export function composable<TOptions extends object, TFile extends File = File>(
   builder: ComposableBuilder<TOptions, TFile>,
-): typeof composable;
+): ComposableBuilder<TOptions, TFile>;
 export function composable(
   composable: Composable | ComposableBuilder,
-): typeof composable {
+): Composable | ComposableBuilder {
   return composable;
 }

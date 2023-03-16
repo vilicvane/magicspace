@@ -3,14 +3,15 @@ import * as Path from 'path';
 import FastGlob from 'fast-glob';
 import {__importDefault} from 'tslib';
 
-import type {Composable, File} from '../file';
+import type {Composable, FileGenerics} from '../file';
 
 import type {ComposableModuleDefault} from './composable';
 
 const COMPOSABLES_MATCH_PATTERN_DEFAULT = '**/*.js';
 
-export interface BoilerplateComposable<TFile extends File = File>
-  extends Composable<TFile> {
+export interface BoilerplateComposable<
+  TFile extends FileGenerics = FileGenerics,
+> extends Composable<TFile> {
   source: string;
   target: string;
 }

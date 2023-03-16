@@ -145,7 +145,7 @@ export function copy(
   dir: string,
   patterns: string | string[],
   {binary = false}: CopyOptions = {},
-): Composable<File<Buffer | string, BinaryFileOptions | TextFileOptions>>[] {
+): (Composable<TextFile> | Composable<File<Buffer, BinaryFileOptions>>)[] {
   if (!Array.isArray(patterns)) {
     patterns = [patterns];
   }
