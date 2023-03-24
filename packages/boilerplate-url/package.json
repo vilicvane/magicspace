@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/boilerplate-url",
-  "version": "0.3.0-alpha.6",
+  "version": "0.3.0-alpha.7",
   "publishConfig": {
     "access": "public"
   },
@@ -12,7 +12,7 @@
     "require": "./bld/library/index.js"
   },
   "dependencies": {
-    "@magicspace/boilerplate-url-resolver": "^0.3.0-alpha.1",
+    "@magicspace/boilerplate-url-resolver": "^0.3.0-alpha.7",
     "@magicspace/core": "^0.3.0-alpha.6",
     "rimraf": "^4.1.2",
     "tslib": "^2.5.0"
