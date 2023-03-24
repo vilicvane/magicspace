@@ -15,9 +15,13 @@ export default boilerplate<Options>(async options => {
     composables: await composables(
       {
         root: Path.join(__dirname, '../composables'),
-        pattern: '(?!@)*.js',
+        pattern: '*.js',
       },
       options,
     ),
+    scripts: {
+      postgenerate:
+        'boilerplate-url-resolver && rimraf .boilerplate-options.json',
+    },
   };
 });

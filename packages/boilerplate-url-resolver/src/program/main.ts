@@ -20,9 +20,11 @@ main(async () => {
     url,
     strip = 0,
     dir,
-  } = require(Path.resolve(
-    '.boilerplate-options.json',
-  )) as Magicspace.BoilerplateOptions;
+  } = require(Path.resolve('.boilerplate-options.json')) as {
+    url: string;
+    strip?: number;
+    dir?: string;
+  };
 
   const response = await fetch(url, {agent});
 
