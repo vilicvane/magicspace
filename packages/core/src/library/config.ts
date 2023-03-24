@@ -71,12 +71,21 @@ export function resolveBoilerplateModule(
   specifier: string,
   dir: string,
 ): BoilerplateModule {
-  const boilerplateModulePath =
-    resolve(dir, specifier) ||
-    // Fallback to magicspace installation location.
-    resolve(__dirname, specifier);
+  const dirs = [
+    dir,
+    __dirname, // fallback to magicspace installation location.
+  ];
 
-  if (!boilerplateModulePath) {
+  let boilerplateModulePath: string | false | undefined;
+
+  for (const dir of dirs) {
+    try {
+      boilerplateModulePath = resolve(dir, specifier);
+      break;
+    } catch {}
+  }
+
+  if (typeof boilerplateModulePath !== 'string') {
     throw new Error(
       `Cannot resolve boilerplate ${JSON.stringify(
         specifier,
