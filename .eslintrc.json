@@ -1,6 +1,7 @@
 {
   "root": true,
   "ignorePatterns": [
+    "node_modules/",
     "/packages/core/src/",
     "/packages/core/bld/",
     "/packages/cli/src/",
@@ -12,9 +13,16 @@
     "/packages/boilerplate-url-resolver/src/",
     "/packages/boilerplate-url-resolver/bld/"
   ],
-  "extends": ["eslint:recommended"],
-  "env": {
-    "node": true,
-    "es2020": true
-  }
+  "extends": ["plugin:@mufan/js"],
+  "overrides": [
+    {
+      "files": "**/*.{js,jsx}"
+    },
+    {
+      "files": "**/*.cjs",
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    }
+  ]
 }
