@@ -35,11 +35,7 @@ export class Space {
   async initialize({
     ours = false,
   }: ProjectInitializeOptions): Promise<
-    | 'not-repository-root'
-    | 'merge-in-progress'
-    | 'empty-repository'
-    | 'already-initialized'
-    | true
+    'not-repository-root' | 'merge-in-progress' | 'already-initialized' | true
   > {
     const {name: tempDir, removeCallback: tempDirRemoveCallback} = Tmp.dirSync({
       prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
@@ -60,11 +56,9 @@ export class Space {
         return 'merge-in-progress';
       }
 
-      if (projectGit.isEmpty()) {
-        return 'empty-repository';
-      }
-
-      const lastMagicspaceCommit = projectGit.getLastMagicspaceCommit();
+      const lastMagicspaceCommit = projectGit.isEmpty()
+        ? undefined
+        : projectGit.getLastMagicspaceCommit();
 
       if (lastMagicspaceCommit) {
         return 'already-initialized';

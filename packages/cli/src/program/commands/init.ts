@@ -57,10 +57,6 @@ Otherwise, you can use ${Chalk.yellow(
         throw new ExpectedError(
           'A merge is already in progress, please resolve it before continue',
         );
-      case 'empty-repository':
-        throw new ExpectedError(
-          'You need to make an initial commit before initializing the repository with magicspace',
-        );
       case 'already-initialized':
         throw new ExpectedError(
           `This repository has already been initialized with magicspace, run ${Chalk.yellow(

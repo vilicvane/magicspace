@@ -20,13 +20,13 @@ npm install --global @mufan/code-boilerplates
 
 ### Initialize
 
-1. Initialize Git repository and **make initial commit** if you have not.
+1. Initialize Git repository.
 
 2. Create magicspace configuration file:
 
    ```bash
    # Assuming you have installed both `magicspace` and `makeflow/mufan-code-boilerplates` globally.
-   magicspace create @mufan/code-boilerplates/general
+   magicspace create @mufan/code-boilerplates/general --schema
    ```
 
    Review the generated `.magicspace/boilerplate.json` file and make relevant changes.
