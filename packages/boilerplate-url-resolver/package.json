@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/boilerplate-url-resolver",
-  "version": "0.3.0-alpha.8",
+  "version": "0.3.0",
   "publishConfig": {
     "access": "public"
   },
