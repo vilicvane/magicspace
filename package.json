@@ -10,7 +10,7 @@
     "lint": "eslint --no-error-on-unmatched-pattern . && run-in-every eslint-project --parallel --echo -- eslint --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint && yarn workspace @magicspace/utils jest",
-    "lerna:publish": "lerna publish prerelease --registry=https://registry.npmjs.org",
+    "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
     "boilerplate-url": "yarn workspace @magicspace/boilerplate-url",
     "boilerplate-url-resolver": "yarn workspace @magicspace/boilerplate-url-resolver",
     "core": "yarn workspace @magicspace/core",
