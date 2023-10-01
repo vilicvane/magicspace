@@ -9,7 +9,8 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "exports": {
     "types": "./bld/library/index.d.ts",
-    "require": "./bld/library/index.js"
+    "require": "./bld/library/index.js",
+    "default": "./bld/library/index.js"
   },
   "dependencies": {
     "@magicspace/utils": "^0.3.0-alpha.8",
@@ -23,7 +24,7 @@
     "npm-path": "^2.0.4",
     "tmp": "^0.2.1",
     "tslang": "^0.1.27",
-    "tslib": "^2.5.0",
+    "tslib": "^2.6.2",
     "x-value": "^0.1.8",
     "yaml": "^2.2.1"
   },

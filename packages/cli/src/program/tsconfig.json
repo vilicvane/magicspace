@@ -7,6 +7,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
 
+    "rootDir": ".",
     "outDir": "../../bld/program"
   },
   "references": [{"path": "../../../core/src/library"}]

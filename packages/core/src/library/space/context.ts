@@ -8,7 +8,10 @@ import type {Space} from './space';
 export class Context {
   private fileMap = new Map<string, File>();
 
-  constructor(readonly space: Space, readonly dir: string) {}
+  constructor(
+    readonly space: Space,
+    readonly dir: string,
+  ) {}
 
   getFile(path: string): File | undefined {
     return this.fileMap.get(path);

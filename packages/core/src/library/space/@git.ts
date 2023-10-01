@@ -19,7 +19,10 @@ import {SpawnSyncFailure, spawnSync} from '../@utils';
 import type {SpaceLogger} from './space-logger';
 
 export class Git {
-  constructor(readonly dir: string, protected logger?: SpaceLogger) {}
+  constructor(
+    readonly dir: string,
+    protected logger?: SpaceLogger,
+  ) {}
 
   isWorkingDirectoryClean(): boolean {
     return !spawnSync(this.dir, 'git', ['status', '--porcelain']).trim();

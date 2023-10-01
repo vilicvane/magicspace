@@ -3,8 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "types": ["node", "jest"],
-    "noEmit": true,
-    "outDir": "../../bld/test"
+    "rootDir": ".",
+    "outDir": "../../.bld/test"
   },
   "references": [{"path": "../library"}]
 }

@@ -25,9 +25,8 @@ export default class extends Command {
   ): Promise<string> {
     const magicspaceDir = Path.resolve(projectDir, options.magicspace);
 
-    const {module: configExport} = await resolveMagicspaceBoilerplateConfig(
-      magicspaceDir,
-    );
+    const {module: configExport} =
+      await resolveMagicspaceBoilerplateConfig(magicspaceDir);
 
     if (Array.isArray(configExport)) {
       throw new ExpectedError(
