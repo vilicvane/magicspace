@@ -52,15 +52,15 @@ export class Space {
         return 'not-repository-root';
       }
 
+      if (projectGit.isEmpty()) {
+        projectGit.makeInitialCommit();
+      }
+
       if (projectGit.isMerging()) {
         return 'merge-in-progress';
       }
 
-      const lastMagicspaceCommit = projectGit.isEmpty()
-        ? undefined
-        : projectGit.getLastMagicspaceCommit();
-
-      if (lastMagicspaceCommit) {
+      if (projectGit.getLastMagicspaceCommit()) {
         return 'already-initialized';
       }
 

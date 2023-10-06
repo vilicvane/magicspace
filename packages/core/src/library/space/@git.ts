@@ -8,6 +8,7 @@ import {
   MAGICSPACE_BRANCH,
   MAGICSPACE_INITIALIZE_COMMIT_MESSAGE,
   MAGICSPACE_INITIALIZE_MERGE_MESSAGE,
+  MAGICSPACE_INITIAL_COMMIT_MESSAGE,
   MAGICSPACE_REMOTE,
   MAGICSPACE_UPDATE_COMMIT_MESSAGE,
   MAGICSPACE_UPDATE_MERGE_MESSAGE,
@@ -53,6 +54,15 @@ export class ProjectGit extends Git {
     const mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 
     return FSExtra.existsSync(mergeHeadFilePath);
+  }
+
+  makeInitialCommit(): void {
+    spawnSync(this.dir, 'git', [
+      'commit',
+      '--allow-empty',
+      '--message',
+      MAGICSPACE_INITIAL_COMMIT_MESSAGE,
+    ]);
   }
 
   getLastMagicspaceCommit(): string | undefined {
