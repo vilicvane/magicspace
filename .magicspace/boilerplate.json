@@ -1,4 +1,5 @@
 {
+  "$schema": "boilerplate.schema.json",
   "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "magicspace-packages",
