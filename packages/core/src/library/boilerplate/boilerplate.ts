@@ -32,6 +32,7 @@ export interface BoilerplateExample<TOptions extends object = object> {
 }
 
 export interface BoilerplateBuilderContext {
+  magicspaceDir: string;
   projectDir: string;
 }
 

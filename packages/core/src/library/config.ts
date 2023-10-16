@@ -123,7 +123,9 @@ export async function resolveMagicspaceConfig(
       Options.asserts(options);
     }
 
-    boilerplates.push(await boilerplateBuilder(options, {projectDir}));
+    boilerplates.push(
+      await boilerplateBuilder(options, {magicspaceDir, projectDir}),
+    );
   }
 
   const aggregatedBoilerplateComposables: BoilerplateComposable[] = [];
