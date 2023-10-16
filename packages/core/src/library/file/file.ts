@@ -67,5 +67,5 @@ export abstract class File<TContent = unknown, TComposeOptions = unknown> {
 }
 
 export interface FileContext {
-  possibleOutputPath: string;
+  outputPath: string;
 }

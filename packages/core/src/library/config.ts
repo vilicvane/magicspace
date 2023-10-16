@@ -98,6 +98,7 @@ export function resolveBoilerplateModule(
 
 export async function resolveMagicspaceConfig(
   magicspaceDir: string,
+  projectDir: string,
 ): Promise<MagicspaceConfig> {
   const {path: configPath, module: configExport} =
     await resolveMagicspaceBoilerplateConfig(magicspaceDir);
@@ -122,7 +123,7 @@ export async function resolveMagicspaceConfig(
       Options.asserts(options);
     }
 
-    boilerplates.push(await boilerplateBuilder(options));
+    boilerplates.push(await boilerplateBuilder(options, {projectDir}));
   }
 
   const aggregatedBoilerplateComposables: BoilerplateComposable[] = [];

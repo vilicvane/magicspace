@@ -31,12 +31,18 @@ export interface BoilerplateExample<TOptions extends object = object> {
   options?: TOptions;
 }
 
+export interface BoilerplateBuilderContext {
+  projectDir: string;
+}
+
 export type BoilerplateCallback<TOptions extends object> = (
   options: TOptions,
+  context: BoilerplateBuilderContext,
 ) => Promise<BoilerplateOptions>;
 
 export type BoilerplateBuilder<TOptions extends object> = (
   options: TOptions,
+  context: BoilerplateBuilderContext,
 ) => Promise<Boilerplate>;
 
 export function boilerplate<TOptions extends object>(

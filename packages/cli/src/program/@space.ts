@@ -63,7 +63,7 @@ export async function createDefaultSpace(
         return 'magicspace-dir-not-exists';
       }
 
-      config = await resolveMagicspaceConfig(magicspaceDir);
+      config = await resolveMagicspaceConfig(magicspaceDir, projectDir);
     } catch (error) {
       if (error instanceof x.TypeConstraintError) {
         throw `Error validating boilerplate options:\n${error.message}`;

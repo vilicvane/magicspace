@@ -9,7 +9,7 @@ export interface Composable<TFile extends FileGenerics = FileGenerics> {
 
 export interface ComposeContext<TFile extends FileGenerics> {
   file: File<TFile['TContent'], TFile['TComposeOptions']>;
-  possibleOutputPath: string;
+  outputPath: string;
   composableModulePath: string;
 }
 

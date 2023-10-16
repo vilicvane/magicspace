@@ -30,10 +30,7 @@ export class Context {
       file = space.createFileObject(
         path,
         {
-          possibleOutputPath: Path.join(
-            space.dir,
-            Path.relative(this.dir, path),
-          ),
+          outputPath: Path.join(space.dir, Path.relative(this.dir, path)),
         },
         composable.type,
       );
