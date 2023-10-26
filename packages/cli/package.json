@@ -4,6 +4,7 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
   "dependencies": {
     "tslib": "^2.6.2"
   }
