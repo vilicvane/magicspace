@@ -4,7 +4,11 @@
     "composite": true,
     "types": ["node", "jest"],
     "rootDir": ".",
-    "outDir": "../../.bld/test"
+    "outDir": "../../bld/test"
   },
-  "references": [{"path": "../library"}]
+  "references": [
+    {
+      "path": "../library"
+    }
+  ]
 }

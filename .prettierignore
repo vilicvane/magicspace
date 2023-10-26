@@ -2,6 +2,5 @@
 boilerplate.schema.json
 # TypeScript Build Artifacts
 bld/
-.bld/
 # Lerna
 lerna.json

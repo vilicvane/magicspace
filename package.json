@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "3": "yarn && yarn-deduplicate && yarn",
-    "build": "rimraf --glob packages/*/{.bld,bld} && tsc --build",
+    "build": "rimraf --glob packages/*/bld && tsc --build",
     "lint": "eslint --no-error-on-unmatched-pattern . && run-in-every eslint-project --parallel --echo -- eslint --no-error-on-unmatched-pattern .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint && yarn bare-test",
@@ -27,7 +27,7 @@
     "packages/cli"
   ],
   "devDependencies": {
-    "@mufan/eslint-plugin": "^0.2.12",
+    "@mufan/eslint-plugin": "^0.2.13",
     "@types/jest": "^29.5.6",
     "@types/node": "^18.13.0",
     "cross-env": "^7.0.3",

@@ -704,10 +704,10 @@
     yargs "16.2.0"
     yargs-parser "20.2.4"
 
-"@mufan/eslint-plugin@^0.2.12":
-  version "0.2.12"
-  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.12.tgz#1aa87974b5f9e2f08d6602f38f9e120a22c85c38"
-  integrity sha512-hgZhoRXvKg9sjMTPooxu83TddpZxDR9fRvrqK7EdOZvQHFcD4thbGPAhDNiQVNdRkYbtxyWoS57QQoB6DtWCgQ==
+"@mufan/eslint-plugin@^0.2.13":
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/@mufan/eslint-plugin/-/eslint-plugin-0.2.13.tgz#00e46df7c8457f3cb6a2c1bd63f00e40fbd70483"
+  integrity sha512-R+PXPG8voZNy6TSjDrZ1UunqTyRIYnWvmQDk3ZidDcays2gZ1hqmYW3ODd6751uUaolqk36VYfq044Yw76+btg==
   dependencies:
     "@types/eslint" "^8.44.4"
     "@typescript-eslint/eslint-plugin" "^6.7.5"
