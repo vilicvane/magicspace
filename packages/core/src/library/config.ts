@@ -1,13 +1,15 @@
 import {readFile} from 'fs/promises';
+import {createRequire} from 'module';
 import * as Path from 'path';
+import {fileURLToPath} from 'url';
 
-import {create as enhancedResolveCreate} from 'enhanced-resolve';
+import EnhancedResolve from 'enhanced-resolve';
 import _ from 'lodash';
 import stripJSONComments from 'strip-json-comments';
-import {__importDefault} from 'tslib';
 import type {JSONSchema} from 'x-value';
 import * as x from 'x-value';
 
+import {requireOrImport} from './@utils.js';
 import type {
   Boilerplate,
   BoilerplateComposable,
@@ -17,7 +19,9 @@ import type {
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-const resolve = enhancedResolveCreate.sync({
+const require = createRequire(import.meta.url);
+
+const resolve = EnhancedResolve.create.sync({
   conditionNames: ['node', 'require'],
 });
 
@@ -64,23 +68,19 @@ export async function resolveMagicspaceBoilerplateConfig(
     const jsonc = await readFile(path, 'utf8');
     module = JSON.parse(stripJSONComments(jsonc));
   } else {
-    try {
-      module = __importDefault(require(path)).default;
-    } catch {
-      module = (await import(path)).default;
-    }
+    module = (await requireOrImport(path)).default;
   }
 
   return {path, module};
 }
 
-export function resolveBoilerplateModule(
+export async function resolveBoilerplateModule(
   specifier: string,
   dir: string,
-): BoilerplateModule {
+): Promise<BoilerplateModule> {
   const dirs = [
     dir,
-    __dirname, // fallback to magicspace installation location.
+    Path.dirname(fileURLToPath(import.meta.url)), // fallback to magicspace installation location.
   ];
 
   let boilerplateModulePath: string | false | undefined;
@@ -102,7 +102,7 @@ export function resolveBoilerplateModule(
     );
   }
 
-  return __importDefault(require(boilerplateModulePath));
+  return await requireOrImport(boilerplateModulePath);
 }
 
 export async function resolveMagicspaceConfig(
@@ -123,10 +123,8 @@ export async function resolveMagicspaceConfig(
 
     const {boilerplate: boilerplateSpecifier, options} = config;
 
-    const {default: boilerplateBuilder, Options} = resolveBoilerplateModule(
-      boilerplateSpecifier,
-      configDir,
-    );
+    const {default: boilerplateBuilder, Options} =
+      await resolveBoilerplateModule(boilerplateSpecifier, configDir);
 
     if (Options) {
       Options.asserts(options);

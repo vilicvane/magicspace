@@ -39,8 +39,7 @@
             "name": "library"
           },
           {
-            "name": "test",
-            "noEmit": true
+            "name": "test"
           }
         ]
       },

@@ -1,4 +1,5 @@
 import * as Path from 'path';
+import {fileURLToPath} from 'url';
 
 import {boilerplate, composables, x} from '@magicspace/core';
 
@@ -14,7 +15,7 @@ export default boilerplate<Options>(async options => {
   return {
     composables: await composables(
       {
-        root: Path.join(__dirname, '../composables'),
+        root: Path.join(fileURLToPath(import.meta.url), '../../composables'),
         pattern: '*.js',
       },
       options,

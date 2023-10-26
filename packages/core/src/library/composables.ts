@@ -1,7 +1,7 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import {sync as fastGlobSync} from 'fast-glob';
+import FastGlob from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
 import {removePathExtension} from './@utils.js';
@@ -150,7 +150,7 @@ export function copy(
     patterns = [patterns];
   }
 
-  const paths = fastGlobSync(patterns, {
+  const paths = FastGlob.sync(patterns, {
     cwd: dir,
     dot: true,
     onlyFiles: true,

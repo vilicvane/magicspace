@@ -1,5 +1,9 @@
+import {createRequire} from 'module';
+
 import type {HelpInfo, SubcommandDefinition} from 'clime';
 import {Command, Options, command, metadata, option} from 'clime';
+
+const require = createRequire(import.meta.url);
 
 export const subcommands: SubcommandDefinition[] = [
   {name: 'create'},

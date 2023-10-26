@@ -1,8 +1,12 @@
 import * as ChildProcess from 'child_process';
+import {createRequire} from 'module';
 import * as Path from 'path';
 
-import {existsSync, moveSync, readdirSync, rmdirSync, statSync} from 'fs-extra';
+import FSExtra from 'fs-extra';
 import npmPath from 'npm-path';
+import {__importDefault} from 'tslib';
+
+const require = createRequire(import.meta.url);
 
 export class SpawnSyncFailure {
   constructor(
@@ -81,9 +85,9 @@ export async function npmRun(
  * @returns `true` if content completely moved, otherwise `false`.
  */
 export function conservativelyMove(from: string, to: string): boolean {
-  if (existsSync(to)) {
-    if (statSync(to).isDirectory()) {
-      const names = readdirSync(from);
+  if (FSExtra.existsSync(to)) {
+    if (FSExtra.statSync(to).isDirectory()) {
+      const names = FSExtra.readdirSync(from);
 
       const completelyMoved = names
         .map(name =>
@@ -92,7 +96,7 @@ export function conservativelyMove(from: string, to: string): boolean {
         .every(result => result);
 
       if (completelyMoved) {
-        rmdirSync(from);
+        FSExtra.rmdirSync(from);
         return true;
       } else {
         return false;
@@ -101,7 +105,7 @@ export function conservativelyMove(from: string, to: string): boolean {
       return false;
     }
   } else if (Path.relative(from, to).startsWith(`..${Path.sep}`)) {
-    moveSync(from, to);
+    FSExtra.moveSync(from, to);
     return true;
   } else {
     return false;
@@ -110,4 +114,12 @@ export function conservativelyMove(from: string, to: string): boolean {
 
 export function removePathExtension(path: string): string {
   return path.slice(0, -Path.extname(path).length);
+}
+
+export async function requireOrImport(path: string): Promise<any> {
+  try {
+    return __importDefault(require(path));
+  } catch {
+    return import(path);
+  }
 }

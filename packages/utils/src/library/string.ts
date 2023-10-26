@@ -1,4 +1,4 @@
-import {isMatch} from 'micromatch';
+import Micromatch from 'micromatch';
 
 import {addElementsToSequentialArray} from './array.js';
 
@@ -35,10 +35,10 @@ export function extendPackageScript(
 
   return addElementsToSequentialArray(existingCommands, commands, {
     isAfterAnchor: afterPattern
-      ? command => isMatch(command, afterPattern)
+      ? command => Micromatch.isMatch(command, afterPattern)
       : undefined,
     isBeforeAnchor: beforePattern
-      ? command => isMatch(command, beforePattern)
+      ? command => Micromatch.isMatch(command, beforePattern)
       : undefined,
   }).join(' && ');
 }

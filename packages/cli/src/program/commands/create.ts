@@ -16,7 +16,7 @@ import {
   option,
   param,
 } from 'clime';
-import {existsSync, outputFile} from 'fs-extra';
+import FSExtra from 'fs-extra';
 import prompts from 'prompts';
 
 import {CONFIG_SCHEMA_FILE_NAME} from '../@constants.js';
@@ -45,13 +45,13 @@ export default class extends Command {
   ): Promise<string | void> {
     const magicspaceDir = Path.resolve(DEFAULT_MAGICSPACE_DIRNAME);
 
-    if (existsSync(magicspaceDir)) {
+    if (FSExtra.existsSync(magicspaceDir)) {
       throw new ExpectedError(
         `Folder ${JSON.stringify(DEFAULT_MAGICSPACE_DIRNAME)} already exists`,
       );
     }
 
-    const {examples, Options} = resolveBoilerplateModule(
+    const {examples, Options} = await resolveBoilerplateModule(
       boilerplate,
       process.cwd(),
     );
@@ -91,7 +91,7 @@ export default class extends Command {
         )
       : boilerplate;
 
-    await outputFile(
+    await FSExtra.outputFile(
       configFilePath,
       `${JSON.stringify(
         {
@@ -112,7 +112,7 @@ export default class extends Command {
         CONFIG_SCHEMA_FILE_NAME,
       );
 
-      await outputFile(
+      await FSExtra.outputFile(
         configSchemaPath,
         JSON.stringify(buildConfigSchema(Options), undefined, 2),
       );

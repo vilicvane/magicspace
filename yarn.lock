@@ -1190,6 +1190,11 @@
     "@types/jsonfile" "*"
     "@types/node" "*"
 
+"@types/global-agent@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/global-agent/-/global-agent-2.1.2.tgz#53cf8394aa660816b6388354b962f351f93d67c6"
+  integrity sha512-6UyOC/RcPM2ebJE1ljPxFszfX19ZdY9IJ1cQQ5uI53QS9943r432ecQ0Wmd/HCRSbQl4obBVN0dmv2U7eHESPQ==
+
 "@types/graceful-fs@^4.1.3":
   version "4.1.6"
   resolved "https://registry.npmjs.org/@types/graceful-fs/-/graceful-fs-4.1.6.tgz"
@@ -2103,10 +2108,10 @@ cli-width@^3.0.0:
   resolved "https://registry.npmjs.org/cli-width/-/cli-width-3.0.0.tgz"
   integrity sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==
 
-clime@^0.5.14:
-  version "0.5.14"
-  resolved "https://registry.npmjs.org/clime/-/clime-0.5.14.tgz"
-  integrity sha512-+q7UDQ+EcruHtZRtd2QVs+t/jf9MpuOyhHbuHcYWvjX8jdly6AU7z3/7MiI0Kj0hzueIEX9JM7vPnkzBrG082Q==
+clime@^0.5.14, clime@^0.5.16:
+  version "0.5.16"
+  resolved "https://registry.yarnpkg.com/clime/-/clime-0.5.16.tgz#82343406ef8032f4293640360542e94552f35b0b"
+  integrity sha512-E+nwvWWBxsE9eiCtNs7cxYUCqD1dGs6pnysgXhL+M5inCZK2IzHZjDgb+pmMWPEMrqmAuPtn82NEOZ9cvYtVKQ==
   dependencies:
     chalk "^2.1.0"
     extendable-error "^0.1.5"

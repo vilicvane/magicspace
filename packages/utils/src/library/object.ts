@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {isMatch} from 'micromatch';
+import Micromatch from 'micromatch';
 import type {Dict} from 'tslang';
 
 import {addElementsToSequentialArray} from './array.js';
@@ -49,10 +49,10 @@ export function extendObjectProperties(
         return key;
       },
       isAfterAnchor: afterPattern
-        ? ([key]) => isMatch(key, afterPattern)
+        ? ([key]) => Micromatch.isMatch(key, afterPattern)
         : undefined,
       isBeforeAnchor: beforePattern
-        ? ([key]) => isMatch(key, beforePattern)
+        ? ([key]) => Micromatch.isMatch(key, beforePattern)
         : undefined,
       replace: toReplace,
     },

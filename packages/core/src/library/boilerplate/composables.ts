@@ -1,8 +1,8 @@
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
-import {__importDefault} from 'tslib';
 
+import {requireOrImport} from '../@utils.js';
 import type {Composable, FileGenerics} from '../file/index.js';
 
 import type {ComposableModuleDefault} from './composable.js';
@@ -62,7 +62,7 @@ export async function composables(
   const allComposables: BoilerplateComposable[] = [];
 
   for (const composableModulePath of pathSet) {
-    let composables = __importDefault(require(composableModulePath))
+    let composables = (await requireOrImport(composableModulePath))
       .default as ComposableModuleDefault;
 
     if (typeof composables === 'function') {

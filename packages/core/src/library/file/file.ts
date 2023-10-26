@@ -1,4 +1,4 @@
-import * as FSExtra from 'fs-extra';
+import FSExtra from 'fs-extra';
 
 import type {BoilerplateComposable} from '../boilerplate/index.js';
 

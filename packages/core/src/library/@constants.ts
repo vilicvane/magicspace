@@ -1,6 +1,10 @@
 import * as Path from 'path';
+import {fileURLToPath} from 'url';
 
-export const PACKAGE_DIR = Path.join(__dirname, '../..');
+export const PACKAGE_DIR = Path.join(
+  fileURLToPath(import.meta.url),
+  '../../..',
+);
 
 export const TEMP_MAGIC_REPOSITORY_DIR_PREFIX = 'magicspace';
 

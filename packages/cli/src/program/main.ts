@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
-import * as Path from 'path';
-
-process.env.GLOBAL_AGENT_ENVIRONMENT_VARIABLE_NAMESPACE = '';
-
-import 'global-agent/bootstrap';
+import {fileURLToPath} from 'url';
 
 import {CLI, Shim} from 'clime';
+import {bootstrap} from 'global-agent';
 
-const cli = new CLI('magicspace', Path.join(__dirname, 'commands'));
+bootstrap({
+  environmentVariableNamespace: '',
+});
+
+const cli = new CLI(
+  'magicspace',
+  fileURLToPath(new URL('commands', import.meta.url)),
+);
 
 const shim = new Shim(cli);
 
