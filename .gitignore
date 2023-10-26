@@ -6,5 +6,4 @@ node_modules/
 yarn-error.log
 # TypeScript Build Artifacts
 bld/
-.bld/
 *.tsbuildinfo
