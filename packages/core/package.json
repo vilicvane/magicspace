@@ -1,6 +1,6 @@
 {
   "name": "@magicspace/core",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "publishConfig": {
     "access": "public"
   },
@@ -13,7 +13,7 @@
     "default": "./bld/library/index.js"
   },
   "dependencies": {
-    "@magicspace/utils": "^0.3.0",
+    "@magicspace/utils": "^0.3.4",
     "enhanced-resolve": "^5.12.0",
     "fast-glob": "^3.2.12",
     "fs-extra": "^11.1.0",
