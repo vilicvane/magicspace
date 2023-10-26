@@ -1,11 +1,9 @@
-import _ from 'lodash';
-
-export interface AddElementsToSequentialArrayOptions<T> {
+export type AddElementsToSequentialArrayOptions<T> = {
   getKey?(element: T): unknown;
   isAfterAnchor?(element: T): boolean;
   isBeforeAnchor?(element: T): boolean;
   replace?: boolean;
-}
+};
 
 export function addElementsToSequentialArray<T>(
   array: T[],

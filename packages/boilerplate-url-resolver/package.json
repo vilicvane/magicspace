@@ -7,12 +7,13 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
   "bin": "bld/program/main.js",
   "dependencies": {
     "duplexer2": "^0.1.4",
     "fstream": "^1.0.12",
     "main-function": "^0.1.4",
-    "node-fetch": "2",
+    "node-fetch": "^3.3.2",
     "proxy-agent": "^5.0.0",
     "tslib": "^2.6.2",
     "unzipper": "^0.10.11"

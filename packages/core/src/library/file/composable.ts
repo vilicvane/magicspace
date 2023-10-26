@@ -1,17 +1,17 @@
-import type {File, FileGenerics} from './file';
+import type {File, FileGenerics} from './file.js';
 
-export interface Composable<TFile extends FileGenerics = FileGenerics> {
+export type Composable<TFile extends FileGenerics = FileGenerics> = {
   type?: string;
   path?: string;
   compose: ComposeFunction<TFile>;
   options?: TFile['TComposeOptions'];
-}
+};
 
-export interface ComposeContext<TFile extends FileGenerics> {
+export type ComposeContext<TFile extends FileGenerics> = {
   file: File<TFile['TContent'], TFile['TComposeOptions']>;
   outputPath: string;
   composableModulePath: string;
-}
+};
 
 export type ComposeFunction<TFile extends FileGenerics> = {
   bivirance(

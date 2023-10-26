@@ -4,12 +4,13 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
   "bin": {
     "magicspace": "bld/program/main.js"
   },
   "dependencies": {
     "@magicspace/core": "^0.3.3",
-    "chalk": "4",
+    "chalk": "^5.3.0",
     "clime": "^0.5.14",
     "fs-extra": "^11.1.0",
     "global-agent": "^3.0.0",

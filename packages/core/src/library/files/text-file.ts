@@ -1,7 +1,7 @@
-import type {FileContext} from '../file';
-import {File} from '../file';
+import type {FileContext} from '../file/index.js';
+import {File} from '../file/index.js';
 
-export interface TextFileOptions {}
+export type TextFileOptions = {};
 
 export class TextFile extends File<string, TextFileOptions> {
   content = '';

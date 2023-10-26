@@ -1,7 +1,7 @@
 import 'prompts';
 
 declare module 'prompts' {
-  interface PromptObject {
+  type PromptObject = {
     instructions?: boolean;
-  }
+  };
 }

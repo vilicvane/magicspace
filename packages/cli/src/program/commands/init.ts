@@ -3,8 +3,8 @@ import * as Path from 'path';
 import Chalk from 'chalk';
 import {Command, ExpectedError, command, metadata, option, param} from 'clime';
 
-import {CommonOptions} from '../@command';
-import {createDefaultSpace} from '../@space';
+import {CommonOptions} from '../@command.js';
+import {createDefaultSpace} from '../@space.js';
 
 export class InitOptions extends CommonOptions {
   @option({

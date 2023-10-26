@@ -11,6 +11,8 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "task.autoDetect": "off",
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.workingDirectories": [
     ".",

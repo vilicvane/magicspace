@@ -2,14 +2,14 @@ import latestVersion from 'latest-version';
 import _ from 'lodash';
 import type {Dict} from 'tslang';
 
-import {logger} from './@logger';
+import {logger} from './@logger.js';
 
-export interface FetchPackageVersionsOptions {
+export type FetchPackageVersionsOptions = {
   /**
    * Defaults to '^'.
    */
   rangePrefix?: string;
-}
+};
 
 export async function fetchPackageVersions(
   versionRangeDict: Dict<string>,

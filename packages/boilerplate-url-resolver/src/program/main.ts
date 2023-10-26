@@ -7,7 +7,7 @@ import {main} from 'main-function';
 import fetch from 'node-fetch';
 import ProxyAgent from 'proxy-agent';
 
-import {Extract} from './@utils';
+import {Extract} from './@utils.js';
 
 const {HTTP_PROXY} = process.env;
 
@@ -37,7 +37,7 @@ main(async () => {
     console.info,
   );
 
-  response.body.pipe(extractStream);
+  response.body!.pipe(extractStream);
 
   await extractStream.promise();
 });

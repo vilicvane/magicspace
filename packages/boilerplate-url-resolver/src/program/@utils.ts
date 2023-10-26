@@ -6,11 +6,11 @@ import {Writer} from 'fstream';
 import type {ParseStream} from 'unzipper';
 import {Parse} from 'unzipper';
 
-export interface ExtractOptions {
+export type ExtractOptions = {
   outDir: string;
   strip?: number;
   dir?: string;
-}
+};
 
 export function Extract(
   {outDir, strip = 0, dir = '.'}: ExtractOptions,

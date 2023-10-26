@@ -1,9 +1,8 @@
-import _ from 'lodash';
-import * as Micromatch from 'micromatch';
+import {isMatch} from 'micromatch';
 
-import {addElementsToSequentialArray} from './array';
+import {addElementsToSequentialArray} from './array.js';
 
-export interface ExtendPackageScriptOptions {
+export type ExtendPackageScriptOptions = {
   /**
    * Add after command that matches this pattern presents (it will skips continuous
    * match).
@@ -17,7 +16,7 @@ export interface ExtendPackageScriptOptions {
    * @link https://github.com/micromatch/micromatch
    */
   before?: string;
-}
+};
 
 export function extendPackageScript(
   script: string | undefined,
@@ -36,10 +35,10 @@ export function extendPackageScript(
 
   return addElementsToSequentialArray(existingCommands, commands, {
     isAfterAnchor: afterPattern
-      ? command => Micromatch.isMatch(command, afterPattern)
+      ? command => isMatch(command, afterPattern)
       : undefined,
     isBeforeAnchor: beforePattern
-      ? command => Micromatch.isMatch(command, beforePattern)
+      ? command => isMatch(command, beforePattern)
       : undefined,
   }).join(' && ');
 }

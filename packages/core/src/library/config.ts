@@ -1,23 +1,23 @@
 import {readFile} from 'fs/promises';
 import * as Path from 'path';
 
-import EnhancedResolve from 'enhanced-resolve';
+import {create as enhancedResolveCreate} from 'enhanced-resolve';
 import _ from 'lodash';
 import stripJSONComments from 'strip-json-comments';
 import {__importDefault} from 'tslib';
-import * as x from 'x-value';
 import type {JSONSchema} from 'x-value';
+import * as x from 'x-value';
 
 import type {
   Boilerplate,
   BoilerplateComposable,
   BoilerplateModule,
   BoilerplateScriptsLifecycleName,
-} from './boilerplate';
+} from './boilerplate/index.js';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-const resolve = EnhancedResolve.create.sync({
+const resolve = enhancedResolveCreate.sync({
   conditionNames: ['node', 'require'],
 });
 
@@ -30,7 +30,7 @@ export type MagicspaceBoilerplateConfig = x.TypeOf<
   typeof MagicspaceBoilerplateConfig
 >;
 
-export interface MagicspaceConfig {
+export type MagicspaceConfig = {
   /**
    * Composable file entries to be resolved.
    */
@@ -39,16 +39,16 @@ export interface MagicspaceConfig {
    * Boilerplate lifecycle scripts.
    */
   scripts: MagicspaceConfigScripts;
-}
+};
 
-export interface MagicspaceConfigScripts {
+export type MagicspaceConfigScripts = {
   postgenerate: MagicspaceConfigScript[];
-}
+};
 
-export interface MagicspaceConfigScript {
+export type MagicspaceConfigScript = {
   source: string;
   script: string;
-}
+};
 
 export async function resolveMagicspaceBoilerplateConfig(
   magicspaceDir: string,
@@ -89,7 +89,9 @@ export function resolveBoilerplateModule(
     try {
       boilerplateModulePath = resolve(dir, specifier);
       break;
-    } catch {}
+    } catch {
+      // ignore
+    }
   }
 
   if (typeof boilerplateModulePath !== 'string') {

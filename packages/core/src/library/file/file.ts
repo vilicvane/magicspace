@@ -1,11 +1,11 @@
 import * as FSExtra from 'fs-extra';
 
-import type {BoilerplateComposable} from '../boilerplate';
+import type {BoilerplateComposable} from '../boilerplate/index.js';
 
-export interface FileGenerics<TContent = unknown, TComposeOptions = unknown> {
+export type FileGenerics<TContent = unknown, TComposeOptions = unknown> = {
   TContent: TContent;
   TComposeOptions: TComposeOptions;
-}
+};
 
 export abstract class File<TContent = unknown, TComposeOptions = unknown> {
   declare TContent: TContent;
@@ -66,6 +66,6 @@ export abstract class File<TContent = unknown, TComposeOptions = unknown> {
   }
 }
 
-export interface FileContext {
+export type FileContext = {
   outputPath: string;
-}
+};

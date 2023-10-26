@@ -1,6 +1,6 @@
 import * as Path from 'path';
 
-import * as FSExtra from 'fs-extra';
+import {existsSync, outputFileSync, readFileSync, removeSync} from 'fs-extra';
 import _ from 'lodash';
 
 import {
@@ -14,10 +14,10 @@ import {
   MAGICSPACE_UPDATE_MERGE_MESSAGE,
   MAGIC_COMMIT_MESSAGE_REGEX_STRING,
   PULL_FIND_RENAMES_THRESHOLD,
-} from '../@constants';
-import {SpawnSyncFailure, spawnSync} from '../@utils';
+} from '../@constants.js';
+import {SpawnSyncFailure, spawnSync} from '../@utils.js';
 
-import type {SpaceLogger} from './space-logger';
+import type {SpaceLogger} from './space-logger.js';
 
 export class Git {
   constructor(
@@ -53,7 +53,7 @@ export class ProjectGit extends Git {
   isMerging(): boolean {
     const mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 
-    return FSExtra.existsSync(mergeHeadFilePath);
+    return existsSync(mergeHeadFilePath);
   }
 
   makeInitialCommit(): void {
@@ -150,7 +150,7 @@ export class ProjectGit extends Git {
       this.logger?.stdout(error.stdout);
     }
 
-    FSExtra.outputFileSync(
+    outputFileSync(
       Path.join(this.dir, '.git/MERGE_MSG'),
       type === 'initialize'
         ? MAGICSPACE_INITIALIZE_MERGE_MESSAGE
@@ -161,11 +161,11 @@ export class ProjectGit extends Git {
   listPossibleDirectoryRenames(): Rename[] {
     const mergeHeadFilePath = Path.join(this.dir, '.git/MERGE_HEAD');
 
-    if (!FSExtra.existsSync(mergeHeadFilePath)) {
+    if (!existsSync(mergeHeadFilePath)) {
       throw new Error('Expecting .git/MERGE_HEAD to be present');
     }
 
-    const mergeHead = FSExtra.readFileSync(mergeHeadFilePath, 'utf8').trim();
+    const mergeHead = readFileSync(mergeHeadFilePath, 'utf8').trim();
 
     const diff = spawnSync(this.dir, 'git', [
       'show',
@@ -261,14 +261,14 @@ export class ProjectGit extends Git {
       .filter((rename): rename is Rename => !!rename);
 
     return _.uniqBy(renames, ({from, to}) => JSON.stringify({from, to})).filter(
-      rename => FSExtra.existsSync(rename.from),
+      rename => existsSync(rename.from),
     );
   }
 }
 
 export class TempGit extends Git {
   cloneProjectRepositoryWithoutCheckout(projectDir: string): void {
-    FSExtra.removeSync(this.dir);
+    removeSync(this.dir);
 
     spawnSync(projectDir, 'git', [
       'clone',
@@ -307,7 +307,7 @@ export class TempGit extends Git {
 /**
  * Rename from and to, relative path.
  */
-export interface Rename {
+export type Rename = {
   from: string;
   to: string;
-}
+};

@@ -1,17 +1,17 @@
 import * as Path from 'path';
 
-import Tmp from 'tmp';
+import {dirSync as tmpDirSync} from 'tmp';
 
-import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants';
-import {conservativelyMove, npmRun} from '../@utils';
-import type {BoilerplateScriptsLifecycleName} from '../boilerplate';
-import type {MagicspaceConfig} from '../config';
-import type {File, FileContext} from '../file';
+import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants.js';
+import {conservativelyMove, npmRun} from '../@utils.js';
+import type {BoilerplateScriptsLifecycleName} from '../boilerplate/index.js';
+import type {MagicspaceConfig} from '../config.js';
+import type {File, FileContext} from '../file/index.js';
 
-import type {Rename} from './@git';
-import {ProjectGit, TempGit} from './@git';
-import {Context} from './context';
-import type {SpaceLogger} from './space-logger';
+import type {Rename} from './@git.js';
+import {ProjectGit, TempGit} from './@git.js';
+import {Context} from './context.js';
+import type {SpaceLogger} from './space-logger.js';
 
 export class Space {
   get config(): MagicspaceConfig {
@@ -37,7 +37,7 @@ export class Space {
   }: ProjectInitializeOptions): Promise<
     'not-repository-root' | 'merge-in-progress' | 'already-initialized' | true
   > {
-    const {name: tempDir, removeCallback: tempDirRemoveCallback} = Tmp.dirSync({
+    const {name: tempDir, removeCallback: tempDirRemoveCallback} = tmpDirSync({
       prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
       unsafeCleanup: true,
     });
@@ -94,7 +94,7 @@ export class Space {
     | 'already-up-to-date'
     | true
   > {
-    const {name: tempDir, removeCallback: tempDirRemoveCallback} = Tmp.dirSync({
+    const {name: tempDir, removeCallback: tempDirRemoveCallback} = tmpDirSync({
       prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
       unsafeCleanup: true,
     });
@@ -262,16 +262,16 @@ export class Space {
   }
 }
 
-export interface ProjectInitializeOptions {
+export type ProjectInitializeOptions = {
   ours?: boolean;
-}
+};
 
 export type FileObjectCreator = (path: string, context: FileContext) => File;
 
 /**
  * Possible directory rename from and to, relative path.
  */
-export interface PossibleDirectorRename extends Rename {
+export type PossibleDirectorRename = {
   from: string;
   to: string;
-}
+} & Rename;

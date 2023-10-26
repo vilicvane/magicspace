@@ -1,3 +1,3 @@
-export {default} from './boilerplate';
-export * from './boilerplate';
-export * from './examples';
+export {default} from './boilerplate.js';
+export * from './boilerplate.js';
+export * from './examples.js';

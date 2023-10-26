@@ -8,8 +8,8 @@ import {
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import * as FSExtra from 'fs-extra';
 
-import {CommonOptions} from '../@command';
-import {CONFIG_SCHEMA_FILE_NAME} from '../@constants';
+import {CommonOptions} from '../@command.js';
+import {CONFIG_SCHEMA_FILE_NAME} from '../@constants.js';
 
 @command({
   description: 'Update magicspace config schema',

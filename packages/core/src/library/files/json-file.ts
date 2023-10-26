@@ -1,11 +1,11 @@
-import type {FileContext} from '../file';
+import type {FileContext} from '../file/index.js';
 
-import type {StructuredFileOptions} from './structured-file';
-import {StructuredFile} from './structured-file';
+import type {StructuredFileOptions} from './structured-file.js';
+import {StructuredFile} from './structured-file.js';
 
-export interface JSONFileOptions extends StructuredFileOptions {
+export type JSONFileOptions = {
   space?: string | number;
-}
+} & StructuredFileOptions;
 
 export class JSONFile<TContent> extends StructuredFile<
   TContent | undefined,

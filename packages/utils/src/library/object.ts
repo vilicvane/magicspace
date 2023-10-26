@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import * as Micromatch from 'micromatch';
+import {isMatch} from 'micromatch';
 import type {Dict} from 'tslang';
 
-import {addElementsToSequentialArray} from './array';
+import {addElementsToSequentialArray} from './array.js';
 
-export interface ExtendObjectPropertiesOptions {
+export type ExtendObjectPropertiesOptions = {
   /**
    * Set after key that matches this pattern presents (it will skips continuous
    * match).
@@ -22,7 +22,7 @@ export interface ExtendObjectPropertiesOptions {
    * Replace existing, defaults to `true`.
    */
   replace?: boolean;
-}
+};
 
 export function extendObjectProperties<
   T extends object,
@@ -49,10 +49,10 @@ export function extendObjectProperties(
         return key;
       },
       isAfterAnchor: afterPattern
-        ? ([key]) => Micromatch.isMatch(key, afterPattern)
+        ? ([key]) => isMatch(key, afterPattern)
         : undefined,
       isBeforeAnchor: beforePattern
-        ? ([key]) => Micromatch.isMatch(key, beforePattern)
+        ? ([key]) => isMatch(key, beforePattern)
         : undefined,
       replace: toReplace,
     },
@@ -63,10 +63,10 @@ export function extendObjectProperties(
 
 export type GeneralSortObjectKeysKeyOptions = SortObjectKeysKeyOptions | string;
 
-export interface SortObjectKeysKeyOptions {
+export type SortObjectKeysKeyOptions = {
   key: string;
   subKeys?: GeneralSortObjectKeysOptions;
-}
+};
 
 export type GeneralSortObjectKeysOptions =
   | 'asc'
@@ -74,13 +74,13 @@ export type GeneralSortObjectKeysOptions =
   | SortObjectKeysOptions
   | GeneralSortObjectKeysKeyOptions[];
 
-export interface SortObjectKeysOptions {
+export type SortObjectKeysOptions = {
   top?: GeneralSortObjectKeysKeyOptions[];
   bottom?: GeneralSortObjectKeysKeyOptions[];
   rest?: SortObjectKeysKeyOptions[];
   compare?(left: string, right: string): number;
   deep?: boolean;
-}
+};
 
 export function sortObjectKeys<T extends object>(
   object: T,

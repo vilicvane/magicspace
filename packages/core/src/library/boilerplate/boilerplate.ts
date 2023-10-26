@@ -1,40 +1,40 @@
 import getCallerFile from 'get-caller-file';
 import type * as x from 'x-value';
 
-import type {BoilerplateComposable} from './composables';
+import type {BoilerplateComposable} from './composables.js';
 
-export interface BoilerplateModule<TOptions extends object = object> {
+export type BoilerplateModule<TOptions extends object = object> = {
   Options?: x.XTypeOfValue<TOptions>;
   examples?: BoilerplateExample<TOptions>[];
   default: BoilerplateBuilder<TOptions>;
-}
+};
 
-export interface BoilerplateOptions {
+export type BoilerplateOptions = {
   extends?: Boilerplate | Boilerplate[];
   composables?: BoilerplateComposable[];
   scripts?: BoilerplateScripts;
-}
+};
 
-export interface Boilerplate extends BoilerplateOptions {
+export type Boilerplate = {
   filename: string;
-}
+} & BoilerplateOptions;
 
-export interface BoilerplateScripts {
+export type BoilerplateScripts = {
   postgenerate?: string;
-}
+};
 
 export type BoilerplateScriptsLifecycleName = keyof BoilerplateScripts;
 
-export interface BoilerplateExample<TOptions extends object = object> {
+export type BoilerplateExample<TOptions extends object = object> = {
   name: string;
   description?: string;
   options?: TOptions;
-}
+};
 
-export interface BoilerplateBuilderContext {
+export type BoilerplateBuilderContext = {
   magicspaceDir: string;
   projectDir: string;
-}
+};
 
 export type BoilerplateCallback<TOptions extends object> = (
   options: TOptions,

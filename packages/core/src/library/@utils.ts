@@ -1,7 +1,7 @@
 import * as ChildProcess from 'child_process';
 import * as Path from 'path';
 
-import * as FSExtra from 'fs-extra';
+import {existsSync, moveSync, readdirSync, rmdirSync, statSync} from 'fs-extra';
 import npmPath from 'npm-path';
 
 export class SpawnSyncFailure {
@@ -47,10 +47,10 @@ export function spawnSync(
   return stdout;
 }
 
-export interface NPMRunOptions {
+export type NPMRunOptions = {
   pathCWD: string;
   cwd: string;
-}
+};
 
 export async function npmRun(
   script: string,
@@ -81,9 +81,9 @@ export async function npmRun(
  * @returns `true` if content completely moved, otherwise `false`.
  */
 export function conservativelyMove(from: string, to: string): boolean {
-  if (FSExtra.existsSync(to)) {
-    if (FSExtra.statSync(to).isDirectory()) {
-      const names = FSExtra.readdirSync(from);
+  if (existsSync(to)) {
+    if (statSync(to).isDirectory()) {
+      const names = readdirSync(from);
 
       const completelyMoved = names
         .map(name =>
@@ -92,7 +92,7 @@ export function conservativelyMove(from: string, to: string): boolean {
         .every(result => result);
 
       if (completelyMoved) {
-        FSExtra.rmdirSync(from);
+        rmdirSync(from);
         return true;
       } else {
         return false;
@@ -101,7 +101,7 @@ export function conservativelyMove(from: string, to: string): boolean {
       return false;
     }
   } else if (Path.relative(from, to).startsWith(`..${Path.sep}`)) {
-    FSExtra.moveSync(from, to);
+    moveSync(from, to);
     return true;
   } else {
     return false;

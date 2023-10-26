@@ -3,23 +3,21 @@ import * as Path from 'path';
 import FastGlob from 'fast-glob';
 import {__importDefault} from 'tslib';
 
-import type {Composable, FileGenerics} from '../file';
+import type {Composable, FileGenerics} from '../file/index.js';
 
-import type {ComposableModuleDefault} from './composable';
+import type {ComposableModuleDefault} from './composable.js';
 
 const COMPOSABLES_MATCH_PATTERN_DEFAULT = '**/*.js';
 
-export interface BoilerplateComposable<
-  TFile extends FileGenerics = FileGenerics,
-> extends Composable<TFile> {
+export type BoilerplateComposable<TFile extends FileGenerics = FileGenerics> = {
   source: string;
   target: string;
-}
+} & Composable<TFile>;
 
-export interface ComposablesMatchOptions {
+export type ComposablesMatchOptions = {
   root: string;
   pattern?: string | string[];
-}
+};
 
 export async function composables(
   matchOptions: string | ComposablesMatchOptions,

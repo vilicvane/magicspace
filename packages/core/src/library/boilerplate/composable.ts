@@ -1,4 +1,4 @@
-import type {Composable, File} from '../file';
+import type {Composable, File} from '../file/index.js';
 
 export type ComposableModuleDefault =
   | Composable

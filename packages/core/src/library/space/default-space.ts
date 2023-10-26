@@ -1,6 +1,6 @@
-import {BinaryFile, JSONFile, TextFile, YAMLFile} from '../files';
+import {BinaryFile, JSONFile, TextFile, YAMLFile} from '../files/index.js';
 
-import type {FileObjectCreator} from './space';
+import type {FileObjectCreator} from './space.js';
 
 export const DEFAULT_MAGICSPACE_DIRNAME = '.magicspace';
 

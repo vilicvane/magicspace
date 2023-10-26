@@ -2,11 +2,11 @@ import type {GeneralSortObjectKeysOptions} from '@magicspace/utils';
 import {sortObjectKeys} from '@magicspace/utils';
 import _ from 'lodash';
 
-import {File} from '../file';
+import {File} from '../file/index.js';
 
-export interface StructuredFileOptions {
+export type StructuredFileOptions = {
   sortKeys?: GeneralSortObjectKeysOptions;
-}
+};
 
 export abstract class StructuredFile<
   TContent,

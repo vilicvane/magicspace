@@ -1,9 +1,9 @@
 import * as Path from 'path';
 
-import type {BoilerplateComposable} from '../boilerplate';
-import type {File} from '../file';
+import type {BoilerplateComposable} from '../boilerplate/index.js';
+import type {File} from '../file/index.js';
 
-import type {Space} from './space';
+import type {Space} from './space.js';
 
 export class Context {
   private fileMap = new Map<string, File>();

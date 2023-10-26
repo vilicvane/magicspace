@@ -1,13 +1,13 @@
 import * as YAML from 'yaml';
 
-import type {FileContext} from '../file';
+import type {FileContext} from '../file/index.js';
 
-import type {StructuredFileOptions} from './structured-file';
-import {StructuredFile} from './structured-file';
+import type {StructuredFileOptions} from './structured-file.js';
+import {StructuredFile} from './structured-file.js';
 
-export interface YAMLFileOptions extends StructuredFileOptions {
+export type YAMLFileOptions = {
   space?: number;
-}
+} & StructuredFileOptions;
 
 export class YAMLFile<TContent> extends StructuredFile<
   TContent | undefined,

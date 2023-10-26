@@ -4,7 +4,7 @@ import type {PossibleDirectorRename} from '@magicspace/core';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 import prompts from 'prompts';
 
-import {createDefaultSpace} from '../@space';
+import {createDefaultSpace} from '../@space.js';
 
 @command({
   description: 'Update possible renamed directories interactively',

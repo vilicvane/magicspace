@@ -1,4 +1,4 @@
-import {extendPackageScript} from '../library';
+import {extendPackageScript} from '../library/index.js';
 
 test('`extendPackageScript` should work', () => {
   expect(

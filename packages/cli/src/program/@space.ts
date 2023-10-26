@@ -11,9 +11,9 @@ import {
   DEFAULT_FILE_OBJECT_CREATOR_MAP,
   Space,
   resolveMagicspaceConfig,
+  x,
 } from '@magicspace/core';
 import Chalk from 'chalk';
-import * as x from 'x-value';
 
 const SPACE_LOGGER: SpaceLogger = {
   info(event: SpaceLoggerEvent) {

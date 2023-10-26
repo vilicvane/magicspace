@@ -6,6 +6,14 @@
     "repository": "https://github.com/makeflow/magicspace.git",
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "license": "MIT",
+    "type": "module",
+    "defaultBranch": "master",
+    "packageManager": "yarn",
+    "badges": {
+      "npm": true,
+      "license": true,
+      "discord": "https://discord.gg/vanVrDwSkS"
+    },
     "packages": [
       {
         "name": "@magicspace/core",

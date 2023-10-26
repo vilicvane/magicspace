@@ -1,7 +1,7 @@
-import type {FileContext} from '../file';
-import {File} from '../file';
+import type {FileContext} from '../file/index.js';
+import {File} from '../file/index.js';
 
-export interface BinaryFileOptions {}
+export type BinaryFileOptions = {};
 
 export class BinaryFile extends File<Buffer, BinaryFileOptions> {
   content = Buffer.alloc(0);

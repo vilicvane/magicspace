@@ -1,4 +1,4 @@
-import {extendObjectProperties, sortObjectKeys} from '../library';
+import {extendObjectProperties, sortObjectKeys} from '../library/index.js';
 
 test('`extendObjectProperties` should work without specify `after`/`before` option', () => {
   expect(

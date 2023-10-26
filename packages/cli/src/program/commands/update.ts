@@ -3,9 +3,9 @@ import * as Path from 'path';
 import Chalk from 'chalk';
 import {Command, ExpectedError, command, metadata, param} from 'clime';
 
-import {CommonOptions} from '../@command';
-import {createDefaultSpace} from '../@space';
-import {compact} from '../@utils';
+import {CommonOptions} from '../@command.js';
+import {createDefaultSpace} from '../@space.js';
+import {compact} from '../@utils.js';
 
 @command({
   description: 'Update magicspace',
@@ -31,7 +31,7 @@ export default class extends Command {
     const result = await space.update();
 
     switch (result) {
-      case true:
+      case true: {
         const renames = space.listPendingPossibleDirectoryRenames();
 
         return compact([
@@ -52,6 +52,7 @@ Execute ${Chalk.yellow(
               'magicspace update-dirs',
             )} to update those directories interactively.`,
         ]).join('\n\n');
+      }
       case 'not-repository-root':
         throw new ExpectedError(
           `Project directory ${JSON.stringify(

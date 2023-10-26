@@ -10,8 +10,8 @@ export type SpaceLoggerEvent =
       script: string;
     };
 
-export interface SpaceLogger {
+export type SpaceLogger = {
   info(event: SpaceLoggerEvent): void;
   stdout(text: string | Buffer): void;
   stderr(text: string | Buffer): void;
-}
+};

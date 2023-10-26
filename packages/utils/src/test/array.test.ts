@@ -1,4 +1,4 @@
-import {addElementsToSequentialArray} from '../library';
+import {addElementsToSequentialArray} from '../library/index.js';
 
 test('`addElementsToSequentialArray` should work with after anchor', () => {
   expect(

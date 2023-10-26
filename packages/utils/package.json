@@ -7,21 +7,21 @@
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
   "exports": {
     "types": "./bld/library/index.d.ts",
-    "require": "./bld/library/index.js",
     "default": "./bld/library/index.js"
   },
   "dependencies": {
-    "chalk": "4",
-    "latest-version": "5",
+    "chalk": "^5.3.0",
+    "latest-version": "^7.0.0",
     "lodash": "^4.17.21",
     "micromatch": "^4.0.5",
     "tslang": "^0.1.27",
     "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "@types/jest": "^29.4.0",
+    "@types/jest": "^29.5.6",
     "@types/lodash": "^4.14.191",
     "@types/micromatch": "^4.0.2"
   }

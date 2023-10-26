@@ -1,11 +1,11 @@
 import * as FS from 'fs';
 import * as Path from 'path';
 
-import FastGlob from 'fast-glob';
+import {sync as fastGlobSync} from 'fast-glob';
 import * as Handlebars from 'handlebars';
 
-import {removePathExtension} from './@utils';
-import type {Composable, ComposeFunction, File} from './file';
+import {removePathExtension} from './@utils.js';
+import type {Composable, ComposeFunction, File} from './file/index.js';
 import type {
   BinaryFileOptions,
   JSONFile,
@@ -14,7 +14,7 @@ import type {
   TextFileOptions,
   YAMLFile,
   YAMLFileOptions,
-} from './files';
+} from './files/index.js';
 
 export function text(
   path: string,
@@ -124,12 +124,12 @@ export function yaml(...args: any[]): Composable<YAMLFile<unknown>> {
   };
 }
 
-export interface CopyOptions {
+export type CopyOptions = {
   /**
    * Copy content as binary, defaults to `false`.
    */
   binary?: boolean;
-}
+};
 
 export function copy(
   dir: string,
@@ -150,7 +150,7 @@ export function copy(
     patterns = [patterns];
   }
 
-  const paths = FastGlob.sync(patterns, {
+  const paths = fastGlobSync(patterns, {
     cwd: dir,
     dot: true,
     onlyFiles: true,
@@ -175,7 +175,7 @@ export function copy(
   });
 }
 
-export interface HandlebarsOptions {
+export type HandlebarsOptions = {
   /**
    * Path to template, defaults to file sibling to the composable module with
    * name `removePathExtension(composableModulePath) + '.hbs'` if not
@@ -183,7 +183,7 @@ export interface HandlebarsOptions {
    */
   template?: string;
   noEscape?: boolean;
-}
+};
 
 export function handlebars<TData extends object>(
   path: string,
