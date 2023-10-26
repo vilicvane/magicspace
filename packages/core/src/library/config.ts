@@ -1,7 +1,9 @@
+import {readFile} from 'fs/promises';
 import * as Path from 'path';
 
 import EnhancedResolve from 'enhanced-resolve';
 import _ from 'lodash';
+import stripJSONComments from 'strip-json-comments';
 import {__importDefault} from 'tslib';
 import * as x from 'x-value';
 import type {JSONSchema} from 'x-value';
@@ -58,10 +60,15 @@ export async function resolveMagicspaceBoilerplateConfig(
 
   let module: MagicspaceBoilerplateConfig | MagicspaceBoilerplateConfig[];
 
-  try {
-    module = __importDefault(require(path)).default;
-  } catch {
-    module = (await import(path)).default;
+  if (path.endsWith('.json')) {
+    const jsonc = await readFile(path, 'utf8');
+    module = JSON.parse(stripJSONComments(jsonc));
+  } else {
+    try {
+      module = __importDefault(require(path)).default;
+    } catch {
+      module = (await import(path)).default;
+    }
   }
 
   return {path, module};
