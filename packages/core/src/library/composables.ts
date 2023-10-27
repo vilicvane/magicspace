@@ -2,7 +2,7 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
-import * as Handlebars from 'handlebars';
+import Handlebars from 'handlebars';
 
 import {removePathExtension} from './@utils.js';
 import type {Composable, ComposeFunction, File} from './file/index.js';

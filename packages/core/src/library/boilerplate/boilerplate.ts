@@ -1,3 +1,5 @@
+import {fileURLToPath} from 'url';
+
 import getCallerFile from 'get-caller-file';
 import type * as x from 'x-value';
 
@@ -49,7 +51,13 @@ export type BoilerplateBuilder<TOptions extends object> = (
 export function boilerplate<TOptions extends object>(
   builder: BoilerplateCallback<TOptions>,
 ): BoilerplateBuilder<TOptions> {
-  const filename = getCallerFile();
+  let filename = getCallerFile();
+
+  try {
+    filename = fileURLToPath(filename);
+  } catch {
+    // ignore
+  }
 
   return async (...args) => ({
     filename,

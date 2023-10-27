@@ -1,6 +1,7 @@
 import * as ChildProcess from 'child_process';
 import {createRequire} from 'module';
 import * as Path from 'path';
+import {pathToFileURL} from 'url';
 
 import FSExtra from 'fs-extra';
 import npmPath from 'npm-path';
@@ -120,6 +121,6 @@ export async function requireOrImport(path: string): Promise<any> {
   try {
     return __importDefault(require(path));
   } catch {
-    return import(path);
+    return import(pathToFileURL(path).href);
   }
 }
