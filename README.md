@@ -29,7 +29,7 @@ npm install --global @mufan/code-boilerplates
 
    ```bash
    # Assuming you have installed both `magicspace` and `makeflow/mufan-code-boilerplates` globally.
-   magicspace create @mufan/code-boilerplates/general --schema
+   magicspace create @mufan/code-boilerplates/typescript --schema
    ```
 
    Review the generated `.magicspace/boilerplate.json` file and make relevant changes.
