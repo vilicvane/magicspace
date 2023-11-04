@@ -2,7 +2,7 @@ import type {Composable, File} from '../file/index.js';
 
 export type ComposableModuleDefault =
   | Composable
-  | Composable[]
+  | (Composable | false | undefined)[]
   | undefined
   | ComposableBuilder;
 
@@ -13,9 +13,11 @@ export type ComposableBuilder<
   options: TOptions,
 ) =>
   | Composable<TFile>
-  | Composable<TFile>[]
+  | (Composable<TFile> | false | undefined)[]
   | undefined
-  | Promise<Composable<TFile> | Composable<TFile>[] | undefined>;
+  | Promise<
+      Composable<TFile> | (Composable<TFile> | false | undefined)[] | undefined
+    >;
 
 /**
  * A utility function that returns the givin composable / composable module function as-is.

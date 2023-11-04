@@ -78,23 +78,30 @@ export async function composables(
     const baseDir = Path.relative(root, Path.dirname(composableModulePath));
 
     allComposables.push(
-      ...composables.map(composable => {
-        const {path} = composable;
+      ...composables
+        .filter(
+          (
+            composable,
+          ): composable is Exclude<typeof composable, false | undefined> =>
+            !!composable,
+        )
+        .map(composable => {
+          const {path} = composable;
 
-        return {
-          source: composableModulePath,
-          target: path
-            ? Path.join(baseDir, path)
-            : Path.join(
-                baseDir,
-                Path.basename(
-                  composableModulePath,
-                  Path.extname(composableModulePath),
+          return {
+            source: composableModulePath,
+            target: path
+              ? Path.join(baseDir, path)
+              : Path.join(
+                  baseDir,
+                  Path.basename(
+                    composableModulePath,
+                    Path.extname(composableModulePath),
+                  ),
                 ),
-              ),
-          ...composable,
-        };
-      }),
+            ...composable,
+          };
+        }),
     );
   }
 
