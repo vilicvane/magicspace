@@ -232,15 +232,18 @@ export class Space {
   createFileObject(
     path: string,
     context: FileContext,
-    type = this.extensionToFileTypeMap.get(Path.dirname(path)),
+    type: string | undefined,
+    creator: FileObjectCreator | undefined,
   ): File {
-    if (!type) {
+    if (type === undefined && !creator) {
       throw new Error(
         `Cannot infer composable file type from path ${JSON.stringify(path)}`,
       );
     }
 
-    const creator = this.fileObjectCreatorMap.get(type);
+    if (!creator) {
+      creator = this.fileObjectCreatorMap.get(type);
+    }
 
     if (!creator) {
       throw new Error(`Unknown file type ${JSON.stringify(type)}`);

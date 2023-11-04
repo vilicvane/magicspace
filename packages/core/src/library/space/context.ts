@@ -33,6 +33,7 @@ export class Context {
           outputPath: Path.join(space.dir, Path.relative(this.dir, path)),
         },
         composable.type,
+        composable.file,
       );
 
       fileMap.set(path, file);

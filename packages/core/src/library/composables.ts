@@ -15,6 +15,7 @@ import type {
   YAMLFile,
   YAMLFileOptions,
 } from './files/index.js';
+import {JSONLikeFile} from './files/index.js';
 
 export function text(
   path: string,
@@ -85,6 +86,66 @@ export function json(...args: any[]): Composable<JSONFile<unknown>> {
     path,
     compose: composer,
     options,
+  };
+}
+
+export type ObjectModuleOptions = {
+  type: 'module' | 'commonjs';
+  comment?: string;
+};
+
+export function objectModule<TContent>(
+  path: string,
+  value: TContent | ComposeFunction<JSONLikeFile<TContent>>,
+  options: ObjectModuleOptions,
+): Composable<JSONLikeFile<TContent>>;
+export function objectModule<TContent>(
+  value: TContent | ComposeFunction<JSONLikeFile<TContent>>,
+  options: ObjectModuleOptions,
+): Composable<JSONLikeFile<TContent>>;
+export function objectModule(
+  ...args: any[]
+): Composable<JSONLikeFile<unknown>> {
+  let path: string | undefined;
+  let value: unknown;
+  let options: ObjectModuleOptions;
+
+  if (typeof args[0] === 'string') {
+    [path, value, options] = args;
+  } else {
+    [value, options] = args;
+  }
+
+  const {type, comment} = options;
+
+  let composer: ComposeFunction<JSONLikeFile<unknown>>;
+
+  if (typeof value === 'function') {
+    composer = value as ComposeFunction<JSONLikeFile<unknown>>;
+  } else {
+    composer = () => value;
+  }
+
+  let composableType: string;
+  let before = comment ? `${comment}\n` : '';
+
+  if (type === 'module') {
+    composableType = 'esm-object-module';
+    before += 'export default ';
+  } else {
+    composableType = 'cjs-object-module';
+    before += 'module.exports = ';
+  }
+
+  return {
+    type: composableType,
+    file: (path, context) => new JSONLikeFile(composableType, path, context),
+    path,
+    compose: composer,
+    options: {
+      before,
+      after: ';',
+    },
   };
 }
 
