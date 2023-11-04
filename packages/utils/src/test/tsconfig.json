@@ -2,6 +2,7 @@
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
+    "types": ["jest"],
     "rootDir": ".",
     "outDir": "../../bld/test"
   },
