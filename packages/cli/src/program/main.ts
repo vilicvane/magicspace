@@ -16,5 +16,4 @@ const cli = new CLI(
 
 const shim = new Shim(cli);
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 shim.execute(process.argv);

@@ -27,7 +27,6 @@ export default class DefaultCommand extends Command {
   @metadata
   async execute(options: DefaultCommandOptions): Promise<string | HelpInfo> {
     if (options.version) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
       return require('../../../package').version;
     }
 

@@ -180,7 +180,6 @@ export class ProjectGit extends Git {
     const diffRenameRegex = /^rename from (.+)\r?\n^rename to (.+)/gm;
     let diffRenameGroups: RegExpExecArray | null;
 
-    // eslint-disable-next-line no-cond-assign
     while ((diffRenameGroups = diffRenameRegex.exec(diff))) {
       renames.push({
         from: diffRenameGroups[1],
