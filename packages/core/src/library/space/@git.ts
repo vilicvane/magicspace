@@ -125,7 +125,11 @@ export class ProjectGit extends Git {
         throw error;
       }
 
-      if (!/^CONFLICT/m.test(error.stdout)) {
+      if (
+        !/^CONFLICT/m.test(error.stdout) &&
+        !/^CONFLICT/m.test(error.stderr)
+      ) {
+        this.logger?.stdout(error.stdout);
         this.logger?.stderr(error.stderr);
 
         if (/^error: Your local changes/m.test(error.stderr)) {
