@@ -19,6 +19,7 @@
     "utils": "yarn workspace @magicspace/utils",
     "magicspace": "yarn workspace magicspace"
   },
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "packages/boilerplate-url",
     "packages/boilerplate-url-resolver",

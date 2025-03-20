@@ -33,6 +33,7 @@ export class Space {
   ) {}
 
   async initialize({
+    force = false,
     ours = false,
   }: ProjectInitializeOptions): Promise<
     'not-repository-root' | 'merge-in-progress' | 'already-initialized' | true
@@ -60,7 +61,7 @@ export class Space {
         return 'merge-in-progress';
       }
 
-      if (projectGit.getLastMagicspaceCommit()) {
+      if (!force && projectGit.getLastMagicspaceCommit()) {
         return 'already-initialized';
       }
 
@@ -266,6 +267,7 @@ export class Space {
 }
 
 export type ProjectInitializeOptions = {
+  force?: boolean;
   ours?: boolean;
 };
 

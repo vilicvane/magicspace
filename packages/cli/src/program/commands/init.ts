@@ -9,6 +9,14 @@ import {createDefaultSpace} from '../@space.js';
 export class InitOptions extends CommonOptions {
   @option({
     toggle: true,
+    description:
+      'Force initialization even if the repository is already initialized',
+    default: false,
+  })
+  force!: boolean;
+
+  @option({
+    toggle: true,
     description: 'Use "ours" merge strategy',
     default: false,
   })
