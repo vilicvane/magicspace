@@ -12,5 +12,5 @@ jobs:
     container: node:20
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install
-      - run: yarn test
+      - run: npm install
+      - run: npm test

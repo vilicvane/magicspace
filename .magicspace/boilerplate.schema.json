@@ -1,19 +1,7 @@
 {
-  "$ref": "#/$defs/type-33",
+  "$ref": "#/$defs/type-32",
   "$defs": {
     "type-1": {
-      "anyOf": [
-        {
-          "type": "string",
-          "const": "module"
-        },
-        {
-          "type": "string",
-          "const": "commonjs"
-        }
-      ]
-    },
-    "type-2": {
       "anyOf": [
         {
           "type": "string",
@@ -49,7 +37,7 @@
         }
       ]
     },
-    "type-3": {
+    "type-2": {
       "type": "object",
       "required": [],
       "properties": {
@@ -71,7 +59,7 @@
       },
       "additionalProperties": false
     },
-    "type-4": {
+    "type-3": {
       "anyOf": [
         {
           "type": "string",
@@ -80,10 +68,14 @@
         {
           "type": "string",
           "const": "yarn"
+        },
+        {
+          "type": "string",
+          "const": "npm"
         }
       ]
     },
-    "type-5": {
+    "type-4": {
       "anyOf": [
         {
           "type": "string",
@@ -99,15 +91,15 @@
         }
       ]
     },
-    "type-6": {
+    "type-5": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-5"
+          "$ref": "#/$defs/type-4"
         }
       ],
-      "description": "Defaults to 'library' if project name is 'library', otherwise 'program'."
+      "description": "Defaults to 'library' if project name includes 'library', otherwise 'program'."
     },
-    "type-7": {
+    "type-6": {
       "type": "object",
       "required": [
         "subpath",
@@ -126,10 +118,10 @@
       },
       "additionalProperties": false
     },
-    "type-8": {
+    "type-7": {
       "anyOf": [
         {
-          "$ref": "#/$defs/type-7"
+          "$ref": "#/$defs/type-6"
         },
         {
           "type": "string"
@@ -139,15 +131,15 @@
         }
       ]
     },
-    "type-9": {
+    "type-8": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-8"
+          "$ref": "#/$defs/type-7"
         }
       ],
       "description": "Whether generate `exports` field in package.json"
     },
-    "type-10": {
+    "type-9": {
       "anyOf": [
         {
           "type": "string"
@@ -158,15 +150,15 @@
         }
       ]
     },
-    "type-11": {
+    "type-10": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-10"
+          "$ref": "#/$defs/type-9"
         }
       ],
       "description": "Extra parent directory, defaults to false."
     },
-    "type-12": {
+    "type-11": {
       "anyOf": [
         {
           "type": "string"
@@ -177,15 +169,15 @@
         }
       ]
     },
-    "type-13": {
+    "type-12": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-12"
+          "$ref": "#/$defs/type-11"
         }
       ],
       "description": "Source directory, defaults to false if the project type is 'script', otherwise 'src'."
     },
-    "type-14": {
+    "type-13": {
       "anyOf": [
         {
           "type": "string"
@@ -196,39 +188,39 @@
         }
       ]
     },
-    "type-15": {
+    "type-14": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-14"
+          "$ref": "#/$defs/type-13"
         }
       ],
       "description": "TypeScript project directory under source directory, defaults to `name` option."
     },
-    "type-16": {
+    "type-15": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "type-17": {
+    "type-16": {
       "anyOf": [
         {
-          "$ref": "#/$defs/type-16"
+          "$ref": "#/$defs/type-15"
         },
         {
           "type": "boolean"
         }
       ]
     },
-    "type-18": {
+    "type-17": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-17"
+          "$ref": "#/$defs/type-16"
         }
       ],
       "description": "Whether to add entrances file(s) and related package/configuration.If true, defaults to ['@entrances.ts']."
     },
-    "type-19": {
+    "type-18": {
       "type": "object",
       "required": [
         "package",
@@ -244,31 +236,31 @@
       },
       "additionalProperties": false
     },
-    "type-20": {
+    "type-19": {
       "anyOf": [
         {
           "type": "string"
         },
         {
-          "$ref": "#/$defs/type-19"
+          "$ref": "#/$defs/type-18"
         }
       ]
     },
-    "type-21": {
+    "type-20": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/type-20"
+        "$ref": "#/$defs/type-19"
       }
     },
-    "type-22": {
+    "type-21": {
       "allOf": [
         {
-          "$ref": "#/$defs/type-21"
+          "$ref": "#/$defs/type-20"
         }
       ],
       "description": "References to other TypeScript projects, corresponded to `references` field in 'tsconfig.json'"
     },
-    "type-23": {
+    "type-22": {
       "type": "object",
       "required": [],
       "properties": {
@@ -277,10 +269,10 @@
           "description": "TypeScript project name, defaults to 'program'."
         },
         "type": {
-          "$ref": "#/$defs/type-6"
+          "$ref": "#/$defs/type-5"
         },
         "exports": {
-          "$ref": "#/$defs/type-9"
+          "$ref": "#/$defs/type-8"
         },
         "exportSourceAs": {
           "type": "string",
@@ -288,37 +280,41 @@
         },
         "dev": {
           "type": "boolean",
-          "description": "Whether this TypeScript project is a development-time project, defaults to true if the project name is 'test' or project type is 'script', otherwise false."
+          "description": "Whether this TypeScript project is a development-time project, defaults to true if the project name includes 'test' or project type is 'script', otherwise false."
         },
         "parentDir": {
-          "$ref": "#/$defs/type-11"
+          "$ref": "#/$defs/type-10"
         },
         "src": {
-          "$ref": "#/$defs/type-13"
+          "$ref": "#/$defs/type-12"
         },
         "dir": {
-          "$ref": "#/$defs/type-15"
+          "$ref": "#/$defs/type-14"
         },
         "noEmit": {
           "type": "boolean",
           "description": "Whether this project does not emit build artifact, defaults to true if `src` is false, otherwise false."
         },
+        "test": {
+          "type": "boolean",
+          "description": "Whether this project is a test project or includes tests, defaults to true if `name` includes 'test', otherwise false."
+        },
         "entrances": {
-          "$ref": "#/$defs/type-18"
+          "$ref": "#/$defs/type-17"
         },
         "references": {
-          "$ref": "#/$defs/type-22"
+          "$ref": "#/$defs/type-21"
         }
       },
       "additionalProperties": false
     },
-    "type-24": {
+    "type-23": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/type-23"
+        "$ref": "#/$defs/type-22"
       }
     },
-    "type-25": {
+    "type-24": {
       "type": "object",
       "required": [
         "name"
@@ -327,29 +323,26 @@
         "name": {
           "type": "string"
         },
-        "type": {
-          "$ref": "#/$defs/type-1"
-        },
         "dir": {
           "type": "string",
           "description": "Directory name of this package, defaults to package name (\"@*/\" removed if any)."
         },
         "badges": {
-          "$ref": "#/$defs/type-3"
+          "$ref": "#/$defs/type-2"
         },
         "projects": {
-          "$ref": "#/$defs/type-24"
+          "$ref": "#/$defs/type-23"
         }
       },
       "additionalProperties": false
     },
-    "type-26": {
+    "type-25": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/type-25"
+        "$ref": "#/$defs/type-24"
       }
     },
-    "type-27": {
+    "type-26": {
       "anyOf": [
         {
           "type": "string",
@@ -365,7 +358,7 @@
         }
       ]
     },
-    "type-28": {
+    "type-27": {
       "anyOf": [
         {
           "type": "string",
@@ -381,7 +374,7 @@
         }
       ]
     },
-    "type-29": {
+    "type-28": {
       "anyOf": [
         {
           "type": "string",
@@ -393,7 +386,7 @@
         }
       ]
     },
-    "type-30": {
+    "type-29": {
       "type": "object",
       "required": [
         "printWidth",
@@ -425,13 +418,13 @@
           "type": "boolean"
         },
         "quoteProps": {
-          "$ref": "#/$defs/type-27"
+          "$ref": "#/$defs/type-26"
         },
         "jsxSingleQuote": {
           "type": "boolean"
         },
         "trailingComma": {
-          "$ref": "#/$defs/type-28"
+          "$ref": "#/$defs/type-27"
         },
         "bracketSpacing": {
           "type": "boolean"
@@ -440,28 +433,27 @@
           "type": "boolean"
         },
         "arrowParens": {
-          "$ref": "#/$defs/type-29"
+          "$ref": "#/$defs/type-28"
         }
       },
       "additionalProperties": false
     },
-    "type-31": {
+    "type-30": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/type-23"
+        "$ref": "#/$defs/type-22"
       }
     },
-    "type-32": {
+    "type-31": {
       "type": "object",
       "required": [
-        "name"
+        "name",
+        "defaultBranch",
+        "packageManager"
       ],
       "properties": {
         "name": {
           "type": "string"
-        },
-        "type": {
-          "$ref": "#/$defs/type-1"
         },
         "description": {
           "type": "string"
@@ -470,37 +462,37 @@
           "type": "string"
         },
         "license": {
-          "$ref": "#/$defs/type-2"
+          "$ref": "#/$defs/type-1"
         },
         "author": {
           "type": "string"
         },
         "badges": {
-          "$ref": "#/$defs/type-3"
+          "$ref": "#/$defs/type-2"
         },
         "defaultBranch": {
           "type": "string"
         },
         "packageManager": {
-          "$ref": "#/$defs/type-4"
+          "$ref": "#/$defs/type-3"
         },
         "packagesDir": {
           "type": "string",
           "description": "Name of the packages directory, defaults to \"packages\"."
         },
         "packages": {
-          "$ref": "#/$defs/type-26"
+          "$ref": "#/$defs/type-25"
         },
         "prettier": {
-          "$ref": "#/$defs/type-30"
+          "$ref": "#/$defs/type-29"
         },
         "projects": {
-          "$ref": "#/$defs/type-31"
+          "$ref": "#/$defs/type-30"
         }
       },
       "additionalProperties": false
     },
-    "type-33": {
+    "type-32": {
       "type": "object",
       "required": [
         "$schema",
@@ -515,7 +507,7 @@
           "type": "string"
         },
         "options": {
-          "$ref": "#/$defs/type-32"
+          "$ref": "#/$defs/type-31"
         }
       },
       "additionalProperties": false

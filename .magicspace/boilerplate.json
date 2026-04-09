@@ -6,9 +6,8 @@
     "repository": "https://github.com/makeflow/magicspace.git",
     "author": "Chengdu Mufan Technology Co., Ltd.",
     "license": "MIT",
-    "type": "module",
     "defaultBranch": "master",
-    "packageManager": "yarn",
+    "packageManager": "npm",
     "badges": {
       "npm": true,
       "license": true,
