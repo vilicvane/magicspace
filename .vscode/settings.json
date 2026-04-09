@@ -3,7 +3,7 @@
   "editor.insertSpaces": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.rulers": [80],
@@ -13,19 +13,9 @@
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
-  "typescript.preferences.importModuleSpecifier": "project-relative",
-  "typescript.preferences.importModuleSpecifierEnding": "js",
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.workingDirectories": [
-    ".",
-    "packages/core/src/library",
-    "packages/cli/src/program",
-    "packages/utils/src/library",
-    "packages/utils/src/test",
-    "packages/boilerplate-url/src/library",
-    "packages/boilerplate-url/src/composables",
-    "packages/boilerplate-url-resolver/src/program"
-  ],
+  "js/ts.preferences.importModuleSpecifier": "project-relative",
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "eslint.validate": [
     "javascript",
     "javascriptreact",

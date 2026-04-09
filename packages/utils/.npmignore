@@ -1,4 +1,5 @@
 *
 !/src/library/**/*.{ts,tsx}
 !/bld/library/**
+/bld/library/**/*.test.js
 *.tsbuildinfo
