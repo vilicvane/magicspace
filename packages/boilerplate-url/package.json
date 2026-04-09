@@ -10,7 +10,7 @@
     "default": "./bld/library/index.js"
   },
   "dependencies": {
-    "@magicspace/core": "workspace:*",
+    "@magicspace/core": "*",
     "tslib": "^2.8.1"
   }
 }
