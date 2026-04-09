@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import type * as HTTP from 'http';
 import {createRequire} from 'module';
 import * as Path from 'path';
 

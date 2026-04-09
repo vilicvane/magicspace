@@ -16,4 +16,4 @@ const cli = new CLI(
 
 const shim = new Shim(cli);
 
-shim.execute(process.argv);
+void shim.execute(process.argv);

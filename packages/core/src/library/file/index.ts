@@ -1,2 +1,2 @@
-export * from './composable.js';
+export type * from './composable.js';
 export * from './file.js';

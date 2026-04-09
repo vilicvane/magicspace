@@ -86,7 +86,7 @@ export class ProjectGit extends Git {
       if (!/(?:error|fatal): No such remote:/.test(error.stderr)) {
         this.logger?.stderr(error.stderr);
 
-        throw new Error('Error removing magicspace remote');
+        throw new Error('Error removing magicspace remote', {cause: error});
       }
     }
 
@@ -135,6 +135,7 @@ export class ProjectGit extends Git {
         if (/^error: Your local changes/m.test(error.stderr)) {
           throw new Error(
             'Cannot merge magicspace changes, conflict with local changes',
+            {cause: error},
           );
         }
 
@@ -145,10 +146,11 @@ export class ProjectGit extends Git {
         ) {
           throw new Error(
             'Cannot merge magicspace changes, conflict with untracked files',
+            {cause: error},
           );
         }
 
-        throw new Error('Error merging magicspace changes');
+        throw new Error('Error merging magicspace changes', {cause: error});
       }
 
       this.logger?.stdout(error.stdout);
@@ -241,7 +243,6 @@ export class ProjectGit extends Git {
           };
         }
 
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           const nextFromDir = Path.dirname(fromDir);
           const nextToDir = Path.dirname(toDir);
