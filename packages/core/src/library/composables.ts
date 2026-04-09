@@ -2,12 +2,11 @@ import * as FS from 'fs';
 import * as Path from 'path';
 
 import FastGlob from 'fast-glob';
-import Handlebars from 'handlebars';
 
-import {removePathExtension} from './@utils.js';
 import type {Composable, ComposeFunction, File} from './file/index.js';
 import type {
   BinaryFileOptions,
+  HandlebarsFile,
   JSONFile,
   JSONFileOptions,
   TextFile,
@@ -248,14 +247,16 @@ export type HandlebarsOptions = {
 
 export function handlebars<TData extends object>(
   path: string,
-  data: TData,
+  data: TData | ComposeFunction<HandlebarsFile<TData>>,
   options?: HandlebarsOptions,
-): Composable<TextFile>;
+): Composable<HandlebarsFile<TData>>;
 export function handlebars<TData extends object>(
-  data: TData,
+  data: TData | ComposeFunction<HandlebarsFile<TData>>,
   options?: HandlebarsOptions,
-): Composable<TextFile>;
-export function handlebars(...args: any[]): Composable<TextFile> {
+): Composable<HandlebarsFile<TData>>;
+export function handlebars(
+  ...args: any[]
+): Composable<HandlebarsFile<unknown>> {
   let path: string | undefined;
   let data: unknown;
   let options: HandlebarsOptions;
@@ -266,18 +267,21 @@ export function handlebars(...args: any[]): Composable<TextFile> {
     [data, options = {}] = args;
   }
 
+  let composer: ComposeFunction<HandlebarsFile<unknown>>;
+
+  if (typeof data === 'function') {
+    composer = data as ComposeFunction<HandlebarsFile<unknown>>;
+  } else {
+    composer = () => data;
+  }
+
   return {
-    type: 'text',
+    type: 'handlebars',
     path,
-    compose(_content, {composableModulePath}) {
-      const templatePath =
-        options.template ?? `${removePathExtension(composableModulePath)}.hbs`;
-
-      const template = FS.readFileSync(templatePath, 'utf8');
-
-      return Handlebars.compile(template, {
-        noEscape: options.noEscape,
-      })(data);
+    compose: composer,
+    options: {
+      template: options.template,
+      noEscape: options.noEscape,
     },
   };
 }

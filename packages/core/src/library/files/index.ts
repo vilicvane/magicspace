@@ -4,3 +4,4 @@ export * from './text-file.js';
 export * from './binary-file.js';
 export * from './yaml-file.js';
 export * from './json-like-file.js';
+export * from './handlebars-file.js';
