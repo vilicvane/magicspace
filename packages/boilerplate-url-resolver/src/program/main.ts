@@ -6,15 +6,11 @@ import * as Path from 'path';
 
 import {main} from 'main-function';
 import fetch from 'node-fetch';
-import ProxyAgent from 'proxy-agent';
+import {ProxyAgent} from 'proxy-agent';
 
 import {Extract} from './@utils.js';
 
-const {HTTP_PROXY} = process.env;
-
-const agent = HTTP_PROXY
-  ? (new ProxyAgent(HTTP_PROXY) as unknown as HTTP.Agent)
-  : undefined;
+const agent = new ProxyAgent();
 
 const require = createRequire(import.meta.url);
 

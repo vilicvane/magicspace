@@ -1,7 +1,9 @@
 *
 !/src/library/**/*.{ts,tsx}
 !/bld/library/**
+/bld/library/**/*.test.js
 !/src/composables/**/*.{ts,tsx}
 !/bld/composables/**
+/bld/composables/**/*.test.js
 !/boilerplate.*
 *.tsbuildinfo

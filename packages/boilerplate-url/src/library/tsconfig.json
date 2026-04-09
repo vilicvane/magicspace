@@ -2,6 +2,7 @@
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
+    "types": ["node"],
     "rootDir": ".",
     "outDir": "../../bld/library"
   },
