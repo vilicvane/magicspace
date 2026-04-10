@@ -18,13 +18,20 @@
     "utils": "npm run --workspace @magicspace/utils",
     "magicspace": "npm run --workspace magicspace"
   },
+  "workspaces": [
+    "packages/boilerplate-url",
+    "packages/boilerplate-url-resolver",
+    "packages/core",
+    "packages/utils",
+    "packages/cli"
+  ],
   "devDependencies": {
     "@mufan/eslint-plugin": "^0.3.0",
     "@types/jest": "^30.0.0",
     "cross-env": "^10.1.0",
     "eslint": "^10.2.0",
     "jest": "^30.3.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.2",
     "rimraf": "^6.1.3",
     "typescript": "^6.0.2"
   }
