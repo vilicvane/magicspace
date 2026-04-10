@@ -96,9 +96,9 @@ export async function resolveBoilerplateModule(
 
   if (typeof boilerplateModulePath !== 'string') {
     throw new Error(
-      `Cannot resolve boilerplate ${JSON.stringify(
-        specifier,
-      )} from ${JSON.stringify(Path.relative(process.cwd(), dir))}`,
+      `\
+Cannot resolve boilerplate ${JSON.stringify(specifier)} from:
+${dirs.map(dir => `- ${dir}`).join('\n')}`,
     );
   }
 
