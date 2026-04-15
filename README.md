@@ -9,14 +9,41 @@ Toolkit for living boilerplate.
 
 - Composable boilerplate mechanism.
 - Git-powered conflict resolution for boilerplate update.
+- Wrap common template tools (like `create-vite`) as living boilerplates with [`@magicspace/boilerplate-command`](packages/boilerplate-command).
+
+## Quick Start with Vite
+
+1. Install magicspace and the boilerplate-command package globally:
+
+   ```bash
+   npm install --global magicspace @magicspace/boilerplate-command
+   ```
+
+2. Initialize a Git repository and create a magicspace configuration:
+
+   ```bash
+   git init my-vite-app && cd my-vite-app
+   magicspace create @magicspace/boilerplate-command
+   ```
+
+   If prompted, select the **vite** example. This generates a `.magicspace/boilerplate.json` that runs `npx create-vite .` under the hood.
+
+3. Initialize magicspace:
+
+   ```bash
+   magicspace init
+   ```
+
+4. Review generated changes and commit to complete the merge.
+
+Now whenever Vite releases a template update, simply run `magicspace update` to get a clean, conflict-aware diff merged into your project.
+
+![magicspace update](./res/magicspace-update.png)
 
 ## Installation
 
 ```bash
 npm install --global magicspace
-
-# Install a boilerplate package
-npm install --global @mufan/code-boilerplates
 ```
 
 ## Usage
@@ -28,8 +55,21 @@ npm install --global @mufan/code-boilerplates
 2. Create magicspace configuration file:
 
    ```bash
-   # Assuming you have installed both `magicspace` and `makeflow/mufan-code-boilerplates` globally.
+   magicspace create <boilerplate> [--schema]
+   ```
+
+   For example, with a custom boilerplate package:
+
+   ```bash
+   npm install --global @mufan/code-boilerplates
    magicspace create @mufan/code-boilerplates/typescript --schema
+   ```
+
+   Or with `@magicspace/boilerplate-command` to wrap any scaffolding CLI:
+
+   ```bash
+   npm install --global @magicspace/boilerplate-command
+   magicspace create @magicspace/boilerplate-command
    ```
 
    Review the generated `.magicspace/boilerplate.json` file and make relevant changes.
@@ -66,7 +106,7 @@ npm install --global @mufan/code-boilerplates
 
 ### Examples
 
-- [Boilerplate URL](packages/boilerplate-url)
+- [`@magicspace/boilerplate-command`](packages/boilerplate-command) — Wrap any CLI scaffolding tool as a magicspace boilerplate.
 - [Mufan Code Boilerplates](https://github.com/makeflow/mufan-code-boilerplates)
 
 ## License
