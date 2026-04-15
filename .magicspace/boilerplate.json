@@ -44,6 +44,20 @@
         ]
       },
       {
+        "name": "@magicspace/boilerplate-command",
+        "projects": [
+          {
+            "name": "library",
+            "references": [
+              {
+                "package": "@magicspace/core",
+                "project": "library"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "name": "@magicspace/boilerplate-url",
         "projects": [
           {

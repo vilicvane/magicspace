@@ -1,0 +1,16 @@
+{
+  "name": "@magicspace/boilerplate-command",
+  "version": "0.0.0",
+  "repository": "https://github.com/makeflow/magicspace.git",
+  "license": "MIT",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "type": "module",
+  "exports": {
+    "types": "./bld/library/index.d.ts",
+    "default": "./bld/library/index.js"
+  },
+  "dependencies": {
+    "@magicspace/core": "*",
+    "tslib": "^2.8.1"
+  }
+}
