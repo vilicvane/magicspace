@@ -1,9 +1,11 @@
+import type {ChildProcess} from 'child_process';
 import * as Path from 'path';
 
 import {dirSync as tmpDirSync} from 'tmp';
 
 import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants.js';
-import {conservativelyMove, npmRun} from '../@utils.js';
+import {conservativelyMove, npmSpawn} from '../@utils.js';
+import type {BoilerplatePostcomposeScriptSpawnOptions} from '../boilerplate/index.js';
 import type {MagicspaceConfig, MagicspaceConfigScriptName} from '../config.js';
 import type {File, FileContext} from '../file/index.js';
 
@@ -37,17 +39,15 @@ export class Space {
   }: ProjectInitializeOptions): Promise<
     'not-repository-root' | 'merge-in-progress' | 'already-initialized' | true
   > {
-    const {name: tempDir, removeCallback: tempDirRemoveCallback} = tmpDirSync({
-      prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
-      unsafeCleanup: true,
-    });
+    const {
+      projectDir,
+      projectGit,
+      tempProjectDir,
+      tempProjectGit,
+      tempProjectDirRemoveCallback,
+    } = this.prepareDirsAndGits();
 
     try {
-      const projectDir = this.dir;
-
-      const projectGit = new ProjectGit(projectDir);
-      const tempGit = new TempGit(tempDir);
-
       if (!projectGit.isRepositoryRoot()) {
         return 'not-repository-root';
       }
@@ -64,17 +64,17 @@ export class Space {
         return 'already-initialized';
       }
 
-      tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
+      tempProjectGit.cloneProjectRepositoryWithoutCheckout(projectDir);
 
-      tempGit.checkoutOrphanMagicspaceBranch();
+      tempProjectGit.checkoutOrphanMagicspaceBranch();
 
-      await this.generate(tempDir);
+      await this.generate(tempProjectDir);
 
-      await this.runLifecycleScripts('postcompose', tempDir);
+      await this.runLifecycleScripts('postcompose', tempProjectDir);
 
-      tempGit.addAndCommitChanges('initialize');
+      tempProjectGit.addAndCommitChanges('initialize');
 
-      projectGit.addOrUpdateMagicspaceRemote(tempDir);
+      projectGit.addOrUpdateMagicspaceRemote(tempProjectDir);
 
       projectGit.pullMagicspaceChangesWithoutCommit('initialize', ours);
 
@@ -82,7 +82,7 @@ export class Space {
 
       return true;
     } finally {
-      tempDirRemoveCallback();
+      tempProjectDirRemoveCallback();
     }
   }
 
@@ -94,17 +94,15 @@ export class Space {
     | 'already-up-to-date'
     | true
   > {
-    const {name: tempDir, removeCallback: tempDirRemoveCallback} = tmpDirSync({
-      prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
-      unsafeCleanup: true,
-    });
+    const {
+      projectDir,
+      projectGit,
+      tempProjectDir,
+      tempProjectGit,
+      tempProjectDirRemoveCallback,
+    } = this.prepareDirsAndGits();
 
     try {
-      const projectDir = this.dir;
-
-      const projectGit = new ProjectGit(projectDir);
-      const tempGit = new TempGit(tempDir);
-
       if (!projectGit.isRepositoryRoot()) {
         return 'not-repository-root';
       }
@@ -123,21 +121,21 @@ export class Space {
         return 'not-initialized';
       }
 
-      tempGit.cloneProjectRepositoryWithoutCheckout(projectDir);
+      tempProjectGit.cloneProjectRepositoryWithoutCheckout(projectDir);
 
-      tempGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
+      tempProjectGit.checkoutOrphanMagicspaceBranch(lastMagicspaceCommit);
 
-      await this.generate(tempDir);
+      await this.generate(tempProjectDir);
 
-      await this.runLifecycleScripts('postcompose', tempDir);
+      await this.runLifecycleScripts('postcompose', tempProjectDir);
 
-      if (tempGit.isWorkingDirectoryClean()) {
+      if (tempProjectGit.isWorkingDirectoryClean()) {
         return 'already-up-to-date';
       }
 
-      tempGit.addAndCommitChanges('update');
+      tempProjectGit.addAndCommitChanges('update');
 
-      projectGit.addOrUpdateMagicspaceRemote(tempDir);
+      projectGit.addOrUpdateMagicspaceRemote(tempProjectDir);
 
       projectGit.pullMagicspaceChangesWithoutCommit('update');
 
@@ -145,7 +143,7 @@ export class Space {
 
       return true;
     } finally {
-      tempDirRemoveCallback();
+      tempProjectDirRemoveCallback();
     }
   }
 
@@ -194,33 +192,67 @@ export class Space {
     lifecycle: MagicspaceConfigScriptName,
     cwd: string,
   ): Promise<void> {
+    const logger = this.logger;
+
     const scriptEntries = this.config.scripts[lifecycle];
 
     for (const {source: configPath, script} of scriptEntries) {
-      const logger = this.logger;
-
       logger?.info({
         type: 'run-lifecycle-script',
         lifecycle,
         script,
       });
 
-      const subprocess = await npmRun(script, {
-        pathCWD: Path.dirname(configPath),
-        cwd,
-      });
+      const pathCWD = Path.dirname(configPath);
 
-      subprocess.stdout!.on('data', chunk => logger?.stdout(chunk));
-      subprocess.stderr!.on('data', chunk => logger?.stderr(chunk));
+      if (typeof script === 'function') {
+        await script({
+          async spawn(
+            command,
+            ...restArgs:
+              | [string[], BoilerplatePostcomposeScriptSpawnOptions?]
+              | [BoilerplatePostcomposeScriptSpawnOptions?]
+          ) {
+            const [args, options] = Array.isArray(restArgs[0])
+              ? (restArgs as [
+                  string[],
+                  BoilerplatePostcomposeScriptSpawnOptions?,
+                ])
+              : [undefined, restArgs[0]];
 
-      await new Promise<void>((resolve, reject) => {
+            const subprocess = await npmSpawn(command, {
+              pathCWD,
+              cwd,
+              shell: options?.shell,
+              args,
+            });
+
+            await handleSubprocess(command, subprocess);
+          },
+        });
+      } else {
+        const subprocess = await npmSpawn(script, {
+          pathCWD,
+          cwd,
+          shell: true,
+        });
+
+        await handleSubprocess(script, subprocess);
+      }
+    }
+
+    function handleSubprocess(
+      command: string,
+      subprocess: ChildProcess,
+    ): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
         subprocess.on('exit', code => {
           if (code === 0) {
             resolve();
           } else {
             reject(
               new Error(
-                `Script ${JSON.stringify(script)} exited with code ${code}`,
+                `Command ${JSON.stringify(command)} exited with code ${code}`,
               ),
             );
           }
@@ -262,6 +294,34 @@ export class Space {
         )} and ${JSON.stringify(type)}`,
       );
     }
+  }
+
+  private prepareDirsAndGits(): {
+    projectDir: string;
+    projectGit: ProjectGit;
+    tempProjectDir: string;
+    tempProjectGit: TempGit;
+    tempProjectDirRemoveCallback: () => void;
+  } {
+    const {name: tempDir, removeCallback: tempProjectDirRemoveCallback} =
+      tmpDirSync({
+        prefix: TEMP_MAGIC_REPOSITORY_DIR_PREFIX,
+        unsafeCleanup: true,
+      });
+
+    const projectDir = this.dir;
+    const projectGit = new ProjectGit(projectDir);
+
+    const tempProjectDir = Path.join(tempDir, Path.basename(projectDir));
+    const tempProjectGit = new TempGit(tempProjectDir);
+
+    return {
+      projectDir,
+      projectGit,
+      tempProjectDir,
+      tempProjectGit,
+      tempProjectDirRemoveCallback,
+    };
   }
 }
 

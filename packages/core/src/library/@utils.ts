@@ -52,27 +52,23 @@ export function spawnSync(
   return stdout;
 }
 
-export type NPMRunOptions = {
+export type NPMSpawnOptions = {
   pathCWD: string;
   cwd: string;
+  shell?: boolean;
+  args?: string[];
 };
 
-export async function npmRun(
+export async function npmSpawn(
   script: string,
-  {pathCWD, cwd}: NPMRunOptions,
+  {pathCWD, cwd, args = [], shell = false}: NPMSpawnOptions,
 ): Promise<ChildProcess.ChildProcess> {
-  const path = await new Promise<string>((resolve, reject) =>
-    npmPath.get({cwd: pathCWD}, (error: any, path: string) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(path);
-      }
-    }),
-  );
+  const path = await getNPMPath(pathCWD);
 
-  return ChildProcess.exec(script, {
+  return ChildProcess.spawn(script, args, {
     cwd,
+    stdio: 'inherit',
+    shell,
     env: {
       ...process.env,
       [npmPath.PATH]: path,
@@ -123,4 +119,16 @@ export async function requireOrImport(path: string): Promise<any> {
   } catch {
     return import(pathToFileURL(path).href);
   }
+}
+
+function getNPMPath(cwd: string): Promise<string> {
+  return new Promise((resolve, reject) =>
+    npmPath.get({cwd}, (error, path) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(path);
+      }
+    }),
+  );
 }

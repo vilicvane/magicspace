@@ -19,13 +19,13 @@ const SPACE_LOGGER: SpaceLogger = {
   info(event: SpaceLoggerEvent) {
     switch (event.type) {
       case 'loaded-composable-module':
-        log('space', 'info', `loaded composable module ${event.path}`);
+        log('space', 'info', `loaded composable module ${event.path}.`);
         break;
       case 'run-lifecycle-script':
         log(
           'space',
           'info',
-          `run ${event.lifecycle} script ${JSON.stringify(event.script)}`,
+          `run ${event.lifecycle} script ${typeof event.script === 'string' ? JSON.stringify(event.script) : '(function)'}:`,
         );
         break;
     }

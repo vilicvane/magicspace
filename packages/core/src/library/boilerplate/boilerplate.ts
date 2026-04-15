@@ -22,11 +22,31 @@ export type Boilerplate = {
 } & BoilerplateOptions;
 
 export type BoilerplateScripts = {
-  postcompose?: string;
+  postcompose?:
+    | string
+    | ((context: BoilerplatePostcomposeScriptContext) => Promise<void>);
   /**
    * @deprecated Use postcompose instead.
    */
   postgenerate?: string;
+};
+
+export type BoilerplatePostcomposeScriptSpawnOptions = {
+  shell?: boolean;
+};
+
+export type BoilerplatePostcomposeScriptContext = {
+  spawn: {
+    (
+      command: string,
+      args: string[],
+      options?: BoilerplatePostcomposeScriptSpawnOptions,
+    ): Promise<void>;
+    (
+      command: string,
+      options?: BoilerplatePostcomposeScriptSpawnOptions,
+    ): Promise<void>;
+  };
 };
 
 export type BoilerplateExample<TOptions extends object = object> = {

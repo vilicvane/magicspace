@@ -14,6 +14,7 @@ import type {
   Boilerplate,
   BoilerplateComposable,
   BoilerplateModule,
+  BoilerplatePostcomposeScriptContext,
   BoilerplateScripts,
 } from './boilerplate/index.js';
 
@@ -51,7 +52,9 @@ export type MagicspaceConfigScriptName = keyof MagicspaceConfigScripts;
 
 export type MagicspaceConfigScript = {
   source: string;
-  script: string;
+  script:
+    | string
+    | ((context: BoilerplatePostcomposeScriptContext) => Promise<void>);
 };
 
 export async function resolveMagicspaceBoilerplateConfig(
@@ -186,7 +189,7 @@ export async function resolveMagicspaceConfig(
       for (const [name, aggregatedScriptEntries] of aggregatedScriptsEntries) {
         const script = normalizedBoilerplateScripts[name];
 
-        if (typeof script === 'string') {
+        if (script != null) {
           aggregatedScriptEntries.push({
             source: filename,
             script,
@@ -202,7 +205,9 @@ export async function resolveMagicspaceConfig(
     ...rest
   }: BoilerplateScripts): Record<
     MagicspaceConfigScriptName,
-    string | undefined
+    | string
+    | ((context: BoilerplatePostcomposeScriptContext) => Promise<void>)
+    | undefined
   > {
     return {
       postcompose: postcompose ?? postgenerate,

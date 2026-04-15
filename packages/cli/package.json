@@ -6,7 +6,7 @@
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "type": "module",
   "bin": {
-    "magicspace": "bld/program/main.js"
+    "magicspace": "bin/magicspace.js"
   },
   "dependencies": {
     "@magicspace/core": "^0.4.0",

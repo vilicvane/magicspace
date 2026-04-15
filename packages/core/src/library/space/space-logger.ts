@@ -1,3 +1,5 @@
+import type {BoilerplatePostcomposeScriptContext} from '../boilerplate/index.js';
+
 export type SpaceLoggerEvent =
   | {
       type: 'loaded-composable-module';
@@ -6,7 +8,9 @@ export type SpaceLoggerEvent =
   | {
       type: 'run-lifecycle-script';
       lifecycle: string;
-      script: string;
+      script:
+        | string
+        | ((context: BoilerplatePostcomposeScriptContext) => Promise<void>);
     };
 
 export type SpaceLogger = {
