@@ -14,15 +14,6 @@
     },
     {
       "path": "packages/boilerplate-command/src/library"
-    },
-    {
-      "path": "packages/boilerplate-url/src/library"
-    },
-    {
-      "path": "packages/boilerplate-url/src/composables"
-    },
-    {
-      "path": "packages/boilerplate-url-resolver/src/program"
     }
   ],
   "files": []

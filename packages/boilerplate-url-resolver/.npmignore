@@ -1,5 +1,0 @@
-*
-!/src/program/**/*.{ts,tsx}
-!/bld/program/**
-/bld/program/**/*.test.js
-*.tsbuildinfo
