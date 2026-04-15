@@ -1,6 +1,9 @@
 {
   "name": "@magicspace/boilerplate-command",
   "version": "0.4.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": "https://github.com/makeflow/magicspace.git",
   "license": "MIT",
   "author": "Chengdu Mufan Technology Co., Ltd.",
