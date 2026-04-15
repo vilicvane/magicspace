@@ -6,6 +6,7 @@ export default defineConfig([
     'packages/core/bld/',
     'packages/cli/bld/',
     'packages/utils/bld/',
+    'packages/boilerplate-command/bld/',
     'packages/boilerplate-url/bld/',
     'packages/boilerplate-url-resolver/bld/',
   ]),
@@ -60,6 +61,18 @@ export default defineConfig([
     files: ['packages/utils/src/test/**/*.{ts,tsx}'],
     plugins: {'@mufan': mufan},
     extends: [configs.typescript, configs.dev],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  // packages/boilerplate-command/src/library
+  {
+    files: ['packages/boilerplate-command/src/library/**/*.{ts,tsx}'],
+    plugins: {'@mufan': mufan},
+    extends: [configs.typescript],
     languageOptions: {
       parserOptions: {
         projectService: true,

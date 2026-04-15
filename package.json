@@ -12,6 +12,7 @@
     "lint-prettier": "prettier --check .",
     "bare-test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test": "npm run lint-prettier && npm run build && npm run lint && npm run bare-test",
+    "boilerplate-command": "npm run --workspace @magicspace/boilerplate-command",
     "boilerplate-url": "npm run --workspace @magicspace/boilerplate-url",
     "boilerplate-url-resolver": "npm run --workspace @magicspace/boilerplate-url-resolver",
     "core": "npm run --workspace @magicspace/core",
@@ -19,6 +20,7 @@
     "magicspace": "npm run --workspace magicspace"
   },
   "workspaces": [
+    "packages/boilerplate-command",
     "packages/boilerplate-url",
     "packages/boilerplate-url-resolver",
     "packages/core",
@@ -31,7 +33,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^10.2.0",
     "jest": "^30.3.0",
-    "prettier": "^3.8.2",
+    "prettier": "^3.8.3",
     "rimraf": "^6.1.3",
     "typescript": "^6.0.2"
   }
