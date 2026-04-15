@@ -22,10 +22,12 @@ export type Boilerplate = {
 } & BoilerplateOptions;
 
 export type BoilerplateScripts = {
+  postcompose?: string;
+  /**
+   * @deprecated Use postcompose instead.
+   */
   postgenerate?: string;
 };
-
-export type BoilerplateScriptsLifecycleName = keyof BoilerplateScripts;
 
 export type BoilerplateExample<TOptions extends object = object> = {
   name: string;

@@ -4,8 +4,7 @@ import {dirSync as tmpDirSync} from 'tmp';
 
 import {TEMP_MAGIC_REPOSITORY_DIR_PREFIX} from '../@constants.js';
 import {conservativelyMove, npmRun} from '../@utils.js';
-import type {BoilerplateScriptsLifecycleName} from '../boilerplate/index.js';
-import type {MagicspaceConfig} from '../config.js';
+import type {MagicspaceConfig, MagicspaceConfigScriptName} from '../config.js';
 import type {File, FileContext} from '../file/index.js';
 
 import type {Rename} from './@git.js';
@@ -71,7 +70,7 @@ export class Space {
 
       await this.generate(tempDir);
 
-      await this.runLifecycleScripts('postgenerate', tempDir);
+      await this.runLifecycleScripts('postcompose', tempDir);
 
       tempGit.addAndCommitChanges('initialize');
 
@@ -130,7 +129,7 @@ export class Space {
 
       await this.generate(tempDir);
 
-      await this.runLifecycleScripts('postgenerate', tempDir);
+      await this.runLifecycleScripts('postcompose', tempDir);
 
       if (tempGit.isWorkingDirectoryClean()) {
         return 'already-up-to-date';
@@ -192,7 +191,7 @@ export class Space {
   }
 
   async runLifecycleScripts(
-    lifecycle: BoilerplateScriptsLifecycleName,
+    lifecycle: MagicspaceConfigScriptName,
     cwd: string,
   ): Promise<void> {
     const scriptEntries = this.config.scripts[lifecycle];

@@ -21,7 +21,7 @@ export default boilerplate<Options>(async options => {
       options,
     ),
     scripts: {
-      postgenerate:
+      postcompose:
         'boilerplate-url-resolver && rimraf .boilerplate-options.json',
     },
   };

@@ -2,7 +2,7 @@
   "root": "bld/composables",
   "composables": ["(?!@)*.js"],
   "scripts": {
-    "postgenerate": "boilerplate-url-resolver && rimraf .boilerplate-options.json"
+    "postcompose": "boilerplate-url-resolver && rimraf .boilerplate-options.json"
   },
   "examples": [
     {

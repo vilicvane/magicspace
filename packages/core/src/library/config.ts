@@ -14,10 +14,8 @@ import type {
   Boilerplate,
   BoilerplateComposable,
   BoilerplateModule,
-  BoilerplateScriptsLifecycleName,
+  BoilerplateScripts,
 } from './boilerplate/index.js';
-
-const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 const require = createRequire(import.meta.url);
 
@@ -46,8 +44,10 @@ export type MagicspaceConfig = {
 };
 
 export type MagicspaceConfigScripts = {
-  postgenerate: MagicspaceConfigScript[];
+  postcompose: MagicspaceConfigScript[];
 };
+
+export type MagicspaceConfigScriptName = keyof MagicspaceConfigScripts;
 
 export type MagicspaceConfigScript = {
   source: string;
@@ -138,9 +138,9 @@ export async function resolveMagicspaceConfig(
   const aggregatedBoilerplateComposables: BoilerplateComposable[] = [];
 
   const aggregatedScriptsEntries = Object.entries({
-    postgenerate: [],
+    postcompose: [],
   } satisfies MagicspaceConfigScripts) as [
-    BoilerplateScriptsLifecycleName,
+    MagicspaceConfigScriptName,
     MagicspaceConfigScript[],
   ][];
 
@@ -152,7 +152,7 @@ export async function resolveMagicspaceConfig(
 
   const scripts = Object.fromEntries(
     aggregatedScriptsEntries.map(([name, entries]) => [name, _.uniq(entries)]),
-  ) as unknown as MagicspaceConfigScripts;
+  ) as MagicspaceConfigScripts;
 
   return {
     composables,
@@ -180,19 +180,34 @@ export async function resolveMagicspaceConfig(
     }
 
     if (boilerplateScripts) {
-      for (const [name, aggregatedScriptEntries] of aggregatedScriptsEntries) {
-        if (hasOwnProperty.call(boilerplateScripts, name)) {
-          const script = boilerplateScripts[name];
+      const normalizedBoilerplateScripts =
+        normalizeBoilerplateScripts(boilerplateScripts);
 
-          if (typeof script === 'string') {
-            aggregatedScriptEntries.push({
-              source: filename,
-              script,
-            });
-          }
+      for (const [name, aggregatedScriptEntries] of aggregatedScriptsEntries) {
+        const script = normalizedBoilerplateScripts[name];
+
+        if (typeof script === 'string') {
+          aggregatedScriptEntries.push({
+            source: filename,
+            script,
+          });
         }
       }
     }
+  }
+
+  function normalizeBoilerplateScripts({
+    postcompose,
+    postgenerate,
+    ...rest
+  }: BoilerplateScripts): Record<
+    MagicspaceConfigScriptName,
+    string | undefined
+  > {
+    return {
+      postcompose: postcompose ?? postgenerate,
+      ...rest,
+    };
   }
 }
 
