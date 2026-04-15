@@ -35,17 +35,27 @@ Review and commit the generated changes. Since this boilerplate exports typed op
 
 ## Custom Commands
 
-You can specify any commands in `.magicspace/boilerplate.json`:
+Interactive scaffolding is fully supported and is often the simplest way to wrap an existing generator. For example, this keeps Vite's normal prompt-driven flow:
+
+```json
+{
+  "boilerplate": "@magicspace/boilerplate-command",
+  "options": {
+    "commands": ["npx create-vite ."]
+  }
+}
+```
+
+If you want a more reproducible setup for later `magicspace update` runs, you can also pass explicit arguments. For example, a Vite React TypeScript project:
 
 ```json
 {
   "boilerplate": "@magicspace/boilerplate-command",
   "options": {
     "commands": [
-      "npx create-vite .",
       {
         "command": "npx",
-        "args": ["degit", "user/template", "."]
+        "args": ["create-vite", ".", "--template", "react-ts"]
       }
     ]
   }
