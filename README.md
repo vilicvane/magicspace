@@ -24,10 +24,10 @@ Toolkit for living boilerplate.
    ```bash
    git init my-vite-app && cd my-vite-app
 
-   magicspace create @magicspace/boilerplate-command --schema
+   magicspace create @magicspace/boilerplate-command
    ```
 
-   Select an example and update the generated `.magicspace/boilerplate.json` if needed. For vite, it would be something like this:
+   Select an example and update the generated `.magicspace/boilerplate.json` if needed. When the boilerplate exports typed options, magicspace also generates `.magicspace/boilerplate.schema.json` and wires `$schema` automatically. For vite, the config would look like this:
 
    ```json
    {
@@ -66,14 +66,16 @@ npm install --global magicspace
 2. Create magicspace configuration file:
 
    ```bash
-   magicspace create <boilerplate> [--schema]
+   magicspace create <boilerplate>
    ```
+
+   If the boilerplate exports typed options, magicspace generates `.magicspace/boilerplate.schema.json` by default and adds `$schema` to `.magicspace/boilerplate.json`.
 
    For example, with a custom boilerplate package:
 
    ```bash
    npm install --global @mufan/code-boilerplates
-   magicspace create @mufan/code-boilerplates/typescript --schema
+   magicspace create @mufan/code-boilerplates/typescript
    ```
 
    Or with `@magicspace/boilerplate-command` to wrap any scaffolding CLI:
@@ -112,6 +114,16 @@ npm install --global magicspace
 2. Review generated changes and resolve conflicts if any.
 
 3. Commit changes to complete the merge process initiated by magicspace; otherwise use `git merge --abort` to abort the update.
+
+### Update Schema
+
+If the boilerplate package changes its option shape or you want to refresh `.magicspace/boilerplate.schema.json`, run:
+
+```bash
+magicspace update-schema [projectDir]
+```
+
+This updates the generated JSON schema for single-boilerplate configs without changing project files.
 
 ## Boilerplate authoring
 

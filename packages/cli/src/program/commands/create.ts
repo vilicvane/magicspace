@@ -25,7 +25,7 @@ export class CreateOptions extends Options {
   @option({
     toggle: true,
     description: 'Generate JSON schema for boilerplate.json',
-    default: false,
+    default: true,
   })
   schema!: boolean;
 }

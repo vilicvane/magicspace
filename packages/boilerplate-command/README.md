@@ -18,13 +18,13 @@ npm install --global magicspace @magicspace/boilerplate-command
 git init my-vite-app && cd my-vite-app
 
 # Create config (select the "vite" example when prompted)
-magicspace create @magicspace/boilerplate-command --schema
+magicspace create @magicspace/boilerplate-command
 
 # Generate initial project files
 magicspace init
 ```
 
-Review and commit the generated changes. Later, run `magicspace update` to pull in upstream template updates.
+Review and commit the generated changes. Since this boilerplate exports typed options, magicspace also generates `.magicspace/boilerplate.schema.json` by default. Later, run `magicspace update` to pull in upstream template updates and `magicspace update-schema` if you need to refresh the generated config schema.
 
 ## Built-in Examples
 
