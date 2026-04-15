@@ -56,38 +56,6 @@
             ]
           }
         ]
-      },
-      {
-        "name": "@magicspace/boilerplate-url",
-        "projects": [
-          {
-            "name": "library",
-            "references": [
-              {
-                "package": "@magicspace/core",
-                "project": "library"
-              }
-            ]
-          },
-          {
-            "name": "composables",
-            "references": [
-              "library",
-              {
-                "package": "@magicspace/core",
-                "project": "library"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "@magicspace/boilerplate-url-resolver",
-        "projects": [
-          {
-            "name": "program"
-          }
-        ]
       }
     ]
   }

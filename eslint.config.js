@@ -7,8 +7,6 @@ export default defineConfig([
     'packages/cli/bld/',
     'packages/utils/bld/',
     'packages/boilerplate-command/bld/',
-    'packages/boilerplate-url/bld/',
-    'packages/boilerplate-url-resolver/bld/',
   ]),
   {
     files: ['**/*.{js,mjs,cjs}'],
@@ -71,42 +69,6 @@ export default defineConfig([
   // packages/boilerplate-command/src/library
   {
     files: ['packages/boilerplate-command/src/library/**/*.{ts,tsx}'],
-    plugins: {'@mufan': mufan},
-    extends: [configs.typescript],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  // packages/boilerplate-url/src/library
-  {
-    files: ['packages/boilerplate-url/src/library/**/*.{ts,tsx}'],
-    plugins: {'@mufan': mufan},
-    extends: [configs.typescript],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  // packages/boilerplate-url/src/composables
-  {
-    files: ['packages/boilerplate-url/src/composables/**/*.{ts,tsx}'],
-    plugins: {'@mufan': mufan},
-    extends: [configs.typescript],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  // packages/boilerplate-url-resolver/src/program
-  {
-    files: ['packages/boilerplate-url-resolver/src/program/**/*.{ts,tsx}'],
     plugins: {'@mufan': mufan},
     extends: [configs.typescript],
     languageOptions: {

@@ -12,18 +12,14 @@
     "lint-prettier": "prettier --check .",
     "bare-test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test": "npm run lint-prettier && npm run build && npm run lint && npm run bare-test",
-    "boilerplate-command": "npm run --workspace @magicspace/boilerplate-command",
     "lerna:publish": "lerna publish patch --registry=https://registry.npmjs.org",
-    "boilerplate-url": "npm run --workspace @magicspace/boilerplate-url",
-    "boilerplate-url-resolver": "npm run --workspace @magicspace/boilerplate-url-resolver",
+    "boilerplate-command": "npm run --workspace @magicspace/boilerplate-command",
     "core": "npm run --workspace @magicspace/core",
     "utils": "npm run --workspace @magicspace/utils",
     "magicspace": "npm run --workspace magicspace"
   },
   "workspaces": [
     "packages/boilerplate-command",
-    "packages/boilerplate-url",
-    "packages/boilerplate-url-resolver",
     "packages/core",
     "packages/utils",
     "packages/cli"
