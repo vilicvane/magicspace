@@ -18,7 +18,7 @@ npm install --global magicspace @magicspace/boilerplate-command
 git init my-vite-app && cd my-vite-app
 
 # Create config (select the "vite" example when prompted)
-magicspace create @magicspace/boilerplate-command
+magicspace create @magicspace/boilerplate-command --schema
 
 # Generate initial project files
 magicspace init

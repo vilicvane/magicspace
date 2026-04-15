@@ -11,7 +11,7 @@ Toolkit for living boilerplate.
 - Git-powered conflict resolution for boilerplate update.
 - Wrap common template tools (like `create-vite`) as living boilerplates with [`@magicspace/boilerplate-command`](packages/boilerplate-command).
 
-## Quick Start with Vite
+## Quick Start with Scaffolding Tools like Vite
 
 1. Install magicspace and the boilerplate-command package globally:
 
@@ -23,10 +23,21 @@ Toolkit for living boilerplate.
 
    ```bash
    git init my-vite-app && cd my-vite-app
-   magicspace create @magicspace/boilerplate-command
+
+   magicspace create @magicspace/boilerplate-command --schema
    ```
 
-   If prompted, select the **vite** example. This generates a `.magicspace/boilerplate.json` that runs `npx create-vite .` under the hood.
+   Select an example and update the generated `.magicspace/boilerplate.json` if needed. For vite, it would be something like this:
+
+   ```json
+   {
+     "$schema": "boilerplate.schema.json",
+     "boilerplate": "@magicspace/boilerplate-command",
+     "options": {
+       "commands": ["npx create-vite ."]
+     }
+   }
+   ```
 
 3. Initialize magicspace:
 
