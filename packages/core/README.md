@@ -4,7 +4,22 @@
 
 # @magicspace/core
 
-Just another awesome magic.
+Core library for [magicspace](https://github.com/vilicvane/magicspace) — provides the boilerplate definition API, composable file generation, space management, and configuration handling.
+
+## Installation
+
+```bash
+npm install @magicspace/core
+```
+
+## Overview
+
+- **`boilerplate()`** — Define a boilerplate with typed options, composable files, and lifecycle scripts.
+- **Composables** — Primitives for composing generated file content.
+- **Space** — Git-powered workspace that manages boilerplate output, patching, and merging.
+- **Config** — Read and resolve `.magicspace/boilerplate.json` configuration.
+
+See the [magicspace README](https://github.com/vilicvane/magicspace) for end-user documentation and the [boilerplate authoring guide](https://github.com/vilicvane/magicspace#boilerplate-authoring).
 
 ## License
 

@@ -4,7 +4,13 @@
 
 # @magicspace/utils
 
-Just another awesome magic.
+Shared utilities for [magicspace](https://github.com/vilicvane/magicspace) — helpers for object, string, array manipulation, package.json handling, and logging.
+
+## Installation
+
+```bash
+npm install @magicspace/utils
+```
 
 ## License
 

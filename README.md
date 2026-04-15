@@ -38,7 +38,7 @@ Toolkit for living boilerplate.
 
 Now whenever Vite releases a template update, simply run `magicspace update` to get a clean, conflict-aware diff merged into your project.
 
-![magicspace update](./res/magicspace-update.png)
+![magicspace update](https://raw.githubusercontent.com/vilicvane/magicspace/5450526ac90442c715190ee978b76970a08b3ab1/res/magicspace-update.png)
 
 ## Installation
 

@@ -28,9 +28,9 @@ Review and commit the generated changes. Later, run `magicspace update` to pull 
 
 ## Built-in Examples
 
-| Name | Command |
-| --- | --- |
-| `vite` | `npx create-vite .` |
+| Name    | Command                  |
+| ------- | ------------------------ |
+| `vite`  | `npx create-vite .`      |
 | `react` | `npx create-react-app .` |
 
 ## Custom Commands
