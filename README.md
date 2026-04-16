@@ -101,6 +101,10 @@ npm install --global magicspace
 
    You would probably want to abort the merge process and initialize magicspace again if you need to make other changes to the configuration file during this process.
 
+> You may use `magicspace create` + `magicspace init --force` to initialize magicspace for an existing project. In this case, there may be conflicts to resolve during the initial merge. Just review the generated changes and resolve conflicts as you would with any Git merge.
+>
+> To keep everything ours during `magicspace init`, you can also use `magicspace init --force --ours` to automatically resolve conflicts in favor of the current branch.
+
 ### Update
 
 1. After updating the boilerplate package or making changes to the magicspace configuration file:
@@ -120,7 +124,7 @@ npm install --global magicspace
 If the boilerplate package changes its option shape or you want to refresh `.magicspace/boilerplate.schema.json`, run:
 
 ```bash
-magicspace update-schema [projectDir]
+magicspace update-schema
 ```
 
 This updates the generated JSON schema for single-boilerplate configs without changing project files.
@@ -129,8 +133,7 @@ This updates the generated JSON schema for single-boilerplate configs without ch
 
 ### Examples
 
-- [`@magicspace/boilerplate-command`](packages/boilerplate-command) — Wrap any CLI scaffolding tool as a magicspace boilerplate.
-- [Mufan Code Boilerplates](https://github.com/makeflow/mufan-code-boilerplates)
+- [@mufan/code-boilerplates](https://github.com/makeflow/mufan-code-boilerplates) the magicspace boilerplates widely used in our projects, keeps project configurations and structures up-to-date cross years.
 
 ## License
 
